@@ -1,9 +1,15 @@
+import asyncio
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 import requests
+
+# Windows requires SelectorEventLoopPolicy for aiomqtt/paho-mqtt compatibility
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 ROOT = Path(__file__).resolve().parents[1]
 RABBIT_API = "http://localhost:15672/api"
