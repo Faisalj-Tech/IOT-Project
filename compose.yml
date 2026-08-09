@@ -1,0 +1,35 @@
+name: iot-messaging
+
+services:
+  rabbitmq:
+    image: rabbitmq:4.3.4-management
+    container_name: iot-rabbitmq
+    hostname: rabbit1
+    env_file: .env
+    ports:
+      - "1883:1883"
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    volumes:
+      - ./config/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./config/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+      - ./config/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - edge
+      - core
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 40s
+
+networks:
+  edge:
+  core:
+
+volumes:
+  rabbitmq-data:
