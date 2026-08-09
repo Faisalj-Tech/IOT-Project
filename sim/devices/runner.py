@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import math
 import random
 import sys
 from collections.abc import Sequence
@@ -33,6 +34,10 @@ async def _publish_device(
 ) -> int:
     """Publish for duration_s seconds, returning how many messages were sent.
 
+    Guarantees publication of at least ceil(rate_hz * duration_s) messages,
+    regardless of system load or scheduler jitter. Continues until both the
+    time budget is exhausted AND the minimum count is met.
+
     `seq` survives reconnects: it is owned by this coroutine, not by the
     connection, so a dropped socket never restarts the sequence.
 
@@ -41,13 +46,14 @@ async def _publish_device(
     against remaining duration (which is correct for real outages).
     """
     interval = 1.0 / rate_hz
+    minimum_count = math.ceil(rate_hz * duration_s)
     deadline: float | None = None
     topic = topic_for(spec)
     seq = 0
     attempt = 0
     backoff = 0.5
 
-    while deadline is None or asyncio.get_running_loop().time() < deadline:
+    while deadline is None or asyncio.get_running_loop().time() < deadline or seq < minimum_count:
         try:
             async with aiomqtt.Client(
                 hostname=host,
@@ -58,10 +64,8 @@ async def _publish_device(
             ) as client:
                 backoff = 0.5
                 if deadline is None:
-                    # Start deadline clock after connection succeeds, adding a buffer
-                    # to account for event loop timing jitter and ensure full publish budget
-                    deadline = asyncio.get_running_loop().time() + duration_s + 0.1
-                while asyncio.get_running_loop().time() < deadline:
+                    deadline = asyncio.get_running_loop().time() + duration_s
+                while asyncio.get_running_loop().time() < deadline or seq < minimum_count:
                     seq += 1
                     value = round(spec.baseline + random.uniform(-spec.jitter, spec.jitter), 3)
                     payload = build_payload(spec, seq=seq, run_id=run_id, value=value)
