@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 import requests
+from influxdb_client import InfluxDBClient
 
 # Windows requires SelectorEventLoopPolicy for aiomqtt/paho-mqtt compatibility
 if sys.platform == "win32":
@@ -13,6 +14,21 @@ if sys.platform == "win32":
 
 ROOT = Path(__file__).resolve().parents[1]
 RABBIT_API = "http://localhost:15672/api"
+
+
+def _load_env() -> None:
+    env_path = ROOT / ".env"
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip())
+
+
+_load_env()
 
 
 def compose(*args: str) -> subprocess.CompletedProcess:
@@ -52,3 +68,24 @@ def rabbit_get(stack):
         return session.get(f"{RABBIT_API}{path}", timeout=10)
 
     return _get
+
+
+@pytest.fixture(scope="session")
+def influx_query(stack):
+    token = os.environ.get("INFLUXDB_TOKEN", "dev-token-0123456789abcdef")
+    org = os.environ.get("INFLUXDB_ORG", "iot")
+    client = InfluxDBClient(url="http://localhost:8086", token=token, org=org)
+
+    def _query(flux: str) -> list[dict]:
+        rows: list[dict] = []
+        for table in client.query_api().query(flux):
+            for record in table.records:
+                row = dict(record.values)
+                row["_value"] = record.get_value()
+                row["_field"] = record.get_field()
+                row["_time"] = record.get_time()
+                rows.append(row)
+        return rows
+
+    yield _query
+    client.close()
