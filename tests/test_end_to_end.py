@@ -40,8 +40,7 @@ def test_telemetry_reaches_influxdb_with_no_sequence_gaps(influx_query):
         )
     )
     expected_total = sum(published.values())
-    # Allow for timing precision - device simulator may produce 48-50 due to asyncio sleep precision
-    assert expected_total >= 48, published
+    assert expected_total >= 50, published
 
     rows: list[dict] = []
     # Telegraf flushes every 10s; allow three flush cycles before giving up.

@@ -35,15 +35,19 @@ async def _publish_device(
 
     `seq` survives reconnects: it is owned by this coroutine, not by the
     connection, so a dropped socket never restarts the sequence.
+
+    Deadline is set after the first successful connect to exclude connection
+    handshake time from the publish budget. Reconnect handshake time counts
+    against remaining duration (which is correct for real outages).
     """
     interval = 1.0 / rate_hz
-    deadline = asyncio.get_running_loop().time() + duration_s
+    deadline: float | None = None
     topic = topic_for(spec)
     seq = 0
     attempt = 0
     backoff = 0.5
 
-    while asyncio.get_running_loop().time() < deadline:
+    while deadline is None or asyncio.get_running_loop().time() < deadline:
         try:
             async with aiomqtt.Client(
                 hostname=host,
@@ -53,6 +57,10 @@ async def _publish_device(
                 identifier=f"{spec.device}-{run_id}",
             ) as client:
                 backoff = 0.5
+                if deadline is None:
+                    # Start deadline clock after connection succeeds, adding a buffer
+                    # to account for event loop timing jitter and ensure full publish budget
+                    deadline = asyncio.get_running_loop().time() + duration_s + 0.1
                 while asyncio.get_running_loop().time() < deadline:
                     seq += 1
                     value = round(spec.baseline + random.uniform(-spec.jitter, spec.jitter), 3)
