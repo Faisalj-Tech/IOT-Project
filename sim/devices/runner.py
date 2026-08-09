@@ -63,13 +63,15 @@ async def _publish_device(
                 identifier=f"{spec.device}-{run_id}",
             ) as client:
                 backoff = 0.5
+                attempt = 0
                 if deadline is None:
                     deadline = asyncio.get_running_loop().time() + duration_s
                 while asyncio.get_running_loop().time() < deadline or seq < minimum_count:
-                    seq += 1
+                    candidate = seq + 1
                     value = round(spec.baseline + random.uniform(-spec.jitter, spec.jitter), 3)
-                    payload = build_payload(spec, seq=seq, run_id=run_id, value=value)
+                    payload = build_payload(spec, seq=candidate, run_id=run_id, value=value)
                     await client.publish(topic, payload=json.dumps(payload).encode(), qos=1)
+                    seq = candidate
                     await asyncio.sleep(interval)
         except aiomqtt.MqttError as exc:
             if attempt >= max_reconnects:
