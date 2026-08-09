@@ -58,6 +58,8 @@ services:
     env_file: .env
     volumes:
       - ./config/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./config/telegraf/telegraf.d:/etc/telegraf/telegraf.d:ro
+    command: ["telegraf", "--config", "/etc/telegraf/telegraf.conf", "--config-directory", "/etc/telegraf/telegraf.d"]
     networks:
       - core
     depends_on:
