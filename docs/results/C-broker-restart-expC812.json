@@ -1,0 +1,1063 @@
+{
+  "experiment": "C-broker-restart",
+  "recorded_at": "2026-08-10T22:30:57.200939+00:00",
+  "run_id": "expC812",
+  "arm": "telegraf",
+  "config": {
+    "devices": 5,
+    "rate_hz": 2.0,
+    "clean_s": 20.0,
+    "outage_s": 45.0,
+    "tail_s": 20.0,
+    "max_reconnects": 12,
+    "default_max_reconnects": 5
+  },
+  "published_counts": {
+    "press-01": 170,
+    "press-02": 170,
+    "press-03": 170,
+    "press-04": 170,
+    "press-05": 170
+  },
+  "published_total": 850,
+  "influx_total": 850,
+  "gaps": {},
+  "duplicates": {},
+  "duplicate_total": 0,
+  "duplicate_rate": 0.0,
+  "nominal_duration_s": 85.0,
+  "wall_clock_s": 158.56087851524353,
+  "time_dilation_s": 73.56087851524353,
+  "broker_restart_s": 7.990173101425171,
+  "verdict": "no-loss",
+  "timeline": {
+    "samples": [
+      {
+        "t": 1786400812.691142,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400814.7238889,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400816.734485,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400818.7475867,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400820.7665098,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 35,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400822.7841861,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 35,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400824.8060114,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 35,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400826.8259485,
+        "telemetry_ready": 30,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400828.8458931,
+        "telemetry_ready": 30,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400830.8651884,
+        "telemetry_ready": 30,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400832.8776507,
+        "error": "ConnectionError: ('Connection aborted.', ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None))"
+      },
+      {
+        "t": 1786400834.9033332,
+        "error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15672): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15672): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))"
+      },
+      {
+        "t": 1786400841.0174978,
+        "error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15672): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15672): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))"
+      },
+      {
+        "t": 1786400847.1213512,
+        "error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15672): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15672): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))"
+      },
+      {
+        "t": 1786400853.2140017,
+        "error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15672): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15672): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))"
+      },
+      {
+        "t": 1786400859.2891395,
+        "error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15672): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15672): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))"
+      },
+      {
+        "t": 1786400865.3913198,
+        "error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15672): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15672): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))"
+      },
+      {
+        "t": 1786400871.4716766,
+        "error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15672): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15672): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))"
+      },
+      {
+        "t": 1786400877.5257554,
+        "error": "ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+      },
+      {
+        "t": 1786400881.552085,
+        "error": "ConnectionError: ('Connection aborted.', ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None))"
+      },
+      {
+        "t": 1786400883.5785587,
+        "error": "ConnectionError: ('Connection aborted.', ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None))"
+      },
+      {
+        "t": 1786400885.6064959,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400887.72366,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400889.743525,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400891.7657132,
+        "telemetry_ready": 80,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400893.7861154,
+        "telemetry_ready": 80,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400895.8080118,
+        "telemetry_ready": 100,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400897.8318386,
+        "telemetry_ready": 100,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400899.8416827,
+        "telemetry_ready": 100,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400901.8527982,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400903.869787,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400905.892454,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400907.908459,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400909.9262457,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400911.9492142,
+        "telemetry_ready": 5,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400913.9715526,
+        "telemetry_ready": 5,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400915.9904218,
+        "telemetry_ready": 55,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400918.011264,
+        "telemetry_ready": 55,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400920.022649,
+        "telemetry_ready": 55,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400922.0476959,
+        "telemetry_ready": 55,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400924.0584238,
+        "telemetry_ready": 55,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400926.0737941,
+        "telemetry_ready": 105,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400928.0864718,
+        "telemetry_ready": 105,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400930.09682,
+        "telemetry_ready": 105,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400932.1079698,
+        "telemetry_ready": 105,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400934.1340914,
+        "telemetry_ready": 105,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400936.1547601,
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400938.173604,
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400940.1891842,
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400942.1975543,
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400944.2102125,
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400946.222369,
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400948.242651,
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400950.2566788,
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400952.2710242,
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400954.2874908,
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400956.3056164,
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400958.3265944,
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400960.342143,
+        "telemetry_ready": 248,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400962.36102,
+        "telemetry_ready": 248,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400964.3866768,
+        "telemetry_ready": 248,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400966.401675,
+        "telemetry_ready": 295,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400968.4259224,
+        "telemetry_ready": 295,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400970.440491,
+        "telemetry_ready": 295,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400972.4575112,
+        "telemetry_ready": 295,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400974.473647,
+        "telemetry_ready": 295,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400976.48714,
+        "telemetry_ready": 345,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400978.5071511,
+        "telemetry_ready": 345,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400980.5342398,
+        "telemetry_ready": 300,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400982.5583272,
+        "telemetry_ready": 300,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400984.5686054,
+        "telemetry_ready": 300,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400986.5934582,
+        "telemetry_ready": 300,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400988.6125271,
+        "telemetry_ready": 300,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400990.62766,
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400992.6412444,
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400994.6514378,
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400996.6613703,
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786400998.6740596,
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401000.6908565,
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401002.7132497,
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401004.7327633,
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401006.7444494,
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401008.7561142,
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401010.7783709,
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401012.7954288,
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401014.8159006,
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401016.8241396,
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401018.8435557,
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401020.86288,
+        "telemetry_ready": 100,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401022.8789725,
+        "telemetry_ready": 100,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401024.9031873,
+        "telemetry_ready": 100,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401026.926382,
+        "telemetry_ready": 100,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401028.9438481,
+        "telemetry_ready": 100,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401030.9588206,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401032.9777071,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401034.9949234,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401037.0085924,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401039.0270917,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401041.0434396,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401043.0583313,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401045.0663636,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401047.0759692,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401049.0930653,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401051.1102622,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401053.127617,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401055.1445918,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786401057.1602497,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      }
+    ],
+    "marks": [
+      {
+        "label": "sim_start",
+        "t": 1786400812.6932003
+      },
+      {
+        "label": "rabbitmq_stop",
+        "t": 1786400832.6958935
+      },
+      {
+        "label": "rabbitmq_start",
+        "t": 1786400878.6048818
+      },
+      {
+        "label": "rabbitmq_healthy",
+        "t": 1786400886.5950549
+      },
+      {
+        "label": "sim_done",
+        "t": 1786400971.2540789
+      }
+    ]
+  }
+}
