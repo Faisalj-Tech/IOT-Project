@@ -322,3 +322,26 @@ def sequence_report(rows: list[dict], published: dict[str, int]) -> dict:
         "gaps": gaps,
         "duplicates": duplicates,
     }
+
+
+import aiomqtt
+
+
+def publish_raw(topic: str, payload: bytes, count: int = 1) -> None:
+    """Publish arbitrary bytes at QoS 1, bypassing build_payload's contract.
+
+    Experiment D needs payloads the device simulator would never produce.
+    """
+
+    async def _publish() -> None:
+        async with aiomqtt.Client(
+            hostname="localhost",
+            port=1883,
+            username=os.environ.get("RABBITMQ_DEVICE_USER", "device"),
+            password=os.environ.get("RABBITMQ_DEVICE_PASSWORD", "devicepass"),
+            identifier=f"rawpub-{int(time.time())}",
+        ) as client:
+            for _ in range(count):
+                await client.publish(topic, payload=payload, qos=1)
+
+    asyncio.run(_publish())
