@@ -226,3 +226,99 @@ def results_dir():
     crashed with a full timeseries is a finding, one with no data is a dead end.
     """
     return write_result
+
+
+import asyncio
+import os
+from collections import Counter
+from concurrent.futures import Future, ThreadPoolExecutor
+
+from sim.devices.runner import run_devices
+
+_EXECUTOR = ThreadPoolExecutor(max_workers=4)
+
+
+def start_sim(specs, rate_hz: float, duration_s: float, run_id: str,
+              max_reconnects: int = 5) -> Future:
+    """Run the device simulator on a background thread.
+
+    The experiment body stays synchronous so container manipulation reads as a
+    straight-line script. asyncio.run in a worker thread picks up the global
+    WindowsSelectorEventLoopPolicy already set by main/conftest.py.
+    """
+
+    def _run() -> dict:
+        return asyncio.run(
+            run_devices(
+                specs,
+                rate_hz=rate_hz,
+                duration_s=duration_s,
+                run_id=run_id,
+                host="localhost",
+                port=1883,
+                username=os.environ.get("RABBITMQ_DEVICE_USER", "device"),
+                password=os.environ.get("RABBITMQ_DEVICE_PASSWORD", "devicepass"),
+                max_reconnects=max_reconnects,
+            )
+        )
+
+    return _EXECUTOR.submit(_run)
+
+
+def drain_and_fetch(influx_query, run_id: str, start: str, expected_total: int,
+                    timeout_s: float = 180.0) -> list[dict]:
+    """Poll until the row count settles, then return the rows.
+
+    Two exit conditions, deliberately different. A healthy run exits as soon as it has
+    reached the expected total and held steady for three polls. A lossy run never
+    reaches the total, so it exits on a longer stall instead — six stable polls, i.e.
+    30s with no new rows, which is three of Telegraf's 10s flush intervals. Without
+    that second condition an experiment that actually lost messages would burn the
+    whole timeout before reporting the very number it was run to measure.
+    """
+    from tests.conftest import fetch_seqs
+
+    deadline = time.time() + timeout_s
+    rows: list[dict] = []
+    last_count = -1
+    stable_polls = 0
+    while time.time() < deadline:
+        rows = fetch_seqs(influx_query, run_id, start=start)
+        if len(rows) == last_count:
+            stable_polls += 1
+        else:
+            stable_polls = 0
+            last_count = len(rows)
+        if stable_polls >= 3 and len(rows) >= expected_total:
+            break
+        if stable_polls >= 6:
+            break
+        time.sleep(5)
+    return rows
+
+
+def sequence_report(rows: list[dict], published: dict[str, int]) -> dict:
+    """Compare observed sequence numbers against what the simulator says it sent.
+
+    Gaps are the loss proof (ADR-0001). Duplicates are counted separately because
+    QoS 1 is at-least-once: a publish that lands but loses its PUBACK is retried with
+    the same seq, and since build_payload regenerates `ts` and `seq` is a field rather
+    than a tag, both points persist at distinct timestamps.
+    """
+    gaps: dict[str, list[int]] = {}
+    duplicates: dict[str, int] = {}
+    for device, count in published.items():
+        observed = [int(r["_value"]) for r in rows if r.get("device") == device]
+        counts = Counter(observed)
+        missing = [n for n in range(1, count + 1) if n not in counts]
+        extra = sum(v - 1 for v in counts.values() if v > 1)
+        if missing:
+            gaps[device] = missing
+        if extra:
+            duplicates[device] = extra
+    return {
+        "total_rows": len(rows),
+        "per_device": {d: sum(1 for r in rows if r.get("device") == d) for d in published},
+        "gaps": gaps,
+        "duplicates": duplicates,
+    }
