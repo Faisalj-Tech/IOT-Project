@@ -1,5 +1,7 @@
 """The fixture that breaks containers must prove the container actually broke."""
 
+import subprocess
+
 import pytest
 
 pytestmark = [pytest.mark.stack, pytest.mark.experiment]
@@ -27,6 +29,15 @@ def test_kill_survives_the_restart_policy(docker_control):
     )
     docker_control.start("grafana")
     assert docker_control.is_running("grafana")
+
+    docker_control.restore()
+    proc = subprocess.run(
+        ["docker", "inspect", "--format", "{{.HostConfig.RestartPolicy.Name}}", "iot-grafana"],
+        capture_output=True, text=True,
+    )
+    assert proc.stdout.strip() == "unless-stopped", (
+        "restore() did not re-apply the restart policy after kill() cleared it"
+    )
 
 
 def test_restore_recovers_a_service_left_down(docker_control):
