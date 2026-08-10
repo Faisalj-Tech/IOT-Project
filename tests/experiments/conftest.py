@@ -2,7 +2,10 @@
 
 import json
 import subprocess
+import threading
 import time
+from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 
@@ -109,3 +112,117 @@ def docker_control(stack):
         yield control
     finally:
         control.restore()
+
+
+RESULTS_DIR = ROOT / "docs" / "results"
+POLL_INTERVAL_S = 2.0
+
+
+class GaugeRecorder:
+    """Poll RabbitMQ management gauges on a background thread.
+
+    messages_ready and messages_unacknowledged are gauges, not counters, which is
+    why ADR-0001's ban does not apply: they are recorded as evidence of buffering
+    and as the direct read on Telegraf's in-flight batch size. They never take part
+    in a delivery or loss assertion.
+
+    Poll failures are recorded as error samples rather than raised. The broker being
+    unreachable is a legitimate experimental condition, not a harness bug.
+    """
+
+    def __init__(self, rabbit_get) -> None:
+        self._rabbit_get = rabbit_get
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+        self.samples: list[dict] = []
+        self.marks: list[dict] = []
+
+    def _sample_once(self) -> dict:
+        now = time.time()
+        try:
+            telemetry = self._rabbit_get("/queues/%2F/telemetry.q").json()
+            dlq = self._rabbit_get("/queues/%2F/dlq").json()
+            nodes = self._rabbit_get("/nodes").json()
+            node = nodes[0] if nodes else {}
+            return {
+                "t": now,
+                "telemetry_ready": int(telemetry.get("messages_ready", 0)),
+                "telemetry_unacked": int(telemetry.get("messages_unacknowledged", 0)),
+                "dlq_messages": int(dlq.get("messages", 0)),
+                "alarms": {
+                    "mem": bool(node.get("mem_alarm", False)),
+                    "disk": bool(node.get("disk_free_alarm", False)),
+                },
+            }
+        except Exception as exc:
+            return {"t": now, "error": f"{type(exc).__name__}: {exc}"}
+
+    def _loop(self) -> None:
+        while not self._stop.is_set():
+            self.samples.append(self._sample_once())
+            self._stop.wait(POLL_INTERVAL_S)
+
+    def start(self) -> None:
+        self._thread = threading.Thread(target=self._loop, daemon=True)
+        self._thread.start()
+
+    def stop(self) -> None:
+        self._stop.set()
+        if self._thread is not None:
+            self._thread.join(timeout=10)
+
+    def mark(self, label: str) -> None:
+        self.marks.append({"label": label, "t": time.time()})
+
+    def peak(self, key: str) -> float:
+        values = [s[key] for s in self.samples if key in s]
+        return max(values) if values else 0
+
+    def latest(self, key: str) -> int:
+        """Most recent successful reading of a gauge.
+
+        Distinct from peak() and not interchangeable with it: "how deep was Telegraf's
+        in-flight batch at the moment we killed it" is a latest(), and reporting a
+        run-wide peak under that name would overstate it.
+        """
+        for sample in reversed(self.samples):
+            if key in sample:
+                return sample[key]
+        return 0
+
+    def timeline(self) -> dict:
+        return {"samples": self.samples, "marks": self.marks}
+
+
+def write_result(experiment: str, payload: dict) -> Path:
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    run_id = payload.get("run_id", "norun")
+    path = RESULTS_DIR / f"{experiment}-{run_id}.json"
+    body = {
+        "experiment": experiment,
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
+        **payload,
+    }
+    path.write_text(json.dumps(body, indent=2), encoding="utf-8")
+    return path
+
+
+@pytest.fixture
+def gauge_recorder(stack, rabbit_get):
+    recorder = GaugeRecorder(rabbit_get)
+    recorder.start()
+    try:
+        yield recorder
+    finally:
+        recorder.stop()
+
+
+@pytest.fixture
+def results_dir():
+    """Returns a callable that writes a result JSON.
+
+    Writing happens through this fixture rather than at the end of a test body so
+    that a failing experiment still leaves its evidence behind: an experiment that
+    crashed with a full timeseries is a finding, one with no data is a dead end.
+    """
+    return write_result
