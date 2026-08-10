@@ -2,18 +2,9 @@ import time
 
 import pytest
 
+from tests.conftest import query_measurement
+
 pytestmark = pytest.mark.stack
-
-BUCKET = "telemetry"
-
-
-def query_measurement(influx_query, measurement: str) -> list[dict]:
-    flux = f'''
-from(bucket: "{BUCKET}")
-  |> range(start: -5m)
-  |> filter(fn: (r) => r._measurement == "{measurement}")
-'''
-    return influx_query(flux)
 
 
 def test_broker_overview_metrics_reach_influxdb(influx_query):

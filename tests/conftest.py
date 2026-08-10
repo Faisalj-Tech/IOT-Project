@@ -2,6 +2,7 @@ import asyncio
 import os
 import subprocess
 import sys
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -31,14 +32,28 @@ def _load_env() -> None:
 _load_env()
 
 
-def compose(*args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        ["docker", "compose", *args],
+def compose(*args: str, files: tuple[str, ...] = ("compose.yml",)) -> subprocess.CompletedProcess:
+    """Run `docker compose` against the project, raising with captured output on failure.
+
+    subprocess.CalledProcessError's default __str__ hides stdout/stderr, which makes a
+    failed `up --wait` almost undiagnosable from a bare pytest failure. Handoff finding #5.
+    """
+    file_args: list[str] = []
+    for name in files:
+        file_args += ["-f", name]
+    proc = subprocess.run(
+        ["docker", "compose", *file_args, *args],
         cwd=ROOT,
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
     )
+    if proc.returncode != 0:
+        raise RuntimeError(
+            f"docker compose {' '.join(args)} failed with exit {proc.returncode}\n"
+            f"--- stdout ---\n{proc.stdout}\n--- stderr ---\n{proc.stderr}"
+        )
+    return proc
 
 
 @pytest.fixture(scope="session")
@@ -89,3 +104,43 @@ def influx_query(stack):
 
     yield _query
     client.close()
+
+
+BUCKET = "telemetry"
+
+
+def flux_range_start(started_at: datetime) -> str:
+    """RFC3339 UTC, one minute before started_at.
+
+    Points carry device-side timestamps (telegraf.conf sets timestamp_path = "ts"),
+    so after an outage the drained points land at outage-era times. Verification
+    queries must anchor on the run's own start, never on a relative recent window.
+    """
+    return (started_at - timedelta(minutes=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _field_query(run_id: str, field: str, start: str) -> str:
+    return f'''
+from(bucket: "{BUCKET}")
+  |> range(start: {start})
+  |> filter(fn: (r) => r._measurement == "telemetry")
+  |> filter(fn: (r) => r.run_id == "{run_id}")
+  |> filter(fn: (r) => r._field == "{field}")
+'''
+
+
+def fetch_seqs(influx_query, run_id: str, start: str = "-15m") -> list[dict]:
+    return influx_query(_field_query(run_id, "seq", start))
+
+
+def fetch_values(influx_query, run_id: str, start: str = "-15m") -> list[dict]:
+    return influx_query(_field_query(run_id, "value", start))
+
+
+def query_measurement(influx_query, measurement: str, start: str = "-5m") -> list[dict]:
+    flux = f'''
+from(bucket: "{BUCKET}")
+  |> range(start: {start})
+  |> filter(fn: (r) => r._measurement == "{measurement}")
+'''
+    return influx_query(flux)

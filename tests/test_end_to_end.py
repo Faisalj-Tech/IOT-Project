@@ -6,21 +6,9 @@ import pytest
 
 from sim.devices.payload import default_specs
 from sim.devices.runner import run_devices
+from tests.conftest import fetch_seqs
 
 pytestmark = pytest.mark.stack
-
-BUCKET = "telemetry"
-
-
-def fetch_seqs(influx_query, run_id: str) -> list[dict]:
-    flux = f'''
-from(bucket: "{BUCKET}")
-  |> range(start: -15m)
-  |> filter(fn: (r) => r._measurement == "telemetry")
-  |> filter(fn: (r) => r.run_id == "{run_id}")
-  |> filter(fn: (r) => r._field == "seq")
-'''
-    return influx_query(flux)
 
 
 def test_telemetry_reaches_influxdb_with_no_sequence_gaps(influx_query):
