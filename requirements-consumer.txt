@@ -1,0 +1,2 @@
+aio-pika==10.0.1
+influxdb-client==1.49.0

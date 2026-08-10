@@ -2,3 +2,4 @@
 pytest==8.4.2
 requests==2.32.5
 influxdb-client==1.49.0
+aio-pika==10.0.1
