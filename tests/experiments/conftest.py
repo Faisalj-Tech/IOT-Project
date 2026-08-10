@@ -345,3 +345,33 @@ def publish_raw(topic: str, payload: bytes, count: int = 1) -> None:
                 await client.publish(topic, payload=payload, qos=1)
 
     asyncio.run(_publish())
+
+
+CONSUMER_FILES = ("compose.yml", "compose.consumer.yml")
+
+
+@pytest.fixture
+def consumer_stack(stack, docker_control):
+    """Swap Telegraf out for the ack-after-write consumer, and swap back afterwards.
+
+    Competing consumers on one queue would split the stream, so the arms must run in
+    separate runs rather than side by side.
+    """
+    docker_control.stop("telegraf", timeout=10)
+    compose("up", "-d", "--build", "consumer", files=CONSUMER_FILES)
+    deadline = time.time() + 60
+    while time.time() < deadline:
+        if docker_control.is_running("consumer"):
+            break
+        time.sleep(1)
+    else:
+        raise AssertionError("consumer container did not start")
+    time.sleep(5)  # let the AMQP consumer attach before the run begins
+    try:
+        yield
+    finally:
+        try:
+            compose("rm", "-sf", "consumer", files=CONSUMER_FILES)
+        except Exception:
+            pass
+        docker_control.start("telegraf")

@@ -1,0 +1,26 @@
+# Phase 2 overlay: the ack-after-write consumer, used only in experiment E's arm.
+# It authenticates as the existing telegraf user, which already carries `read` on
+# telemetry.q, so definitions.json stays a clean Phase 1 artifact.
+#
+# Telegraf must be stopped before this runs. Two consumers on one queue would split
+# the message stream between them and make the comparison meaningless.
+
+services:
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumer
+    image: iot-ackafterwrite-consumer:phase2
+    container_name: iot-consumer
+    env_file: .env
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      INFLUXDB_URL: http://influxdb:8086
+    networks:
+      - core
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    restart: unless-stopped
