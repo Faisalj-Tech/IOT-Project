@@ -50,7 +50,7 @@ Measured: two runs, same configuration but different termination signals.
 - After restore: unacknowledged dropped to 0, ready queue released (345 messages processed)
 - Requeued messages: 150
 
-Both arms achieved zero loss. The graceful shutdown did *not* out-perform the abrupt shutdown in terms of requeue overhead; both required broker redelivery of the same order of magnitude (~145–150 messages). This shows that at Telegraf's prefetch depth, the in-flight batch size dominates the outcome, and SIGTERM's flush opportunity does not reduce the requeue burden — the real bottleneck is the prefetch_count, not the graceful-vs-abrupt distinction. Telegraf's acknowledgement behaviour is write-then-ack by default (a message is ack'd *after* the InfluxDB write completes); this explains why both modes redeliver ~15% of their in-flight batch.
+Both arms achieved zero loss. The graceful shutdown did *not* out-perform the abrupt shutdown in terms of requeue overhead; both required broker redelivery of the same order of magnitude (~145–150 messages). This shows that at Telegraf's prefetch depth, the in-flight batch size dominates the outcome, and SIGTERM's flush opportunity does not reduce the requeue burden — the real bottleneck is the prefetch_count, not the graceful-vs-abrupt distinction. Telegraf's acknowledgement behavior is ack-on-receipt: a message is ack'd once it has been parsed and handed to the output plugins, *before* the write to InfluxDB is confirmed. This explains why both kill modes redeliver ~15% of their in-flight batch — those messages were either still being parsed or their output writes had not yet completed when Telegraf died, so they were never ack'd to the broker.
 
 ### C — Broker Restart
 
@@ -100,7 +100,7 @@ Both poison triggers resulted in the same outcome: safe dead-lettering. No messa
 
 ### E — Ack-after-Write Consumer
 
-This experiment runs the custom consumer arm (write-before-ack strategy) through three scenarios (A, B, D) and compares the results against Telegraf's (write-after-ack) behavior observed above. Experiment E's assertions are stricter than D's because E tests our own consumer's contract, not Telegraf's.
+This experiment runs the custom consumer arm (ack-after-write strategy) through three scenarios (A, B, D) and compares the results against Telegraf's (ack-on-receipt) behavior observed above. Experiment E's assertions are stricter than D's because E tests our own consumer's contract, not Telegraf's.
 
 **E.A — InfluxDB Outage (consumer arm)** (source: `E-consumer-influx-outage-expEa82795.json`):
 - Published: 1,000 messages
@@ -129,9 +129,9 @@ The ack-after-write consumer arm achieved zero loss in scenarios matching Telegr
 
 ## Telegraf's Acknowledgement Behaviour
 
-Telegraf employs a **write-then-ack** acknowledgement discipline: a message is acknowledged to the broker only after its write to InfluxDB completes successfully. Experiment B's data (145–150 requeued messages out of 1,000 published in a 50-message in-flight batch) confirms this: when Telegraf is killed mid-batch, the 50 unacknowledged messages are redelivered by the broker on reconnect. No loss occurs because RabbitMQ's at-least-once delivery guarantee persists the messages until acknowledgement is received.
+Telegraf employs an **ack-on-receipt** acknowledgement discipline: a message is acknowledged to the broker once it has been parsed and handed to the output plugins, *before* the write to InfluxDB is confirmed. This is the inverse of the custom ack-after-write consumer (Experiment E), which acks only after InfluxDB confirms the write. Experiment B's data (145–150 requeued messages out of 1,000 published in a 50-message in-flight batch) confirms this: when Telegraf is killed mid-batch, the 50 unacknowledged messages are those still being parsed or whose output writes had not yet completed. They were never ack'd to the broker, so the broker redelivers them on Telegraf's reconnect. No loss occurs because RabbitMQ's at-least-once delivery guarantee persists the messages until acknowledgement is received.
 
-Experiment D's outcome (parse-nack-to-dlq and output-nack-to-dlq for both d1 and d2 triggers) further confirms that Telegraf does not fail silently or drop messages without telling us: failures are nack'd, which triggers the dead-letter exchange, moving the message to a dedicated queue visible to operations. This provides observability — an operator scanning the DLQ can identify malformed or incompatible messages and take corrective action.
+Experiment D's outcome (parse-nack-to-dlq for both d1 and d2 triggers) further confirms that Telegraf does not fail silently or drop messages without telling us: failures are nack'd, which triggers the dead-letter exchange, moving the message to a dedicated queue visible to operations. This provides observability — an operator scanning the DLQ can identify malformed or incompatible messages and take corrective action.
 
 ## Recommendation
 
@@ -141,7 +141,7 @@ The measurements justify these conclusions:
 
 2. **Poison messages are safe-by-default.** Messages that fail parsing or output serialization are nack'd and dead-lettered, not silently dropped. Operators have a visible queue (`amq.gen-DLQ`) to detect and address problematic messages. Both Telegraf and a custom consumer arm behave identically here.
 
-3. **Requeue overhead is modest but real.** Experiment B measured 145–150 requeued messages per 1,000 published when the parser was killed mid-batch (out of 50 unacknowledged). This 14–15% overhead is the cost of at-least-once delivery; it is not a loss, but it represents duplicate work that operations should expect during parser restarts.
+3. **Requeue overhead is modest but real.** Experiment B measured 145–150 requeued messages per 1,000 published when Telegraf was killed mid-batch. Because Telegraf acks on receipt (after parse, before write), these requeued messages were those still being parsed or in output stages when Telegraf died — they were never ack'd, so the broker redelivers them. This 14–15% overhead is the cost of at-least-once delivery; it is not a loss, but it represents duplicate work that operations should expect during parser restarts.
 
 4. **Time dilation during broker restart is significant.** Experiment C observed 77 seconds of additional wall-clock time during a ~8-second broker restart due to message queueing and reconnection latency. This is observable but does not cause loss; the queue absorbs the delays.
 
@@ -160,7 +160,7 @@ This experiment suite is a single-node validation of the message pipeline's core
 - **Queue behavior:** The telemetry queue is unbounded (no `x-max-length` limit). Queue-saturation effects are not measured; Phase 6 will test queue limits and overflow behavior.
 - **Payload shape:** All messages follow the same schema (5 pressure sensors, JSON payload, ~100 bytes each). Different formats, sizes, or fanout patterns are not tested.
 - **Outage durations:** Tested values are 60 seconds (database outage), 45 seconds (broker restart). Longer outages (hours, days) and cascading failures (simultaneous database + broker restart) are not in scope.
-- **Parser behavior:** Telegraf is a third-party component. Its ack semantics are observed (write-then-ack) but not designed or tuned by us; Phase 6 will measure acknowledgement latency under load.
+- **Parser behavior:** Telegraf is a third-party component. Its ack semantics are observed (ack-on-receipt) but not designed or tuned by us; Phase 6 will measure acknowledgement latency under load.
 
 **Future phases will cover:**
 - **Phase 3:** Multi-node broker replication and failover
@@ -170,3 +170,37 @@ This experiment suite is a single-node validation of the message pipeline's core
 
 **Report generated from experimental runs dated 2026-08-11T21:13–21:35 UTC.**  
 **All source data: `docs/results/`**
+
+---
+
+## Fix Report (2026-08-11, Fix Round 1)
+
+### Finding 1: Telegraf's ack semantics stated backwards
+
+**Error:** The report stated Telegraf uses "write-then-ack" acknowledgement (acks after InfluxDB confirms the write).
+
+**Correction:** Telegraf actually uses ack-on-receipt (acks once a message is parsed and handed to output plugins, *before* the write is confirmed). This is documented in `consumer/ackafterwrite.py`'s module docstring, which explicitly notes: "Telegraf acknowledges a message once it has been parsed and handed to the output plugins." The custom ack-after-write consumer built in Task 9 exists as a deliberate contrast to Telegraf's ack-on-receipt behavior.
+
+**Changes made:**
+1. **Section B (line 53):** Corrected explanation of requeue behavior: "Telegraf's acknowledgement behavior is ack-on-receipt: a message is ack'd once it has been parsed and handed to the output plugins, *before* the write to InfluxDB is confirmed. This explains why both kill modes redeliver ~15% of their in-flight batch — those messages were either still being parsed or their output writes had not yet completed when Telegraf died, so they were never ack'd to the broker."
+
+2. **Section E (line 103):** Corrected consumer comparison: changed from "Telegraf's (write-after-ack)" to "Telegraf's (ack-on-receipt)" and consumer arm from "(write-before-ack)" to "(ack-after-write)".
+
+3. **Section: Telegraf's Acknowledgement Behaviour (line 130):** Completely rewrote to state ack-on-receipt correctly and explain the contrast to the custom consumer.
+
+4. **Recommendation section (line 144):** Updated explanation of requeue overhead to correctly attribute it to Telegraf's ack-on-receipt behavior.
+
+5. **Limits section (line 163):** Corrected observed ack semantics from "write-then-ack" to "ack-on-receipt".
+
+### Finding 2: Fabricated outcome label and internal contradiction
+
+**Error:** The report's Telegraf acknowledgement section stated: "Experiment D's outcome (parse-nack-to-dlq and output-nack-to-dlq for both d1 and d2 triggers)". Two problems: (a) `output-nack-to-dlq` is not a real outcome value (only accepted, parse-nack-to-dlq, parse-nack-requeue-loop, output-ack-then-drop, silently-discarded-no-counter are valid); (b) this contradicted the report's own Results/D section which correctly stated both d1 and d2 outcomes as `parse-nack-to-dlq`.
+
+**Correction:** Both d1 and d2 poison message triggers resulted in the same outcome: `parse-nack-to-dlq`. The output-stage error (d2-output) still resulted in nack-to-dlq, not a different outcome.
+
+**Changes made:**
+- **Section: Telegraf's Acknowledgement Behaviour (line 134):** Corrected to: "Experiment D's outcome (parse-nack-to-dlq for both d1 and d2 triggers) further confirms that Telegraf does not fail silently or drop messages without telling us: failures are nack'd, which triggers the dead-letter exchange..."
+
+### Note
+
+No code or test changes were required. This is documentation-only correction addressing semantic misunderstandings about Telegraf's ack behavior and an outcome labeling error.
