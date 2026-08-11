@@ -1,0 +1,119 @@
+{
+  "experiment": "E-consumer-poison",
+  "recorded_at": "2026-08-11T20:38:04.737264+00:00",
+  "run_id": "poisonE1",
+  "arm": "ack-after-write",
+  "messages_published": 5,
+  "dlq_before": 0,
+  "dlq_after": 5,
+  "dlq_delta": 5,
+  "ready_after": 0,
+  "landed_in_influx": false,
+  "outcome": "nack-to-dlq",
+  "verdict": "nack-to-dlq",
+  "timeline": {
+    "samples": [
+      {
+        "t": 1786480664.6614454,
+        "telemetry_ready": 465,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786480666.6991374,
+        "telemetry_ready": 392,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786480668.7122595,
+        "telemetry_ready": 392,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786480670.72676,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786480672.750713,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786480674.7742755,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786480676.7901275,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786480678.8048499,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786480680.8218005,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786480682.8366134,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      }
+    ],
+    "marks": []
+  }
+}
