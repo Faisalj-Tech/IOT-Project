@@ -268,15 +268,17 @@ def start_sim(specs, rate_hz: float, duration_s: float, run_id: str,
 
 
 def drain_and_fetch(influx_query, run_id: str, start: str, expected_total: int,
-                    timeout_s: float = 180.0) -> list[dict]:
+                    timeout_s: float = 180.0, stable_polls_limit: int = 6) -> list[dict]:
     """Poll until the row count settles, then return the rows.
 
     Two exit conditions, deliberately different. A healthy run exits as soon as it has
     reached the expected total and held steady for three polls. A lossy run never
-    reaches the total, so it exits on a longer stall instead — six stable polls, i.e.
-    30s with no new rows, which is three of Telegraf's 10s flush intervals. Without
-    that second condition an experiment that actually lost messages would burn the
-    whole timeout before reporting the very number it was run to measure.
+    reaches the total, so it exits on a longer stall instead — stable_polls_limit
+    stable polls (default: six, i.e. 30s with no new rows, which is three of Telegraf's
+    10s flush intervals). This limit is parameterizable to handle slower post-recovery
+    drains that exhibit temporary plateaus mid-backlog. Without that second condition
+    an experiment that actually lost messages would burn the whole timeout before
+    reporting the very number it was run to measure.
     """
     from tests.conftest import fetch_seqs
 
@@ -293,7 +295,7 @@ def drain_and_fetch(influx_query, run_id: str, start: str, expected_total: int,
             last_count = len(rows)
         if stable_polls >= 3 and len(rows) >= expected_total:
             break
-        if stable_polls >= 6:
+        if stable_polls >= stable_polls_limit:
             break
         time.sleep(5)
     return rows

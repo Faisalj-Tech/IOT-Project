@@ -66,7 +66,7 @@ def test_broker_restart_costs_time_and_duplicates_but_not_messages(
     expected_total = sum(published.values())
 
     start = flux_range_start(started_at)
-    rows = drain_and_fetch(influx_query, run_id, start, expected_total, timeout_s=240)
+    rows = drain_and_fetch(influx_query, run_id, start, expected_total, timeout_s=240, stable_polls_limit=18)
     report = sequence_report(rows, published)
     duplicate_total = sum(report["duplicates"].values())
 

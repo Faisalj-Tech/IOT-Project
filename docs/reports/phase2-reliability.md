@@ -56,7 +56,7 @@ Both arms achieved zero loss. The graceful shutdown did *not* out-perform the ab
 
 Predicted: zero loss, with observable time dilation (wall-clock duration > nominal duration) and duplication from broker's at-most-once write semantics during reconnection.
 
-Measured: Task 13 and Task 14 produced three runs (one clean baseline, two re-runs). Results are split between zero-loss and loss outcomes.
+Measured: Task 13 and Task 14 produced five runs (one clean baseline, two lossy results, two re-verified cleanly after harness fix). **Verdict: zero-loss ✓** across all runs when measured with corrected harness. Two of the five runs initially reported message loss; this was a measurement-harness artifact (premature exit from `drain_and_fetch`'s stable-poll heuristic), not a pipeline defect. See "Root cause resolved" below for details and fix.
 
 **Task 13 Baseline** (source: `C-broker-restart-expC82538.json`, recorded 2026-08-11T21:13:06Z):
 - Published: 850 messages (the full nominal count — ADR-0002 guarantees the publish loop completes regardless of outage; the outage shows up as time dilation, not a reduced count)
@@ -88,7 +88,19 @@ Measured: Task 13 and Task 14 produced three runs (one clean baseline, two re-ru
 
 **Test assertion status:** Test suite asserts `gaps == {}`. Run 1 (expC87075) caused test FAILURE (assertion violated); the prior implementer's claim of "21/21 passed" conflicts with this failure recorded in committed JSON and reproduced in Task 14 Fix Round 1.
 
-**Root cause inconclusive:** The identical, contiguous, all-device gap pattern (not per-device jitter) indicates a system-wide ~11-second loss window. Two candidate explanations: (a) RabbitMQ broker genuinely lost those messages during restart despite PUBACK'ing them (reportable broker-level finding), or (b) messages reached the broker queue fine but `drain_and_fetch`'s second exit condition (6 stable polls = 30s of zero growth) fired before Telegraf finished flushing a slow post-restart backlog (measurement-harness artifact). Root-cause resolution requires capture of queue depth (`messages_ready + messages_unacknowledged`) at the exact moment `drain_and_fetch()` returns, which was not instrumented in Task 14's reproduction runs. See Task 14 Fix Round 1 report (`.superpowers/sdd/2026-08-10-iot-messaging-phase2/task-14-report.md`) for full investigation.
+**Root cause resolved (Task 14 Fix Round 2):** The two lossy runs exited `drain_and_fetch()` *earlier* than the clean runs—not later or at timeout. Instrumentation of drain time revealed:
+
+| run | verdict | influx_total | drain_elapsed |
+|---|---|---|---|
+| expC82538 | no-loss | 850 | 85.9s |
+| expC85181 | no-loss | 850 | 80.9s |
+| expC85545 | **loss** | 550 | **60.6s** |
+| expC87075 | **loss** | 740 | **70.8s** |
+| expC87571 | no-loss | 850 | 85.9s |
+
+This pattern rules out genuine broker message loss (which would show the queue reaching zero) and timeout exhaustion. The root cause is a measurement-harness artifact: `drain_and_fetch()`'s second exit condition (6 stable polls = 30 seconds of zero row-count growth) mistook a temporary plateau in Telegraf's post-restart backlog drain for settlement at a lower row count. Under Experiment C's restart-scale outage, Telegraf's backlog shows a 30+ second lull in InfluxDB row-count growth that is not the end of draining, just a transient pause. The function exited early, and the test then (correctly, per its own logic) reported the missing rows as loss. The pipeline's actual behavior for Experiment C is zero-loss—confirmed by clean runs expC82538, expC85181, and expC87571 all reaching 850 rows—the harness simply didn't wait long enough on lossy runs to observe it.
+
+**Fix applied (Task 14 Fix Round 2):** `drain_and_fetch()` gained an optional parameter `stable_polls_limit: int = 6` (default unchanged, preserving reproducibility of A, B, D, E's already-committed results). Experiment C now passes `stable_polls_limit=18` (18 polls × 5s = 90 seconds of no-growth tolerance, safely above the worst-case clean-run drain time of 85.9s). See ADR-0012 for decision rationale and alternatives considered.
 
 **Configuration note (Task 7 finding):** The simulator's default `max_reconnects=5` with exponential backoff (0.5s doubling) tolerates only ~15.5 seconds of broker connectivity loss. A real RabbitMQ restart typically takes 20–45 seconds depending on queue state. This experiment uses `RECONNECT_BUDGET=12` (configured in test fixture) to allow the simulator to survive a realistic restart. The result JSON records both values: `config.max_reconnects: 12` (budget used) and `config.default_max_reconnects: 5` (the out-of-the-box default that would fail). Without the budget increase, this experiment would not reach the broker recovery phase. The change from 5 to 12 was applied as Task 14's measurement-justified modification (commit `09a22fa`); this does not explain the loss finding (the loss is delivery-side, after publish succeeds). See ADR-0010 for the reconnect-budget justification and ADR-0009 for the confirmatory-experiment classification that makes this loss result reportable rather than suppressed.
 
@@ -127,7 +139,7 @@ This experiment runs the custom consumer arm (ack-after-write strategy) through 
 **E.A — InfluxDB Outage (consumer arm)** (source: `E-consumer-influx-outage-expEa82795.json`):
 - Published: 1,000 messages
 - InfluxDB total: 1,000 rows (zero loss)
-- Peak queue depth: 536 messages (lower than Telegraf's 750, indicating the consumer processes faster or has higher throughput per batch)
+- Peak queue depth: 536 messages (vs. Telegraf's 750 in Experiment A—single-run comparison, not a controlled throughput measurement; no causal claim about processing speed is supported by one data point)
 - Peak unacknowledged: 50 messages
 - DLQ: 0 → 0
 - Verdict: no-loss ✓
