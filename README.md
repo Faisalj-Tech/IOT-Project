@@ -58,6 +58,27 @@ The suite brings the stack up, publishes known telemetry, and asserts it arrives
 in InfluxDB with a gap-free per-device sequence. Set `KEEP_STACK=1` to skip
 teardown while iterating.
 
+## Reliability experiments (Phase 2)
+
+The reliability matrix is deselected from the default test run because each
+experiment takes minutes. Run it explicitly:
+
+```bash
+pytest tests/ -m experiment -v -s        # the full matrix, ~45 minutes
+pytest tests/experiments/test_influx_outage.py -m experiment -v   # one experiment
+```
+
+Every run writes raw evidence to `docs/results/<experiment>-<run_id>.json`, and
+`docs/reports/phase2-reliability.md` is drafted from those files. The experiments
+stop and kill containers on purpose; the harness restores every service it took
+down, including when an experiment fails.
+
+The consumer arm needs its image built once:
+
+```bash
+docker compose -f compose.yml -f compose.consumer.yml build consumer
+```
+
 ## Teardown
 
 ```bash

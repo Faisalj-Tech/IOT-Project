@@ -1,0 +1,1563 @@
+{
+  "experiment": "B-telegraf-kill",
+  "recorded_at": "2026-08-11T21:34:12.819638+00:00",
+  "run_id": "expBgra83754",
+  "arm": "graceful",
+  "config": {
+    "devices": 5,
+    "rate_hz": 2.0,
+    "clean_s": 20.0,
+    "before_kill_s": 20.0,
+    "after_kill_s": 40.0,
+    "tail_s": 20.0
+  },
+  "published_counts": {
+    "press-01": 200,
+    "press-02": 200,
+    "press-03": 200,
+    "press-04": 200,
+    "press-05": 200
+  },
+  "published_total": 1000,
+  "influx_total": 1000,
+  "gaps": {},
+  "duplicates": {},
+  "unacked_at_takedown": 50,
+  "ready_at_takedown": 195,
+  "unacked_after_takedown": 0,
+  "ready_after_takedown": 345,
+  "requeued_messages": 150,
+  "peak_messages_ready": 835,
+  "peak_messages_unacked": 50,
+  "dlq_baseline": 5,
+  "dlq_final": 5,
+  "verdict": "no-loss",
+  "timeline": {
+    "samples": [
+      {
+        "t": 1786483754.1116493,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483756.123589,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483758.1447742,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483760.1651967,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483762.176576,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483764.1985211,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483766.2124708,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483768.2298567,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483770.2398,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483772.2630875,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483774.27497,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483776.295425,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483778.3162034,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483780.3359842,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483782.355744,
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483784.3779807,
+        "telemetry_ready": 95,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483786.3954787,
+        "telemetry_ready": 95,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483788.413633,
+        "telemetry_ready": 145,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483790.4373388,
+        "telemetry_ready": 145,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483792.4521625,
+        "telemetry_ready": 145,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483794.477346,
+        "telemetry_ready": 195,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483796.4975226,
+        "telemetry_ready": 195,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483798.5127454,
+        "telemetry_ready": 245,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483800.5227027,
+        "telemetry_ready": 245,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483802.5386066,
+        "telemetry_ready": 245,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483804.5563414,
+        "telemetry_ready": 345,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483806.566689,
+        "telemetry_ready": 345,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483808.58331,
+        "telemetry_ready": 395,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483810.6027677,
+        "telemetry_ready": 395,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483812.6230748,
+        "telemetry_ready": 395,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483814.640647,
+        "telemetry_ready": 440,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483816.6624274,
+        "telemetry_ready": 440,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483818.6829786,
+        "telemetry_ready": 490,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483820.6985662,
+        "telemetry_ready": 490,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483822.7091055,
+        "telemetry_ready": 490,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483824.727303,
+        "telemetry_ready": 540,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483826.7467406,
+        "telemetry_ready": 540,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483828.7677326,
+        "telemetry_ready": 590,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483830.7840598,
+        "telemetry_ready": 590,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483832.8024614,
+        "telemetry_ready": 590,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483834.8216937,
+        "telemetry_ready": 640,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483836.843296,
+        "telemetry_ready": 640,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483838.8555717,
+        "telemetry_ready": 690,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483840.8804278,
+        "telemetry_ready": 690,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483842.9002292,
+        "telemetry_ready": 690,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483844.9189236,
+        "telemetry_ready": 740,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483846.9301007,
+        "telemetry_ready": 740,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483848.9493177,
+        "telemetry_ready": 787,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483850.9702277,
+        "telemetry_ready": 787,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483852.98962,
+        "telemetry_ready": 787,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483855.005483,
+        "telemetry_ready": 785,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483857.0307221,
+        "telemetry_ready": 785,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483859.0503201,
+        "telemetry_ready": 835,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483861.062481,
+        "telemetry_ready": 835,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483863.0760515,
+        "telemetry_ready": 835,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483865.0875275,
+        "telemetry_ready": 805,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483867.096974,
+        "telemetry_ready": 805,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483869.1165092,
+        "telemetry_ready": 805,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483871.1289268,
+        "telemetry_ready": 805,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483873.1389277,
+        "telemetry_ready": 805,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483875.1515076,
+        "telemetry_ready": 755,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483877.175427,
+        "telemetry_ready": 755,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483879.1993768,
+        "telemetry_ready": 755,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483881.215243,
+        "telemetry_ready": 755,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483883.236043,
+        "telemetry_ready": 755,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483885.257404,
+        "telemetry_ready": 705,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483887.2693737,
+        "telemetry_ready": 705,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483889.283244,
+        "telemetry_ready": 705,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483891.3003764,
+        "telemetry_ready": 705,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483893.316288,
+        "telemetry_ready": 655,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483895.3373141,
+        "telemetry_ready": 655,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483897.3586068,
+        "telemetry_ready": 655,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483899.3816144,
+        "telemetry_ready": 655,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483901.3959916,
+        "telemetry_ready": 655,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483903.4179735,
+        "telemetry_ready": 605,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483905.4374933,
+        "telemetry_ready": 605,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483907.460295,
+        "telemetry_ready": 605,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483909.4733238,
+        "telemetry_ready": 605,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483911.4845283,
+        "telemetry_ready": 605,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483913.5040069,
+        "telemetry_ready": 555,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483915.5196228,
+        "telemetry_ready": 555,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483917.5297346,
+        "telemetry_ready": 555,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483919.5466852,
+        "telemetry_ready": 555,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483921.566345,
+        "telemetry_ready": 555,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483923.58251,
+        "telemetry_ready": 505,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483925.6007955,
+        "telemetry_ready": 505,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483927.6258495,
+        "telemetry_ready": 505,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483929.6457179,
+        "telemetry_ready": 505,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483931.666062,
+        "telemetry_ready": 505,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483933.6868172,
+        "telemetry_ready": 455,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483935.7007606,
+        "telemetry_ready": 455,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483937.7246006,
+        "telemetry_ready": 455,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483939.7447133,
+        "telemetry_ready": 455,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483941.766092,
+        "telemetry_ready": 455,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483943.7809217,
+        "telemetry_ready": 405,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483945.790501,
+        "telemetry_ready": 405,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483947.8039873,
+        "telemetry_ready": 405,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483949.8126814,
+        "telemetry_ready": 405,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483951.8305955,
+        "telemetry_ready": 405,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483953.843346,
+        "telemetry_ready": 355,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483955.8656313,
+        "telemetry_ready": 355,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483957.8730087,
+        "telemetry_ready": 355,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483959.8970804,
+        "telemetry_ready": 355,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483961.9149451,
+        "telemetry_ready": 355,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483963.9359913,
+        "telemetry_ready": 305,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483965.9487426,
+        "telemetry_ready": 305,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483967.9689677,
+        "telemetry_ready": 305,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483969.9908178,
+        "telemetry_ready": 305,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483972.0117867,
+        "telemetry_ready": 305,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483974.0357864,
+        "telemetry_ready": 255,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483976.052278,
+        "telemetry_ready": 255,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483978.0741289,
+        "telemetry_ready": 255,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483980.0864568,
+        "telemetry_ready": 255,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483982.0960395,
+        "telemetry_ready": 255,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483984.1187088,
+        "telemetry_ready": 205,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483986.1322086,
+        "telemetry_ready": 205,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483988.1549802,
+        "telemetry_ready": 205,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483990.174215,
+        "telemetry_ready": 205,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483992.191136,
+        "telemetry_ready": 205,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483994.2163625,
+        "telemetry_ready": 155,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483996.2291613,
+        "telemetry_ready": 155,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786483998.2374914,
+        "telemetry_ready": 155,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484000.2587717,
+        "telemetry_ready": 155,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484002.2764115,
+        "telemetry_ready": 155,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484004.298966,
+        "telemetry_ready": 105,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484006.3116152,
+        "telemetry_ready": 105,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484008.320814,
+        "telemetry_ready": 105,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484010.3406928,
+        "telemetry_ready": 105,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484012.361206,
+        "telemetry_ready": 105,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484014.3826718,
+        "telemetry_ready": 55,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484016.39453,
+        "telemetry_ready": 55,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484018.4052782,
+        "telemetry_ready": 55,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484020.424845,
+        "telemetry_ready": 55,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484022.4452603,
+        "telemetry_ready": 55,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484024.4663045,
+        "telemetry_ready": 5,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484026.4754705,
+        "telemetry_ready": 5,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484028.501688,
+        "telemetry_ready": 5,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484030.5243852,
+        "telemetry_ready": 5,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484032.5404463,
+        "telemetry_ready": 5,
+        "telemetry_unacked": 50,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484034.562279,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 5,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484036.5829043,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 5,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484038.5926871,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 5,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484040.6056323,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 5,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484042.6279745,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 5,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484044.6445215,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484046.6678813,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484048.6835043,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484050.7109392,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786484052.72356,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 5,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      }
+    ],
+    "marks": [
+      {
+        "label": "sim_start",
+        "t": 1786483754.1263766
+      },
+      {
+        "label": "influxdb_stop",
+        "t": 1786483774.129759
+      },
+      {
+        "label": "telegraf_down_graceful",
+        "t": 1786483794.6464562
+      },
+      {
+        "label": "requeue_sampled",
+        "t": 1786483805.7684724
+      },
+      {
+        "label": "influxdb_start",
+        "t": 1786483837.7694552
+      },
+      {
+        "label": "telegraf_start",
+        "t": 1786483843.7316637
+      },
+      {
+        "label": "sim_done",
+        "t": 1786483855.623463
+      },
+      {
+        "label": "drained",
+        "t": 1786484052.816626
+      }
+    ]
+  }
+}
