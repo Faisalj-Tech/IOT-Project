@@ -39,7 +39,7 @@ Measured: two runs, same configuration but different termination signals.
 - InfluxDB total: 1,000 rows (zero loss)
 - Unacknowledged at takedown: 50 messages
 - Ready (unprocessed) at takedown: 210 messages
-- After restore: unacknowledged dropped to 0, ready queue released (345 messages processed post-restart)
+- After restore: unacknowledged dropped to 0, ready queue released (ready queue depth rose to 355 as the in-flight batch was requeued)
 - Requeued messages: 145 (messages broker re-delivered after Telegraf's acknowledgement was lost)
 
 **Graceful SIGTERM** (source: `B-telegraf-kill-expBgra83754.json`):
@@ -56,7 +56,7 @@ Both arms achieved zero loss. The graceful shutdown did *not* out-perform the ab
 
 Predicted: zero loss, with observable time dilation (wall-clock duration > nominal duration) and duplication from broker's at-most-once write semantics during reconnection.
 
-Measured: Task 13 and Task 14 produced five runs (one clean baseline, two lossy results, two re-verified cleanly after harness fix). **Verdict: zero-loss ✓** across all runs when measured with corrected harness. Two of the five runs initially reported message loss; this was a measurement-harness artifact (premature exit from `drain_and_fetch`'s stable-poll heuristic), not a pipeline defect. See "Root cause resolved" below for details and fix.
+Measured: Task 13 and Task 14 produced nine committed runs total; the five below were used to diagnose an intermittent loss pattern (three clean, two false-negative), and two further runs (cited later in this section) verified the harness fix. **Verdict: zero-loss ✓** across all runs when measured with corrected harness. Two of the five diagnostic runs initially reported message loss; this was a measurement-harness artifact (premature exit from `drain_and_fetch`'s stable-poll heuristic), not a pipeline defect. See "Root cause resolved" below for details and fix.
 
 **Task 13 Baseline** (source: `C-broker-restart-expC82538.json`, recorded 2026-08-11T21:13:06Z):
 - Published: 850 messages (the full nominal count — ADR-0002 guarantees the publish loop completes regardless of outage; the outage shows up as time dilation, not a reduced count)
@@ -86,7 +86,7 @@ Measured: Task 13 and Task 14 produced five runs (one clean baseline, two lossy 
 - Broker restart duration: ~7.0 seconds
 - Verdict: loss ⚠
 
-**Test assertion status:** Test suite asserts `gaps == {}`. Run 1 (expC87075) caused test FAILURE (assertion violated); the prior implementer's claim of "21/21 passed" conflicts with this failure recorded in committed JSON and reproduced in Task 14 Fix Round 1.
+**Test assertion status:** Test suite asserts `gaps == {}`. Run 2 (expC87075) caused test FAILURE (assertion violated).
 
 **Root cause resolved (Task 14 Fix Round 2):** The two lossy runs exited `drain_and_fetch()` *earlier* than the clean runs—not later or at timeout. Instrumentation of drain time revealed:
 
@@ -209,36 +209,3 @@ This experiment suite is a single-node validation of the message pipeline's core
 **Report generated from experimental runs dated 2026-08-11T21:13–21:35 UTC.**  
 **All source data: `docs/results/`**
 
----
-
-## Fix Report (2026-08-11, Fix Round 1)
-
-### Finding 1: Telegraf's ack semantics stated backwards
-
-**Error:** The report stated Telegraf uses "write-then-ack" acknowledgement (acks after InfluxDB confirms the write).
-
-**Correction:** Telegraf actually uses ack-on-receipt (acks once a message is parsed and handed to output plugins, *before* the write is confirmed). This is documented in `consumer/ackafterwrite.py`'s module docstring, which explicitly notes: "Telegraf acknowledges a message once it has been parsed and handed to the output plugins." The custom ack-after-write consumer built in Task 9 exists as a deliberate contrast to Telegraf's ack-on-receipt behavior.
-
-**Changes made:**
-1. **Section B (line 53):** Corrected explanation of requeue behavior: "Telegraf's acknowledgement behavior is ack-on-receipt: a message is ack'd once it has been parsed and handed to the output plugins, *before* the write to InfluxDB is confirmed. This explains why both kill modes redeliver ~15% of their in-flight batch — those messages were either still being parsed or their output writes had not yet completed when Telegraf died, so they were never ack'd to the broker."
-
-2. **Section E (line 103):** Corrected consumer comparison: changed from "Telegraf's (write-after-ack)" to "Telegraf's (ack-on-receipt)" and consumer arm from "(write-before-ack)" to "(ack-after-write)".
-
-3. **Section: Telegraf's Acknowledgement Behaviour (line 130):** Completely rewrote to state ack-on-receipt correctly and explain the contrast to the custom consumer.
-
-4. **Recommendation section (line 144):** Updated explanation of requeue overhead to correctly attribute it to Telegraf's ack-on-receipt behavior.
-
-5. **Limits section (line 163):** Corrected observed ack semantics from "write-then-ack" to "ack-on-receipt".
-
-### Finding 2: Fabricated outcome label and internal contradiction
-
-**Error:** The report's Telegraf acknowledgement section stated: "Experiment D's outcome (parse-nack-to-dlq and output-nack-to-dlq for both d1 and d2 triggers)". Two problems: (a) `output-nack-to-dlq` is not a real outcome value (only accepted, parse-nack-to-dlq, parse-nack-requeue-loop, output-ack-then-drop, silently-discarded-no-counter are valid); (b) this contradicted the report's own Results/D section which correctly stated both d1 and d2 outcomes as `parse-nack-to-dlq`.
-
-**Correction:** Both d1 and d2 poison message triggers resulted in the same outcome: `parse-nack-to-dlq`. The output-stage error (d2-output) still resulted in nack-to-dlq, not a different outcome.
-
-**Changes made:**
-- **Section: Telegraf's Acknowledgement Behaviour (line 134):** Corrected to: "Experiment D's outcome (parse-nack-to-dlq for both d1 and d2 triggers) further confirms that Telegraf does not fail silently or drop messages without telling us: failures are nack'd, which triggers the dead-letter exchange..."
-
-### Note
-
-No code or test changes were required. This is documentation-only correction addressing semantic misunderstandings about Telegraf's ack behavior and an outcome labeling error.
