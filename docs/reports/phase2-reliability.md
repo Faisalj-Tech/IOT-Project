@@ -47,7 +47,7 @@ Measured: two runs, same configuration but different termination signals.
 - InfluxDB total: 1,000 rows (zero loss)
 - Unacknowledged at takedown: 50 messages
 - Ready at takedown: 195 messages
-- After restore: unacknowledged dropped to 0, ready queue released (345 messages processed)
+- After restore: unacknowledged dropped to 0, ready queue released (ready queue depth rose to 345 as the in-flight batch was requeued)
 - Requeued messages: 150
 
 Both arms achieved zero loss. The graceful shutdown did *not* out-perform the abrupt shutdown in terms of requeue overhead; both required broker redelivery of the same order of magnitude (~145–150 messages). This shows that at Telegraf's prefetch depth, the in-flight batch size dominates the outcome, and SIGTERM's flush opportunity does not reduce the requeue burden — the real bottleneck is the prefetch_count, not the graceful-vs-abrupt distinction. Telegraf's acknowledgement behavior is ack-on-receipt: a message is ack'd once it has been parsed and handed to the output plugins, *before* the write to InfluxDB is confirmed. This explains why both kill modes redeliver ~15% of their in-flight batch — those messages were either still being parsed or their output writes had not yet completed when Telegraf died, so they were never ack'd to the broker.
@@ -56,7 +56,7 @@ Both arms achieved zero loss. The graceful shutdown did *not* out-perform the ab
 
 Predicted: zero loss, with observable time dilation (wall-clock duration > nominal duration) and duplication from broker's at-most-once write semantics during reconnection.
 
-Measured: Task 13 and Task 14 produced nine committed runs total; the five below were used to diagnose an intermittent loss pattern (three clean, two false-negative), and two further runs (cited later in this section) verified the harness fix. **Verdict: zero-loss ✓** across all runs when measured with corrected harness. Two of the five diagnostic runs initially reported message loss; this was a measurement-harness artifact (premature exit from `drain_and_fetch`'s stable-poll heuristic), not a pipeline defect. See "Root cause resolved" below for details and fix.
+Measured: Task 13 and Task 14 produced seven runs discussed in this section — the five below were used to diagnose an intermittent loss pattern (three clean, two false-negative), and two further runs (cited later in this section) verified the harness fix. (Two earlier runs, `expC812` and `expC1204`, predate this investigation — from Task 7's initial broker-restart work — and aren't part of the diagnosis below.) **Verdict: zero-loss ✓** across all runs when measured with corrected harness. Two of the five diagnostic runs initially reported message loss; this was a measurement-harness artifact (premature exit from `drain_and_fetch`'s stable-poll heuristic), not a pipeline defect. See "Root cause resolved" below for details and fix.
 
 **Task 13 Baseline** (source: `C-broker-restart-expC82538.json`, recorded 2026-08-11T21:13:06Z):
 - Published: 850 messages (the full nominal count — ADR-0002 guarantees the publish loop completes regardless of outage; the outage shows up as time dilation, not a reduced count)
