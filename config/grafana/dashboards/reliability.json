@@ -1,0 +1,68 @@
+{
+  "uid": "iot-reliability",
+  "title": "IoT Reliability and Outage Behaviour",
+  "tags": ["iot", "phase2"],
+  "timezone": "utc",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-30m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "telemetry.q ready vs unacknowledged",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": {} }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"rabbitmq_queue\")\n  |> filter(fn: (r) => r.queue == \"telemetry.q\")\n  |> filter(fn: (r) => r._field == \"messages_ready\" or r._field == \"messages_unack\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "DLQ depth",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 9 },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": {} }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"rabbitmq_queue\")\n  |> filter(fn: (r) => r.queue == \"dlq\")\n  |> filter(fn: (r) => r._field == \"messages\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Telegraf metrics dropped",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 9 },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": {} }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"internal_agent\")\n  |> filter(fn: (r) => r._field == \"metrics_dropped\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Broker alarms",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 9 },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": {} }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"rabbitmq_node\")\n  |> filter(fn: (r) => r._field == \"mem_alarm\" or r._field == \"disk_free_alarm\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)"
+        }
+      ]
+    }
+  ]
+}
