@@ -1,6 +1,6 @@
 {
   "experiment": "E-consumer-poison",
-  "recorded_at": "2026-08-11T20:38:04.737264+00:00",
+  "recorded_at": "2026-08-11T20:52:16.572828+00:00",
   "run_id": "poisonE1",
   "arm": "ack-after-write",
   "messages_published": 5,
@@ -14,9 +14,9 @@
   "timeline": {
     "samples": [
       {
-        "t": 1786480664.6614454,
-        "telemetry_ready": 465,
-        "telemetry_unacked": 50,
+        "t": 1786481516.468541,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
         "dlq_messages": 0,
         "alarms": {
           "mem": false,
@@ -24,9 +24,9 @@
         }
       },
       {
-        "t": 1786480666.6991374,
-        "telemetry_ready": 392,
-        "telemetry_unacked": 50,
+        "t": 1786481518.4932983,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
         "dlq_messages": 0,
         "alarms": {
           "mem": false,
@@ -34,9 +34,9 @@
         }
       },
       {
-        "t": 1786480668.7122595,
-        "telemetry_ready": 392,
-        "telemetry_unacked": 50,
+        "t": 1786481520.5140817,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
         "dlq_messages": 0,
         "alarms": {
           "mem": false,
@@ -44,7 +44,27 @@
         }
       },
       {
-        "t": 1786480670.72676,
+        "t": 1786481522.5315018,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786481524.5417707,
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1786481526.5626159,
         "telemetry_ready": 0,
         "telemetry_unacked": 0,
         "dlq_messages": 5,
@@ -54,7 +74,7 @@
         }
       },
       {
-        "t": 1786480672.750713,
+        "t": 1786481528.5789962,
         "telemetry_ready": 0,
         "telemetry_unacked": 0,
         "dlq_messages": 5,
@@ -64,7 +84,7 @@
         }
       },
       {
-        "t": 1786480674.7742755,
+        "t": 1786481530.596641,
         "telemetry_ready": 0,
         "telemetry_unacked": 0,
         "dlq_messages": 5,
@@ -74,7 +94,7 @@
         }
       },
       {
-        "t": 1786480676.7901275,
+        "t": 1786481532.6181488,
         "telemetry_ready": 0,
         "telemetry_unacked": 0,
         "dlq_messages": 5,
@@ -84,27 +104,7 @@
         }
       },
       {
-        "t": 1786480678.8048499,
-        "telemetry_ready": 0,
-        "telemetry_unacked": 0,
-        "dlq_messages": 5,
-        "alarms": {
-          "mem": false,
-          "disk": false
-        }
-      },
-      {
-        "t": 1786480680.8218005,
-        "telemetry_ready": 0,
-        "telemetry_unacked": 0,
-        "dlq_messages": 5,
-        "alarms": {
-          "mem": false,
-          "disk": false
-        }
-      },
-      {
-        "t": 1786480682.8366134,
+        "t": 1786481534.632197,
         "telemetry_ready": 0,
         "telemetry_unacked": 0,
         "dlq_messages": 5,

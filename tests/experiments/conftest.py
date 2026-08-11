@@ -61,7 +61,8 @@ class DockerControl:
 
     def stop(self, service: str, timeout: int = 10) -> None:
         """Graceful stop. timeout=0 denies shutdown grace but still sends SIGTERM."""
-        compose("stop", "-t", str(timeout), service)
+        files = CONSUMER_FILES if service == "consumer" else ("compose.yml",)
+        compose("stop", "-t", str(timeout), service, files=files)
         self._await_state(service, running=False)
         if service not in self._downed:
             self._downed.append(service)
@@ -81,7 +82,8 @@ class DockerControl:
         args = ["up", "-d"]
         if wait:
             args.append("--wait")
-        compose(*args, service)
+        files = CONSUMER_FILES if service == "consumer" else ("compose.yml",)
+        compose(*args, service, files=files)
         self._await_state(service, running=True)
         if service in self._downed:
             self._downed.remove(service)
