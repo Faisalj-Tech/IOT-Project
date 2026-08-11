@@ -241,7 +241,7 @@ _EXECUTOR = ThreadPoolExecutor(max_workers=4)
 
 
 def start_sim(specs, rate_hz: float, duration_s: float, run_id: str,
-              max_reconnects: int = 5) -> Future:
+              max_reconnects: int = 12) -> Future:
     """Run the device simulator on a background thread.
 
     The experiment body stays synchronous so container manipulation reads as a

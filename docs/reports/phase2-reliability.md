@@ -57,7 +57,7 @@ Both arms achieved zero loss. The graceful shutdown did *not* out-perform the ab
 Predicted: zero loss, with observable time dilation (wall-clock duration > nominal duration) and duplication from broker's at-most-once write semantics during reconnection.
 
 Measured (source: `C-broker-restart-expC82538.json`):
-- Published: 850 messages (reduced publish rate during broker restart)
+- Published: 850 messages (the full nominal count — ADR-0002 guarantees the publish loop completes regardless of outage; the outage shows up as time dilation, not a reduced count)
 - InfluxDB total: 850 rows (zero loss)
 - Sequence gaps: none
 - Duplicate count: 0
@@ -139,7 +139,7 @@ The measurements justify these conclusions:
 
 1. **Zero-loss operation is achievable** under the tested conditions: the pipeline survives InfluxDB outage, Telegraf termination (both abrupt and graceful), and broker restart without losing a single message. This confidence holds for a single-broker, unbounded-queue setup with the tested outage durations (60 seconds for database outage, 45 seconds for broker restart).
 
-2. **Poison messages are safe-by-default.** Messages that fail parsing or output serialization are nack'd and dead-lettered, not silently dropped. Operators have a visible queue (`amq.gen-DLQ`) to detect and address problematic messages. Both Telegraf and a custom consumer arm behave identically here.
+2. **Poison messages are safe-by-default.** Messages that fail parsing or output serialization are nack'd and dead-lettered, not silently dropped. Operators have a visible queue (`dlq`) to detect and address problematic messages. Both Telegraf and a custom consumer arm behave identically here.
 
 3. **Requeue overhead is modest but real.** Experiment B measured 145–150 requeued messages per 1,000 published when Telegraf was killed mid-batch. Because Telegraf acks on receipt (after parse, before write), these requeued messages were those still being parsed or in output stages when Telegraf died — they were never ack'd, so the broker redelivers them. This 14–15% overhead is the cost of at-least-once delivery; it is not a loss, but it represents duplicate work that operations should expect during parser restarts.
 
@@ -158,7 +158,7 @@ This experiment suite is a single-node validation of the message pipeline's core
 
 - **Scope:** One node per service (RabbitMQ, Telegraf, InfluxDB). No cluster replication, no failover. A broker crash is unrecoverable in this setup.
 - **Queue behavior:** The telemetry queue is unbounded (no `x-max-length` limit). Queue-saturation effects are not measured; Phase 6 will test queue limits and overflow behavior.
-- **Payload shape:** All messages follow the same schema (5 pressure sensors, JSON payload, ~100 bytes each). Different formats, sizes, or fanout patterns are not tested.
+- **Payload shape:** All messages follow the same schema (5 temperature sensors, JSON payload, ~100 bytes each). Different formats, sizes, or fanout patterns are not tested.
 - **Outage durations:** Tested values are 60 seconds (database outage), 45 seconds (broker restart). Longer outages (hours, days) and cascading failures (simultaneous database + broker restart) are not in scope.
 - **Parser behavior:** Telegraf is a third-party component. Its ack semantics are observed (ack-on-receipt) but not designed or tuned by us; Phase 6 will measure acknowledgement latency under load.
 

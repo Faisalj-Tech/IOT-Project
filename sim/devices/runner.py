@@ -93,7 +93,7 @@ async def run_devices(
     port: int = 1883,
     username: str = "device",
     password: str = "devicepass",
-    max_reconnects: int = 5,
+    max_reconnects: int = 12,
 ) -> dict[str, int]:
     counts = await asyncio.gather(
         *(
