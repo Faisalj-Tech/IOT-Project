@@ -31,6 +31,64 @@ def _load_env() -> None:
 
 _load_env()
 
+LOCK_PATH = ROOT / ".pytest-stack.lock"
+
+
+def _pid_alive(pid: int) -> bool:
+    """Is this PID a running process?
+
+    os.kill(pid, 0) is the POSIX idiom and is NOT safe here: on Windows, os.kill
+    is implemented with TerminateProcess, so probing with signal 0 would kill the
+    very process we are asking about. Windows gets tasklist instead.
+    """
+    if sys.platform == "win32":
+        proc = subprocess.run(
+            ["tasklist", "/FI", f"PID eq {pid}", "/NH"],
+            capture_output=True, text=True, check=False,
+        )
+        return str(pid) in proc.stdout
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True  # exists, owned by someone else
+    return True
+
+
+def acquire_stack_lock(path: Path = LOCK_PATH) -> None:
+    """Refuse to share a live stack with another pytest session.
+
+    A lock whose PID is gone is reclaimed rather than reported, so a crashed run
+    does not require manual cleanup. If reclamation is ever wrong, the refusal
+    message names the file to delete.
+
+    `path` is parameterised so the unit tests can exercise this against a
+    throwaway file instead of the lock the live session is holding.
+    """
+    if path.exists():
+        raw = path.read_text(encoding="utf-8").strip()
+        try:
+            holder = int(raw)
+        except ValueError:
+            holder = None
+        if holder is not None and holder != os.getpid() and _pid_alive(holder):
+            raise RuntimeError(
+                f"another pytest session (PID {holder}) is using this stack. "
+                f"Concurrent runs produced contaminated results in Phase 2 (see ADR-0012 "
+                f"and HANDOFF). Wait for it to finish, or delete {path} if you are "
+                f"certain it is stale."
+            )
+    path.write_text(str(os.getpid()), encoding="utf-8")
+
+
+def release_stack_lock(path: Path = LOCK_PATH) -> None:
+    if path.exists():
+        try:
+            path.unlink()
+        except OSError:
+            pass
+
 
 def compose(*args: str, files: tuple[str, ...] = ("compose.yml",)) -> subprocess.CompletedProcess:
     """Run `docker compose` against the project, raising with captured output on failure.
@@ -64,10 +122,14 @@ def stack():
     """
     if not (ROOT / ".env").exists():
         pytest.fail("main/.env is missing. Copy .env.example to .env first.")
-    compose("up", "-d", "--wait")
-    yield
-    if os.environ.get("KEEP_STACK") != "1":
-        compose("down", "-v")
+    acquire_stack_lock()
+    try:
+        compose("up", "-d", "--wait")
+        yield
+    finally:
+        if os.environ.get("KEEP_STACK") != "1":
+            compose("down", "-v")
+        release_stack_lock()
 
 
 @pytest.fixture(scope="session")
