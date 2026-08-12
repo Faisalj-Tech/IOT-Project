@@ -21,13 +21,28 @@ if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
+def resolve_nodes(
+    host: str, port: int, nodes: Sequence[tuple[str, int]] | None
+) -> list[tuple[str, int]]:
+    """Normalise the single-endpoint and node-list forms to one list.
+
+    Phase 1/2 callers pass host/port and get a one-element list, so their
+    behaviour is bit-for-bit unchanged.
+    """
+    if nodes is None:
+        return [(host, port)]
+    resolved = [(h, int(p)) for h, p in nodes]
+    if not resolved:
+        raise ValueError("nodes must not be empty; omit it to use host/port instead")
+    return resolved
+
+
 async def _publish_device(
     spec: DeviceSpec,
     rate_hz: float,
     duration_s: float,
     run_id: str,
-    host: str,
-    port: int,
+    nodes: list[tuple[str, int]],
     username: str,
     password: str,
     max_reconnects: int,
@@ -52,8 +67,10 @@ async def _publish_device(
     seq = 0
     attempt = 0
     backoff = 0.5
+    node_index = 0
 
     while deadline is None or asyncio.get_running_loop().time() < deadline or seq < minimum_count:
+        host, port = nodes[node_index % len(nodes)]
         try:
             async with aiomqtt.Client(
                 hostname=host,
@@ -77,7 +94,12 @@ async def _publish_device(
             if attempt >= max_reconnects:
                 raise
             attempt += 1
-            log.warning("%s disconnected (%s); reconnecting in %.1fs", spec.device, exc, backoff)
+            node_index += 1  # a dead node stays dead; try the next one
+            log.warning(
+                "%s disconnected from %s:%s (%s); retrying on %s:%s in %.1fs",
+                spec.device, host, port, exc,
+                *nodes[node_index % len(nodes)], backoff,
+            )
             await asyncio.sleep(backoff)
             backoff = min(backoff * 2, 10.0)
 
@@ -94,7 +116,9 @@ async def run_devices(
     username: str = "device",
     password: str = "devicepass",
     max_reconnects: int = 12,
+    nodes: Sequence[tuple[str, int]] | None = None,
 ) -> dict[str, int]:
+    resolved = resolve_nodes(host, port, nodes)
     counts = await asyncio.gather(
         *(
             _publish_device(
@@ -102,8 +126,7 @@ async def run_devices(
                 rate_hz=rate_hz,
                 duration_s=duration_s,
                 run_id=run_id,
-                host=host,
-                port=port,
+                nodes=resolved,
                 username=username,
                 password=password,
                 max_reconnects=max_reconnects,
