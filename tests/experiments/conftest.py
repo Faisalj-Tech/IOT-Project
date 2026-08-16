@@ -216,46 +216,165 @@ def docker_control(stack):
 
 RESULTS_DIR = ROOT / "docs" / "results"
 POLL_INTERVAL_S = 2.0
+_EXEC_TIMEOUT_S = 8.0
+
+
+def cluster_mode() -> bool:
+    """Is this session running against the 3-node cluster overlay? Task 6 wires
+    this to the environment; until then every session is single-node."""
+    return False
+
+
+def _exec_json(container: str, *args: str) -> object:
+    """Run a RabbitMQ CLI tool inside a container and parse its JSON.
+
+    Verified against RabbitMQ 4.3.4:
+      rabbitmq-diagnostics -q --formatter json cluster_status
+      rabbitmq-queues      -q --formatter json quorum_status <queue>
+      rabbitmqctl          -q --formatter json list_queues name messages_ready messages_unacknowledged
+
+    Note list_queues lives on rabbitmqctl, not rabbitmq-queues, and there is no
+    list_node_alarms subcommand — alarms come out of cluster_status.
+    """
+    proc = subprocess.run(
+        ["docker", "exec", container, *args],
+        cwd=ROOT, check=True, capture_output=True, text=True, timeout=_EXEC_TIMEOUT_S,
+    )
+    return json.loads(proc.stdout)
 
 
 class GaugeRecorder:
-    """Poll RabbitMQ management gauges on a background thread.
+    """Poll every cluster node's gauges and cluster view on a background thread.
 
     messages_ready and messages_unacknowledged are gauges, not counters, which is
-    why ADR-0001's ban does not apply: they are recorded as evidence of buffering
-    and as the direct read on Telegraf's in-flight batch size. They never take part
-    in a delivery or loss assertion.
+    why ADR-0001's ban does not apply: they are recorded as evidence of buffering,
+    as the direct read on an in-flight batch size, and (ADR-0007) as a drain-exit
+    guard. They never take part in a delivery or loss assertion.
 
-    Poll failures are recorded as error samples rather than raised. The broker being
+    Each node's answer is kept under its own key and never merged. Under a
+    partition the nodes disagreeing IS the finding, and a merged or first-node-only
+    sample cannot express it. The flat top-level keys mirror node 1 so every
+    Phase 2 experiment and its committed results keep reading what they always did.
+
+    Two read paths. HTTP while a node answers; `docker exec` when it does not,
+    because a partitioned container loses its published ports (spec 4.1) and exec
+    needs no networking at all. Total failure of both is recorded as an error
+    sample for that node alone, leaving the other nodes intact: a broker being
     unreachable is a legitimate experimental condition, not a harness bug.
     """
 
-    def __init__(self, rabbit_get) -> None:
-        self._rabbit_get = rabbit_get
+    def __init__(self, rabbit_get_node, nodes: tuple[int, ...] = (1,)) -> None:
+        self._get_for = rabbit_get_node
+        self._nodes = nodes
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
+        self._exec_only: set[int] = set()
         self.samples: list[dict] = []
         self.marks: list[dict] = []
 
+    def expect_exec(self, node: int) -> None:
+        """Sample this node through docker exec only, skipping HTTP entirely.
+
+        Called by an experiment the moment it partitions a node. Without it the
+        recorder spends the whole split waiting on a socket that will never
+        answer: `rabbit_get_node`'s session uses timeout=10, three calls per
+        sample, against a 2-second poll interval — a 60-second split would yield
+        one or two samples of the very thing being measured.
+        """
+        self._exec_only.add(node)
+
+    def expect_http(self, node: int) -> None:
+        """Resume HTTP sampling. Called on heal."""
+        self._exec_only.discard(node)
+
+    def _sample_node_http(self, node: int) -> dict:
+        get = self._get_for(node)
+        telemetry = get("/queues/%2F/telemetry.q").json()
+        dlq = get("/queues/%2F/dlq").json()
+        nodes = get("/nodes").json()
+        me = f"rabbit@rabbit{node}"
+        entry = next((n for n in nodes if n.get("name") == me), {})
+        return {
+            "reachable": True,
+            "source": "http",
+            "telemetry_ready": int(telemetry.get("messages_ready", 0)),
+            "telemetry_unacked": int(telemetry.get("messages_unacknowledged", 0)),
+            "dlq_messages": int(dlq.get("messages", 0)),
+            "members": list(telemetry.get("members", [])),
+            "online": list(telemetry.get("online", [])),
+            "leader": telemetry.get("leader"),
+            "partitions": list(entry.get("partitions", [])),
+            "running": bool(entry.get("running", False)),
+            "alarms": {
+                "mem": bool(entry.get("mem_alarm", False)),
+                "disk": bool(entry.get("disk_free_alarm", False)),
+            },
+        }
+
+    def _sample_node_exec(self, node: int) -> dict:
+        container = container_for("rabbitmq", node)
+        status = _exec_json(container, "rabbitmq-diagnostics", "-q", "--formatter", "json",
+                            "cluster_status")
+        quorum = _exec_json(container, "rabbitmq-queues", "-q", "--formatter", "json",
+                            "quorum_status", "telemetry.q")
+        queues = _exec_json(container, "rabbitmqctl", "-q", "--formatter", "json",
+                            "list_queues", "name", "messages_ready", "messages_unacknowledged")
+        by_name = {q["name"]: q for q in queues}
+        telemetry = by_name.get("telemetry.q", {})
+        dlq = by_name.get("dlq", {})
+        leader = next(
+            (r["Node Name"] for r in quorum if r.get("Raft State") == "leader"), None
+        )
+        alarms = status.get("alarms") or []
+        return {
+            "reachable": True,
+            "source": "exec",
+            "telemetry_ready": int(telemetry.get("messages_ready", 0)),
+            "telemetry_unacked": int(telemetry.get("messages_unacknowledged", 0)),
+            "dlq_messages": int(dlq.get("messages_ready", 0)),
+            "members": [r["Node Name"] for r in quorum],
+            "online": [r["Node Name"] for r in quorum],
+            "leader": leader,
+            "partitions": list(status.get("partitions") or []),
+            "running": True,
+            "alarms": {
+                "mem": any("memory" in str(a) for a in alarms),
+                "disk": any("disk" in str(a) for a in alarms),
+            },
+        }
+
+    def _sample_node(self, node: int) -> dict:
+        http_exc: Exception | None = None
+        if node not in self._exec_only:
+            try:
+                return self._sample_node_http(node)
+            except Exception as exc:
+                http_exc = exc
+        try:
+            return self._sample_node_exec(node)
+        except Exception as exec_exc:
+            return {
+                "reachable": False,
+                "source": None,
+                "http_error": None if http_exc is None else f"{type(http_exc).__name__}: {http_exc}",
+                "exec_error": f"{type(exec_exc).__name__}: {exec_exc}",
+            }
+
     def _sample_once(self) -> dict:
         now = time.time()
-        try:
-            telemetry = self._rabbit_get("/queues/%2F/telemetry.q").json()
-            dlq = self._rabbit_get("/queues/%2F/dlq").json()
-            nodes = self._rabbit_get("/nodes").json()
-            node = nodes[0] if nodes else {}
-            return {
-                "t": now,
-                "telemetry_ready": int(telemetry.get("messages_ready", 0)),
-                "telemetry_unacked": int(telemetry.get("messages_unacknowledged", 0)),
-                "dlq_messages": int(dlq.get("messages", 0)),
-                "alarms": {
-                    "mem": bool(node.get("mem_alarm", False)),
-                    "disk": bool(node.get("disk_free_alarm", False)),
-                },
-            }
-        except Exception as exc:
-            return {"t": now, "error": f"{type(exc).__name__}: {exc}"}
+        per_node = {n: self._sample_node(n) for n in self._nodes}
+        sample: dict = {"t": now, "nodes": per_node}
+        first = per_node.get(self._nodes[0], {})
+        if first.get("reachable"):
+            sample.update({
+                "telemetry_ready": first["telemetry_ready"],
+                "telemetry_unacked": first["telemetry_unacked"],
+                "dlq_messages": first["dlq_messages"],
+                "alarms": first["alarms"],
+            })
+        else:
+            sample["error"] = first.get("http_error", "unreachable")
+        return sample
 
     def _loop(self) -> None:
         while not self._stop.is_set():
@@ -269,7 +388,7 @@ class GaugeRecorder:
     def stop(self) -> None:
         self._stop.set()
         if self._thread is not None:
-            self._thread.join(timeout=10)
+            self._thread.join(timeout=30)
 
     def mark(self, label: str) -> None:
         self.marks.append({"label": label, "t": time.time()})
@@ -279,16 +398,49 @@ class GaugeRecorder:
         return max(values) if values else 0
 
     def latest(self, key: str) -> int:
-        """Most recent successful reading of a gauge.
+        """Most recent successful reading of a gauge on the first sampled node.
 
-        Distinct from peak() and not interchangeable with it: "how deep was Telegraf's
-        in-flight batch at the moment we killed it" is a latest(), and reporting a
-        run-wide peak under that name would overstate it.
+        Distinct from peak() and not interchangeable with it: "how deep was
+        Telegraf's in-flight batch at the moment we killed it" is a latest(), and
+        reporting a run-wide peak under that name would overstate it.
         """
         for sample in reversed(self.samples):
             if key in sample:
                 return sample[key]
         return 0
+
+    def node_latest(self, node: int, key: str):
+        """Most recent reading of `key` on a named node, regardless of read path."""
+        for sample in reversed(self.samples):
+            entry = sample.get("nodes", {}).get(node, {})
+            if entry.get("reachable") and key in entry:
+                return entry[key]
+        return None
+
+    def mark_time(self, label: str) -> float | None:
+        """When a named mark was recorded. None if it was never marked."""
+        for mark in reversed(self.marks):
+            if mark["label"] == label:
+                return mark["t"]
+        return None
+
+    def node_window(self, node: int, key: str, since: float,
+                    until: float | None = None):
+        """Latest reading of `key` on a node *within a time window*.
+
+        node_latest scans all of history, which is wrong for anything that asks
+        "what did this node look like during the split". If the partitioned node
+        went unreachable, node_latest happily returns its pre-partition value and
+        an assertion built on it reports the opposite of the truth.
+        """
+        until = float("inf") if until is None else until
+        for sample in reversed(self.samples):
+            if not (since <= sample["t"] <= until):
+                continue
+            entry = sample.get("nodes", {}).get(node, {})
+            if entry.get("reachable") and key in entry:
+                return entry[key]
+        return None
 
     def timeline(self) -> dict:
         return {"samples": self.samples, "marks": self.marks}
@@ -307,9 +459,13 @@ def write_result(experiment: str, payload: dict) -> Path:
     return path
 
 
+CLUSTER_NODE_INDICES = (1, 2, 3)
+
+
 @pytest.fixture
-def gauge_recorder(stack, rabbit_get):
-    recorder = GaugeRecorder(rabbit_get)
+def gauge_recorder(stack, rabbit_get_node):
+    nodes = CLUSTER_NODE_INDICES if cluster_mode() else (1,)
+    recorder = GaugeRecorder(rabbit_get_node, nodes=nodes)
     recorder.start()
     try:
         yield recorder

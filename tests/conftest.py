@@ -14,7 +14,16 @@ if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 ROOT = Path(__file__).resolve().parents[1]
-RABBIT_API = "http://localhost:15672/api"
+
+# Node 1 keeps Phase 1's port so every existing caller and config is unchanged.
+RABBIT_MGMT_PORTS = {1: 15672, 2: 15673, 3: 15674}
+
+
+def rabbit_api(node: int = 1) -> str:
+    return f"http://localhost:{RABBIT_MGMT_PORTS[node]}/api"
+
+
+RABBIT_API = rabbit_api(1)  # retained: Phase 1/2 modules import this name
 
 
 def _load_env() -> None:
@@ -133,7 +142,8 @@ def stack():
 
 
 @pytest.fixture(scope="session")
-def rabbit_get(stack):
+def rabbit_get_node(stack):
+    """Returns a factory: rabbit_get_node(2) is a GET bound to node 2's API."""
     auth = (
         os.environ.get("RABBITMQ_ADMIN_USER", "admin"),
         os.environ.get("RABBITMQ_ADMIN_PASSWORD", "adminpass"),
@@ -141,10 +151,22 @@ def rabbit_get(stack):
     session = requests.Session()
     session.auth = auth
 
-    def _get(path: str) -> requests.Response:
-        return session.get(f"{RABBIT_API}{path}", timeout=10)
+    def _for_node(node: int = 1):
+        base = rabbit_api(node)
 
-    return _get
+        def _get(path: str) -> requests.Response:
+            return session.get(f"{base}{path}", timeout=10)
+
+        return _get
+
+    yield _for_node
+    session.close()
+
+
+@pytest.fixture(scope="session")
+def rabbit_get(rabbit_get_node):
+    """Node 1's getter. Unchanged contract for every Phase 1/2 caller."""
+    return rabbit_get_node(1)
 
 
 @pytest.fixture(scope="session")

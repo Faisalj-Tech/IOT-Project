@@ -62,3 +62,86 @@ def test_record_writes_a_result_json(results_dir, tmp_path):
     assert written["experiment"] == "smoke"
     assert "recorded_at" in written
     path.unlink()
+
+
+def test_samples_carry_a_per_node_section(gauge_recorder):
+    time.sleep(5)
+    samples = [s for s in gauge_recorder.samples if "error" not in s]
+    assert samples, gauge_recorder.samples
+    first = samples[0]
+    assert "nodes" in first, "recorder must keep every node's view separately"
+    assert 1 in first["nodes"], first["nodes"]
+    node1 = first["nodes"][1]
+    assert set(node1) >= {
+        "reachable", "source", "telemetry_ready", "telemetry_unacked",
+        "dlq_messages", "alarms", "members", "leader", "partitions",
+    }, node1
+    assert node1["reachable"] is True
+    assert node1["source"] == "http"
+    assert node1["leader"] == "rabbit@rabbit1"
+    assert node1["members"] == ["rabbit@rabbit1"]
+    assert node1["partitions"] == []
+
+
+def test_flat_keys_still_mirror_node_one(gauge_recorder):
+    """Phase 2 experiments and their committed results read the flat keys."""
+    time.sleep(5)
+    samples = [s for s in gauge_recorder.samples if "error" not in s]
+    first = samples[0]
+    assert first["telemetry_ready"] == first["nodes"][1]["telemetry_ready"]
+    assert first["telemetry_unacked"] == first["nodes"][1]["telemetry_unacked"]
+    assert first["dlq_messages"] == first["nodes"][1]["dlq_messages"]
+    assert first["alarms"] == first["nodes"][1]["alarms"]
+
+
+def test_node_latest_reads_the_named_node(gauge_recorder):
+    time.sleep(5)
+    assert isinstance(gauge_recorder.node_latest(1, "telemetry_ready"), int)
+
+
+def test_exec_reads_a_node_whose_published_ports_are_gone(gauge_recorder, docker_control):
+    """A partitioned node loses its published ports, so exec is the only read path.
+
+    expect_exec is called explicitly rather than relying on the HTTP attempt to
+    fail first — that is exactly what Experiments H and I do, and for the same
+    reason: three HTTP calls at timeout=10 against a 2-second poll interval would
+    starve the recorder of samples for the whole split.
+    """
+    docker_control.partition("rabbitmq")
+    gauge_recorder.expect_exec(1)
+    time.sleep(8)
+    docker_control.heal("rabbitmq")
+    gauge_recorder.expect_http(1)
+    time.sleep(8)
+
+    reachable = [
+        s["nodes"][1]
+        for s in gauge_recorder.samples
+        if "nodes" in s and s["nodes"].get(1, {}).get("reachable")
+    ]
+    sources = [entry["source"] for entry in reachable]
+    assert "exec" in sources, (
+        f"recorder never read the partitioned node through docker exec: {sources}"
+    )
+    assert "http" in sources, "recorder never recovered to HTTP after the partition healed"
+
+    by_source = {entry["source"]: entry for entry in reachable}
+    assert by_source["exec"]["members"], "exec path returned no Raft membership"
+    assert by_source["exec"]["leader"] == "rabbit@rabbit1", by_source["exec"]
+
+
+def test_node_window_ignores_readings_outside_the_window(gauge_recorder):
+    """node_latest scans all history; node_window must not."""
+    time.sleep(5)
+    cutoff = time.time()
+    time.sleep(3)
+    assert gauge_recorder.node_window(1, "telemetry_ready", since=cutoff) is not None
+    assert gauge_recorder.node_window(
+        1, "telemetry_ready", since=cutoff - 3600, until=cutoff - 1800
+    ) is None
+
+
+def test_mark_time_returns_the_timestamp_of_a_named_mark(gauge_recorder):
+    gauge_recorder.mark("split")
+    assert gauge_recorder.mark_time("split") == gauge_recorder.marks[-1]["t"]
+    assert gauge_recorder.mark_time("never-marked") is None
