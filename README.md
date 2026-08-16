@@ -90,6 +90,11 @@ every Phase 1/2 test resolve unchanged. Nodes 2 and 3 boot from fresh,
 cluster-only volumes and import no definitions of their own — only node 1
 imports, so formation is not a three-way race.
 
+A pre-existing Phase 1/2 `.env` lacks `RABBITMQ_ERLANG_COOKIE` and
+`RABBITMQ_PARTITION_HANDLING` — copy them from `.env.example` before
+bringing the cluster up, or formation fails with a peer-discovery-looking
+error instead of the config gap it actually is.
+
 Bring-up:
 
 ```bash
