@@ -111,16 +111,21 @@ docker exec iot-rabbitmq rabbitmq-queues -q --formatter json quorum_status telem
 
 `cluster_status` should list all three nodes under `running_nodes`, and
 `quorum_status` should return three rows (one `leader`, two `follower`, all
-`voter`). On this implementation the cluster formed cleanly on the first
-attempt with three voting members — the definitions-import-vs-formation race
-described in ADR-0013 did not fire, so `rabbitmq-queues grow` was not needed.
-If your `quorum_status` ever returns a single row, the race did fire; recover
-with:
+`voter`). The definitions-import-vs-formation race described in ADR-0013 is
+**non-deterministic per bring-up, not per machine** — on this implementation
+it did not fire on one `down -v` / `up -d --wait` cycle and did fire on a
+later one, on the same machine. Treat `quorum_status` returning a single row
+as a routine possibility to check after every fresh bring-up, not a rare
+edge case. Recover with:
 
 ```bash
 docker exec iot-rabbitmq rabbitmq-queues grow rabbit@rabbit2 all
 docker exec iot-rabbitmq rabbitmq-queues grow rabbit@rabbit3 all
 ```
+
+`tests/experiments/test_cluster_preflight.py` (Task 7) asserts this for you
+and names the exact `grow` commands in its failure message, so a half-formed
+cluster fails loudly before any experiment runs on it.
 
 Per-node ports (spec §4.1):
 
