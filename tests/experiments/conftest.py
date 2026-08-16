@@ -11,13 +11,44 @@ import pytest
 
 from tests.conftest import ROOT, compose
 
-CONTAINER_NAMES = {
-    "rabbitmq": "iot-rabbitmq",
+CONTAINER_NAMES: dict[str, str | tuple[str, ...]] = {
+    "rabbitmq": ("iot-rabbitmq", "iot-rabbitmq2", "iot-rabbitmq3"),
     "influxdb": "iot-influxdb",
     "telegraf": "iot-telegraf",
     "grafana": "iot-grafana",
     "consumer": "iot-consumer",
 }
+
+# `name: iot-messaging` in compose.yml prefixes every network Compose creates.
+PARTITION_NETWORKS = ("iot-messaging_core", "iot-messaging_edge")
+
+
+def _entry(service: str) -> tuple[str, ...]:
+    entry = CONTAINER_NAMES[service]
+    return (entry,) if isinstance(entry, str) else entry
+
+
+def container_for(service: str, node: int = 1) -> str:
+    """Container name for a service, addressed by 1-based node index.
+
+    Single-container services accept node=1 only. Passing node=2 to one of them
+    is a bug in the caller, not a request to guess.
+    """
+    entry = _entry(service)
+    if not 1 <= node <= len(entry):
+        raise ValueError(
+            f"{service} has {len(entry)} container(s); node={node} is out of range"
+        )
+    return entry[node - 1]
+
+
+def compose_service_for(service: str, node: int = 1) -> str:
+    """Compose service name. Node 1 keeps the bare name so Phase 1/2 configs work."""
+    _entry(service)  # validates the service exists
+    if node == 1:
+        return service
+    container_for(service, node)  # validates the index
+    return f"{service}{node}"
 
 
 def _docker(*args: str) -> subprocess.CompletedProcess:
@@ -32,76 +63,143 @@ def _docker(*args: str) -> subprocess.CompletedProcess:
     return proc
 
 
+def compose_files() -> tuple[str, ...]:
+    """Which compose files the current stack was brought up with. Task 6 makes this
+    cluster-aware; until then the stack is always the single-node Phase 1 stack."""
+    return ("compose.yml",)
+
+
 class DockerControl:
-    """Stop, kill, and restart compose services, verifying each state transition.
+    """Stop, kill, partition, and restart compose services, verifying each transition.
 
     Every infrastructure service carries `restart: unless-stopped`. `docker kill`
     alone is therefore undone by the daemon within seconds, which would turn a
     "Telegraf was dead for 60s" experiment into "Telegraf bounced". kill() clears
     the restart policy first and restore() puts it back.
+
+    Ledgers key on (service, node) so a three-node cluster cannot collapse three
+    downed brokers into one entry.
     """
 
     def __init__(self) -> None:
-        self._downed: list[str] = []
-        self._policy_cleared: list[str] = []
+        self._downed: list[tuple[str, int]] = []
+        self._policy_cleared: list[tuple[str, int]] = []
+        self._partitioned: list[tuple[str, int]] = []
+        self._original_networks: dict[tuple[str, int], set[str]] = {}
 
-    def is_running(self, service: str) -> bool:
-        container = CONTAINER_NAMES[service]
-        proc = _docker("inspect", "--format", "{{.State.Running}}", container)
+    def _files(self, service: str) -> tuple[str, ...]:
+        if service == "consumer":
+            return CONSUMER_FILES
+        return compose_files()
+
+    def is_running(self, service: str, node: int = 1) -> bool:
+        proc = _docker("inspect", "--format", "{{.State.Running}}", container_for(service, node))
         return proc.stdout.strip() == "true"
 
-    def _await_state(self, service: str, running: bool, timeout: float = 30.0) -> None:
+    def _await_state(self, service: str, running: bool, node: int = 1, timeout: float = 30.0) -> None:
         deadline = time.time() + timeout
         while time.time() < deadline:
-            if self.is_running(service) == running:
+            if self.is_running(service, node) == running:
                 return
             time.sleep(0.5)
         state = "running" if running else "stopped"
-        raise AssertionError(f"{service} did not reach state {state} within {timeout}s")
+        raise AssertionError(
+            f"{container_for(service, node)} did not reach state {state} within {timeout}s"
+        )
 
-    def stop(self, service: str, timeout: int = 10) -> None:
+    def stop(self, service: str, timeout: int = 10, node: int = 1) -> None:
         """Graceful stop. timeout=0 denies shutdown grace but still sends SIGTERM."""
-        files = CONSUMER_FILES if service == "consumer" else ("compose.yml",)
-        compose("stop", "-t", str(timeout), service, files=files)
-        self._await_state(service, running=False)
-        if service not in self._downed:
-            self._downed.append(service)
+        compose("stop", "-t", str(timeout), compose_service_for(service, node),
+                files=self._files(service))
+        self._await_state(service, running=False, node=node)
+        if (service, node) not in self._downed:
+            self._downed.append((service, node))
 
-    def kill(self, service: str) -> None:
+    def kill(self, service: str, node: int = 1) -> None:
         """Abrupt SIGKILL that survives the restart policy."""
-        container = CONTAINER_NAMES[service]
+        container = container_for(service, node)
         _docker("update", "--restart=no", container)
-        if service not in self._policy_cleared:
-            self._policy_cleared.append(service)
+        if (service, node) not in self._policy_cleared:
+            self._policy_cleared.append((service, node))
         _docker("kill", container)
-        self._await_state(service, running=False)
-        if service not in self._downed:
-            self._downed.append(service)
+        self._await_state(service, running=False, node=node)
+        if (service, node) not in self._downed:
+            self._downed.append((service, node))
 
-    def start(self, service: str, wait: bool = True) -> None:
+    def start(self, service: str, wait: bool = True, node: int = 1) -> None:
         args = ["up", "-d"]
         if wait:
             args.append("--wait")
-        files = CONSUMER_FILES if service == "consumer" else ("compose.yml",)
-        compose(*args, service, files=files)
-        self._await_state(service, running=True)
-        if service in self._downed:
-            self._downed.remove(service)
+        compose(*args, compose_service_for(service, node), files=self._files(service))
+        self._await_state(service, running=True, node=node)
+        if (service, node) in self._downed:
+            self._downed.remove((service, node))
+
+    def partition(self, service: str, node: int = 1) -> None:
+        """Detach a container from the shared networks — a real network partition.
+
+        The container keeps running and keeps its disk state; its peers simply
+        cannot resolve or reach it. Its published host ports go down with the
+        detachment (measured; see spec 4.1), which is why cluster state on a
+        partitioned node is read through `docker exec` rather than HTTP.
+        """
+        import json
+        container = container_for(service, node)
+
+        # Record the original networks before disconnecting.
+        if (service, node) not in self._original_networks:
+            proc = _docker("inspect", "--format", "{{json .NetworkSettings.Networks}}", container)
+            self._original_networks[(service, node)] = set(json.loads(proc.stdout).keys())
+
+        # Disconnect from the partition networks.
+        for network in PARTITION_NETWORKS:
+            try:
+                _docker("network", "disconnect", network, container)
+            except RuntimeError:
+                # Container may not be connected to this network; skip it.
+                pass
+        if (service, node) not in self._partitioned:
+            self._partitioned.append((service, node))
+
+    def heal(self, service: str, node: int = 1) -> None:
+        import json
+        container = container_for(service, node)
+
+        # Get the original networks (recorded in partition()).
+        original_networks = self._original_networks.get((service, node), set())
+
+        # Reconnect only to the networks the container was originally on.
+        for network in PARTITION_NETWORKS:
+            if network in original_networks:
+                try:
+                    _docker("network", "connect", network, container)
+                except RuntimeError:
+                    # Already connected or some other error; skip it.
+                    pass
+
+        if (service, node) in self._partitioned:
+            self._partitioned.remove((service, node))
 
     def restore(self) -> None:
-        """Bring everything back and re-apply cleared restart policies.
+        """Bring everything back, reattach every network, re-apply restart policies.
 
-        Runs on every exit path, including assertion failure and interrupt, so a
-        failed experiment cannot leave a service down for the next one.
+        Runs on every exit path, including assertion failure and interrupt. A
+        partition that outlives a crashed test silently poisons every later run
+        in the session — a worse failure than the one that caused it.
         """
-        for service in list(self._downed):
+        for service, node in list(self._partitioned):
             try:
-                self.start(service)
+                self.heal(service, node)
             except Exception:
                 pass
-        for service in list(self._policy_cleared):
+        for service, node in list(self._downed):
             try:
-                _docker("update", "--restart=unless-stopped", CONTAINER_NAMES[service])
+                self.start(service, node=node)
+            except Exception:
+                pass
+        for service, node in list(self._policy_cleared):
+            try:
+                _docker("update", "--restart=unless-stopped", container_for(service, node))
             except Exception:
                 pass
         self._policy_cleared.clear()
