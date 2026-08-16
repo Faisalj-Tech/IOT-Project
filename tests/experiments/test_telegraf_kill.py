@@ -68,7 +68,8 @@ def _run_arm(arm, docker_control, gauge_recorder, results_dir, influx_query, rab
     expected_total = sum(published.values())
 
     start = flux_range_start(started_at)
-    rows = drain_and_fetch(influx_query, run_id, start, expected_total, timeout_s=240)
+    drain = drain_and_fetch(influx_query, run_id, start, expected_total, timeout_s=240, gauge_recorder=gauge_recorder)
+    rows = drain.rows
     gauge_recorder.mark("drained")
 
     report = sequence_report(rows, published)
@@ -98,6 +99,7 @@ def _run_arm(arm, docker_control, gauge_recorder, results_dir, influx_query, rab
             "peak_messages_unacked": gauge_recorder.peak("telemetry_unacked"),
             "dlq_baseline": dlq_baseline,
             "dlq_final": dlq_final,
+            **drain.as_result_fields(),
             "verdict": "no-loss" if not report["gaps"] else "loss",
             "timeline": gauge_recorder.timeline(),
         },

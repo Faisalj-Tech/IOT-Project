@@ -4,6 +4,7 @@ import json
 import subprocess
 import threading
 import time
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -521,38 +522,86 @@ def start_sim(specs, rate_hz: float, duration_s: float, run_id: str,
     return _EXECUTOR.submit(_run)
 
 
-def drain_and_fetch(influx_query, run_id: str, start: str, expected_total: int,
-                    timeout_s: float = 180.0, stable_polls_limit: int = 6) -> list[dict]:
-    """Poll until the row count settles, then return the rows.
+@dataclass
+class DrainResult:
+    """What a drain produced and how it decided to stop.
 
-    Two exit conditions, deliberately different. A healthy run exits as soon as it has
-    reached the expected total and held steady for three polls. A lossy run never
-    reaches the total, so it exits on a longer stall instead — stable_polls_limit
-    stable polls (default: six, i.e. 30s with no new rows, which is three of Telegraf's
-    10s flush intervals). This limit is parameterizable to handle slower post-recovery
-    drains that exhibit temporary plateaus mid-backlog. Without that second condition
-    an experiment that actually lost messages would burn the whole timeout before
-    reporting the very number it was run to measure.
+    ADR-0012's root cause took several rounds to find because none of these were
+    recorded — they had to be re-derived from timestamps and gauge timelines after
+    the fact. They are nearly free to capture and make a repeat self-diagnosing.
+    """
+
+    rows: list[dict] = field(default_factory=list)
+    elapsed_s: float = 0.0
+    exit_condition: str = "timeout"
+    ready_at_exit: int | None = None
+    unacked_at_exit: int | None = None
+
+    def as_result_fields(self) -> dict:
+        return {
+            "drain_elapsed_s": self.elapsed_s,
+            "drain_exit_condition": self.exit_condition,
+            "queue_ready_at_drain_exit": self.ready_at_exit,
+            "queue_unacked_at_drain_exit": self.unacked_at_exit,
+        }
+
+
+def drain_and_fetch(influx_query, run_id: str, start: str, expected_total: int,
+                    timeout_s: float = 180.0, stable_polls_limit: int = 6,
+                    gauge_recorder=None, leader_node: int = 1) -> DrainResult:
+    """Wait for the pipeline to finish draining, then return the rows.
+
+    Primary exit: the broker reports the queue empty (`messages_ready == 0` and
+    `messages_unacknowledged == 0`) and the row count has stopped moving. Both
+    gauges are already sampled by gauge_recorder and are permitted as buffering
+    evidence and as a guard under ADR-0007; they prove nothing about delivery,
+    they only decide when it is safe to stop waiting for it.
+
+    Fallback exit: poll-count stability, the Phase 2 heuristic, used when no
+    recorder was supplied or when the broker is unreachable. ADR-0012 records this
+    heuristic reporting loss twice on a run that had not lost anything, which is
+    why it is no longer the primary condition — a slow drain that plateaus
+    mid-backlog looks identical to a finished one.
+
+    Last resort: timeout_s. An experiment that actually lost messages never
+    reaches expected_total, so without the fallback it would burn the whole
+    timeout before reporting the very number it was run to measure.
     """
     from tests.conftest import fetch_seqs
 
-    deadline = time.time() + timeout_s
-    rows: list[dict] = []
+    began = time.time()
+    deadline = began + timeout_s
+    result = DrainResult()
     last_count = -1
     stable_polls = 0
+
     while time.time() < deadline:
-        rows = fetch_seqs(influx_query, run_id, start=start)
-        if len(rows) == last_count:
+        result.rows = fetch_seqs(influx_query, run_id, start=start)
+        if len(result.rows) == last_count:
             stable_polls += 1
         else:
             stable_polls = 0
-            last_count = len(rows)
-        if stable_polls >= 3 and len(rows) >= expected_total:
+            last_count = len(result.rows)
+
+        if gauge_recorder is not None:
+            ready = gauge_recorder.node_latest(leader_node, "telemetry_ready")
+            unacked = gauge_recorder.node_latest(leader_node, "telemetry_unacked")
+            result.ready_at_exit = ready
+            result.unacked_at_exit = unacked
+            if ready == 0 and unacked == 0 and stable_polls >= 2:
+                result.exit_condition = "broker-drained"
+                break
+
+        if stable_polls >= 3 and len(result.rows) >= expected_total:
+            result.exit_condition = "row-count-stable"
             break
         if stable_polls >= stable_polls_limit:
+            result.exit_condition = "row-count-stable"
             break
         time.sleep(5)
-    return rows
+
+    result.elapsed_s = round(time.time() - began, 2)
+    return result
 
 
 def sequence_report(rows: list[dict], published: dict[str, int]) -> dict:

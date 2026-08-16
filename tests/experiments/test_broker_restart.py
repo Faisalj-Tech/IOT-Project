@@ -66,7 +66,8 @@ def test_broker_restart_costs_time_and_duplicates_but_not_messages(
     expected_total = sum(published.values())
 
     start = flux_range_start(started_at)
-    rows = drain_and_fetch(influx_query, run_id, start, expected_total, timeout_s=240, stable_polls_limit=18)
+    drain = drain_and_fetch(influx_query, run_id, start, expected_total, timeout_s=240, stable_polls_limit=18, gauge_recorder=gauge_recorder)
+    rows = drain.rows
     report = sequence_report(rows, published)
     duplicate_total = sum(report["duplicates"].values())
 
@@ -92,6 +93,7 @@ def test_broker_restart_costs_time_and_duplicates_but_not_messages(
             "wall_clock_s": wall_clock_s,
             "time_dilation_s": wall_clock_s - nominal_s,
             "broker_restart_s": restart_duration,
+            **drain.as_result_fields(),
             "verdict": "no-loss" if not report["gaps"] else "loss",
             "timeline": gauge_recorder.timeline(),
         },

@@ -26,9 +26,10 @@ def test_consumer_ingests_a_clean_run(consumer_stack, influx_query, docker_contr
     published = start_sim(specs, 5.0, 5.0, run_id).result(timeout=120)
     expected_total = sum(published.values())
 
-    rows = drain_and_fetch(
+    drain = drain_and_fetch(
         influx_query, run_id, flux_range_start(started_at), expected_total, timeout_s=120
     )
+    rows = drain.rows
     report = sequence_report(rows, published)
 
     assert report["gaps"] == {}, f"consumer lost messages: {report['gaps']}"

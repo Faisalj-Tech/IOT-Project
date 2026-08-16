@@ -48,7 +48,8 @@ def test_influxdb_outage_loses_no_messages(
     expected_total = sum(published.values())
 
     start = flux_range_start(started_at)
-    rows = drain_and_fetch(influx_query, run_id, start, expected_total)
+    drain = drain_and_fetch(influx_query, run_id, start, expected_total, gauge_recorder=gauge_recorder)
+    rows = drain.rows
     gauge_recorder.mark("drained")
 
     report = sequence_report(rows, published)
@@ -73,6 +74,7 @@ def test_influxdb_outage_loses_no_messages(
             "peak_messages_unacked": gauge_recorder.peak("telemetry_unacked"),
             "dlq_baseline": dlq_baseline,
             "dlq_final": dlq_final,
+            **drain.as_result_fields(),
             "verdict": "no-loss" if not report["gaps"] else "loss",
             "timeline": gauge_recorder.timeline(),
         },

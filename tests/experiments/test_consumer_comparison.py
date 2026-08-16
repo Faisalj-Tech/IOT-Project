@@ -46,9 +46,10 @@ def test_consumer_arm_survives_an_influxdb_outage(
 
     published = future.result(timeout=300)
     expected_total = sum(published.values())
-    rows = drain_and_fetch(
-        influx_query, run_id, flux_range_start(started_at), expected_total, timeout_s=240
+    drain = drain_and_fetch(
+        influx_query, run_id, flux_range_start(started_at), expected_total, timeout_s=240, gauge_recorder=gauge_recorder
     )
+    rows = drain.rows
     report = sequence_report(rows, published)
     dlq_final = rabbit_get("/queues/%2F/dlq").json()["messages"]
 
@@ -68,6 +69,7 @@ def test_consumer_arm_survives_an_influxdb_outage(
             "peak_messages_unacked": gauge_recorder.peak("telemetry_unacked"),
             "dlq_baseline": dlq_baseline,
             "dlq_final": dlq_final,
+            **drain.as_result_fields(),
             "verdict": "no-loss" if not report["gaps"] else "loss",
             "timeline": gauge_recorder.timeline(),
         },
@@ -100,9 +102,10 @@ def test_consumer_arm_survives_being_killed_mid_outage(
 
     published = future.result(timeout=420)
     expected_total = sum(published.values())
-    rows = drain_and_fetch(
-        influx_query, run_id, flux_range_start(started_at), expected_total, timeout_s=240
+    drain = drain_and_fetch(
+        influx_query, run_id, flux_range_start(started_at), expected_total, timeout_s=240, gauge_recorder=gauge_recorder
     )
+    rows = drain.rows
     report = sequence_report(rows, published)
 
     results_dir(
@@ -116,6 +119,7 @@ def test_consumer_arm_survives_being_killed_mid_outage(
             "gaps": report["gaps"],
             "duplicates": report["duplicates"],
             "unacked_at_takedown": unacked_at_kill,
+            **drain.as_result_fields(),
             "verdict": "no-loss" if not report["gaps"] else "loss",
             "timeline": gauge_recorder.timeline(),
         },
