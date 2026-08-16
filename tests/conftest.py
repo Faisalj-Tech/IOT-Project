@@ -99,6 +99,21 @@ def release_stack_lock(path: Path = LOCK_PATH) -> None:
             pass
 
 
+def cluster_mode() -> bool:
+    """Is this session running against the 3-node cluster overlay?
+
+    Driven by an environment variable rather than by marker inspection because the
+    stack fixture is session-scoped and must choose its compose files before any
+    test runs. tests/experiments/test_cluster_preflight.py fails loudly if a
+    cluster test runs without it.
+    """
+    return os.environ.get("IOT_CLUSTER") == "1"
+
+
+def compose_files() -> tuple[str, ...]:
+    return ("compose.yml", "compose.cluster.yml") if cluster_mode() else ("compose.yml",)
+
+
 def compose(*args: str, files: tuple[str, ...] = ("compose.yml",)) -> subprocess.CompletedProcess:
     """Run `docker compose` against the project, raising with captured output on failure.
 
@@ -133,11 +148,11 @@ def stack():
         pytest.fail("main/.env is missing. Copy .env.example to .env first.")
     acquire_stack_lock()
     try:
-        compose("up", "-d", "--wait")
+        compose("up", "-d", "--wait", files=compose_files())
         yield
     finally:
         if os.environ.get("KEEP_STACK") != "1":
-            compose("down", "-v")
+            compose("down", "-v", files=compose_files())
         release_stack_lock()
 
 

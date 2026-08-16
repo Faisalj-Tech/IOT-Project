@@ -1,0 +1,84 @@
+services:
+  rabbitmq:
+    hostname: rabbit1
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit cluster_partition_handling ${RABBITMQ_PARTITION_HANDLING}"
+    volumes:
+      - ./config/rabbitmq/rabbitmq.cluster.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./config/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+      - ./config/rabbitmq/definitions.cluster.json:/etc/rabbitmq/definitions.json:ro
+      - rabbitmq-data-1:/var/lib/rabbitmq
+
+  rabbitmq2:
+    image: rabbitmq:4.3.4-management
+    container_name: iot-rabbitmq2
+    hostname: rabbit2
+    env_file: .env
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit cluster_partition_handling ${RABBITMQ_PARTITION_HANDLING}"
+    ports:
+      - "1884:1883"
+      - "5673:5672"
+      - "15673:15672"
+    volumes:
+      - ./config/rabbitmq/rabbitmq.cluster-peer.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./config/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+      - rabbitmq-data-2:/var/lib/rabbitmq
+    networks:
+      - edge
+      - core
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 40s
+
+  rabbitmq3:
+    image: rabbitmq:4.3.4-management
+    container_name: iot-rabbitmq3
+    hostname: rabbit3
+    env_file: .env
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit cluster_partition_handling ${RABBITMQ_PARTITION_HANDLING}"
+    ports:
+      - "1885:1883"
+      - "5674:5672"
+      - "15674:15672"
+    volumes:
+      - ./config/rabbitmq/rabbitmq.cluster-peer.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./config/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins:ro
+      - rabbitmq-data-3:/var/lib/rabbitmq
+    networks:
+      - edge
+      - core
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 40s
+
+  telegraf:
+    volumes:
+      - ./config/telegraf/telegraf.cluster.conf:/etc/telegraf/telegraf.conf:ro
+      - ./config/telegraf/telegraf.d:/etc/telegraf/telegraf.d:ro
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      rabbitmq2:
+        condition: service_healthy
+      rabbitmq3:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+
+volumes:
+  rabbitmq-data-1:
+  rabbitmq-data-2:
+  rabbitmq-data-3:

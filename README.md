@@ -79,6 +79,71 @@ The consumer arm needs its image built once:
 docker compose -f compose.yml -f compose.consumer.yml build consumer
 ```
 
+## Cluster (Phase 3)
+
+`compose.cluster.yml` overlays `compose.yml` to turn the single RabbitMQ node
+into a genuine three-node cluster, with `telemetry.q` and `dlq` declared as
+three-member quorum groups (`x-quorum-initial-group-size: 3`, ADR-0013).
+Node 1 keeps the service name `rabbitmq`, the Phase 1 ports, and the Phase 1
+DNS name (`rabbit1`), so `telegraf.d`, the simulator's default endpoint, and
+every Phase 1/2 test resolve unchanged. Nodes 2 and 3 boot from fresh,
+cluster-only volumes and import no definitions of their own — only node 1
+imports, so formation is not a three-way race.
+
+Bring-up:
+
+```bash
+docker compose down -v
+docker compose -f compose.yml -f compose.cluster.yml up -d --wait
+```
+
+Verify formation:
+
+```bash
+docker exec iot-rabbitmq rabbitmq-diagnostics -q --formatter json cluster_status
+docker exec iot-rabbitmq rabbitmq-queues -q --formatter json quorum_status telemetry.q
+```
+
+`cluster_status` should list all three nodes under `running_nodes`, and
+`quorum_status` should return three rows (one `leader`, two `follower`, all
+`voter`). On this implementation the cluster formed cleanly on the first
+attempt with three voting members — the definitions-import-vs-formation race
+described in ADR-0013 did not fire, so `rabbitmq-queues grow` was not needed.
+If your `quorum_status` ever returns a single row, the race did fire; recover
+with:
+
+```bash
+docker exec iot-rabbitmq rabbitmq-queues grow rabbit@rabbit2 all
+docker exec iot-rabbitmq rabbitmq-queues grow rabbit@rabbit3 all
+```
+
+Per-node ports (spec §4.1):
+
+| Node | Container | MQTT | AMQP | Management UI |
+|---|---|---|---|---|
+| 1 (`rabbit1`) | `iot-rabbitmq` | 1883 | 5672 | http://localhost:15672 |
+| 2 (`rabbit2`) | `iot-rabbitmq2` | 1884 | 5673 | http://localhost:15673 |
+| 3 (`rabbit3`) | `iot-rabbitmq3` | 1885 | 5674 | http://localhost:15674 |
+
+Cluster tests are marked `cluster` and deselected by default (`pytest.ini`
+selects `not experiment and not cluster`). Point the harness at the cluster
+overlay by setting `IOT_CLUSTER=1`, which makes `tests.conftest.compose_files()`
+return `("compose.yml", "compose.cluster.yml")` instead of `("compose.yml",)`:
+
+```bash
+IOT_CLUSTER=1 pytest tests/ -m cluster -v
+```
+
+Partition-handling arm (`ignore` vs `pause_minority`, spec 5.H/5.I) is read
+from `RABBITMQ_PARTITION_HANDLING` in `.env` and injected into every node via
+`RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS`. Switching arms is a restart, not a file
+edit:
+
+```bash
+# in .env: RABBITMQ_PARTITION_HANDLING=pause_minority
+docker compose -f compose.yml -f compose.cluster.yml up -d --force-recreate rabbitmq rabbitmq2 rabbitmq3
+```
+
 ## Teardown
 
 ```bash

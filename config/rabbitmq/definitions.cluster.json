@@ -1,0 +1,103 @@
+{
+  "vhosts": [
+    { "name": "/" }
+  ],
+  "users": [
+    {
+      "name": "admin",
+      "password_hash": "uq3utGL66U5CMnUqhfRu8J3xn1iqiv/AwVdXS8D+6KgmEDIf",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ["administrator"]
+    },
+    {
+      "name": "device",
+      "password_hash": "bBrFSa5mbqFRf8oo52tWkYT+tPOC+4dvfL/vqfvI5utgwKpt",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": []
+    },
+    {
+      "name": "telegraf",
+      "password_hash": "Mc9vTJ6lj8L2KSy+bahEqnDoEopntZQ7bahtBm3baCz2ozLo",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ["monitoring"]
+    }
+  ],
+  "permissions": [
+    {
+      "user": "admin",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "device",
+      "vhost": "/",
+      "configure": "^mqtt-subscription-.*$",
+      "write": "^amq\\.topic$",
+      "read": "^mqtt-subscription-.*$"
+    },
+    {
+      "user": "telegraf",
+      "vhost": "/",
+      "configure": "^$",
+      "write": "^telemetry\\.q$",
+      "read": "^(telemetry\\.q|amq\\.topic)$"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "dlx",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "telemetry.q",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-quorum-initial-group-size": 3,
+        "x-dead-letter-exchange": "dlx"
+      }
+    },
+    {
+      "name": "dlq",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-quorum-initial-group-size": 3
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "amq.topic",
+      "vhost": "/",
+      "destination": "telemetry.q",
+      "destination_type": "queue",
+      "routing_key": "region.#",
+      "arguments": {}
+    },
+    {
+      "source": "dlx",
+      "vhost": "/",
+      "destination": "dlq",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    }
+  ],
+  "policies": [],
+  "parameters": [],
+  "topic_permissions": []
+}

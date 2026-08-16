@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.conftest import ROOT, compose
+from tests.conftest import ROOT, cluster_mode, compose, compose_files
 
 CONTAINER_NAMES: dict[str, str | tuple[str, ...]] = {
     "rabbitmq": ("iot-rabbitmq", "iot-rabbitmq2", "iot-rabbitmq3"),
@@ -62,12 +62,6 @@ def _docker(*args: str) -> subprocess.CompletedProcess:
             f"--- stdout ---\n{proc.stdout}\n--- stderr ---\n{proc.stderr}"
         )
     return proc
-
-
-def compose_files() -> tuple[str, ...]:
-    """Which compose files the current stack was brought up with. Task 6 makes this
-    cluster-aware; until then the stack is always the single-node Phase 1 stack."""
-    return ("compose.yml",)
 
 
 class DockerControl:
@@ -218,12 +212,6 @@ def docker_control(stack):
 RESULTS_DIR = ROOT / "docs" / "results"
 POLL_INTERVAL_S = 2.0
 _EXEC_TIMEOUT_S = 8.0
-
-
-def cluster_mode() -> bool:
-    """Is this session running against the 3-node cluster overlay? Task 6 wires
-    this to the environment; until then every session is single-node."""
-    return False
 
 
 def _exec_json(container: str, *args: str) -> object:
@@ -494,14 +482,21 @@ from sim.devices.runner import run_devices
 
 _EXECUTOR = ThreadPoolExecutor(max_workers=4)
 
+# Per-node MQTT endpoints on the cluster overlay. Node 1 keeps Phase 1's port
+# (1883); nodes 2 and 3 are published at 1884/1885 (compose.cluster.yml).
+CLUSTER_MQTT_NODES = [("localhost", 1883), ("localhost", 1884), ("localhost", 1885)]
+
 
 def start_sim(specs, rate_hz: float, duration_s: float, run_id: str,
-              max_reconnects: int = 12) -> Future:
+              max_reconnects: int = 12, nodes=None) -> Future:
     """Run the device simulator on a background thread.
 
     The experiment body stays synchronous so container manipulation reads as a
     straight-line script. asyncio.run in a worker thread picks up the global
     WindowsSelectorEventLoopPolicy already set by main/conftest.py.
+
+    `nodes` defaults to None so Phase 2 callers are unaffected; cluster
+    experiments pass CLUSTER_MQTT_NODES to fail over across brokers.
     """
 
     def _run() -> dict:
@@ -516,6 +511,7 @@ def start_sim(specs, rate_hz: float, duration_s: float, run_id: str,
                 username=os.environ.get("RABBITMQ_DEVICE_USER", "device"),
                 password=os.environ.get("RABBITMQ_DEVICE_PASSWORD", "devicepass"),
                 max_reconnects=max_reconnects,
+                nodes=nodes,
             )
         )
 
