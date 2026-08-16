@@ -373,7 +373,7 @@ class GaugeRecorder:
                 "alarms": first["alarms"],
             })
         else:
-            sample["error"] = first.get("http_error", "unreachable")
+            sample["error"] = first.get("http_error") or first.get("exec_error", "unreachable")
         return sample
 
     def _loop(self) -> None:
