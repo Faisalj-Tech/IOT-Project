@@ -63,6 +63,34 @@
           "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"rabbitmq_node\")\n  |> filter(fn: (r) => r._field == \"mem_alarm\" or r._field == \"disk_free_alarm\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)"
         }
       ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Cluster node state",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 18 },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": {} }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"rabbitmq_node\")\n  |> filter(fn: (r) => r._field == \"running\")\n  |> group(columns: [\"node\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "telemetry.q queue depth by node",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 18 },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": {} }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"rabbitmq_queue\")\n  |> filter(fn: (r) => r.queue == \"telemetry.q\")\n  |> filter(fn: (r) => r._field == \"messages_ready\")\n  |> group(columns: [\"url\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)"
+        }
+      ]
     }
   ]
 }

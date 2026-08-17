@@ -25,4 +25,6 @@ def test_reliability_dashboard_is_provisioned(stack):
         "DLQ depth",
         "Telegraf metrics dropped",
         "Broker alarms",
+        "Cluster node state",
+        "telemetry.q queue depth by node",
     }, titles
