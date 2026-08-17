@@ -11,6 +11,8 @@ majority is read over HTTP. The two views are kept separate and never merged —
 the nodes disagreeing is the finding.
 """
 
+import os
+import subprocess
 import time
 from datetime import datetime, timezone
 
@@ -22,7 +24,7 @@ from tests.experiments.cluster import (
     CLUSTER_NODES, node_name, queue_leader, queue_leader_node, queue_members,
 )
 from tests.experiments.conftest import (
-    CLUSTER_MQTT_NODES, drain_and_fetch, sequence_report, start_sim,
+    CLUSTER_MQTT_NODES, container_for, drain_and_fetch, sequence_report, start_sim,
 )
 from tests.experiments.test_node_kill import surviving_node
 
@@ -177,6 +179,47 @@ def test_partition_under_ignore(
     )
     assert payload["gaps"] == {}, (
         f"messages published to the majority side were lost: {payload['gaps']}"
+    )
+    assert len(payload["members_after_heal"]) == 3, (
+        f"the group did not return to three members after healing: "
+        f"{payload['members_after_heal']}"
+    )
+
+
+def test_partition_under_pause_minority(
+    docker_control, gauge_recorder, results_dir, influx_query, rabbit_get_node
+):
+    """Requires the stack to have been brought up with RABBITMQ_PARTITION_HANDLING=pause_minority."""
+    effective = subprocess.run(
+        ["docker", "exec", container_for("rabbitmq", 1), "rabbitmqctl", "eval",
+         "application:get_env(rabbit, cluster_partition_handling)."],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    if "pause_minority" not in effective:
+        pytest.skip(
+            f"the cluster is running with {effective!r}, not pause_minority. Bring the "
+            f"stack up with RABBITMQ_PARTITION_HANDLING=pause_minority in .env first — "
+            f"this arm measures the mode, so running it under `ignore` would silently "
+            f"duplicate Experiment H. Current .env value: "
+            f"{os.environ.get('RABBITMQ_PARTITION_HANDLING')!r}"
+        )
+
+    payload = _run_partition_experiment(
+        "I-partition-pause-minority", "pause_minority", docker_control, gauge_recorder,
+        results_dir, influx_query, rabbit_get_node,
+    )
+    target = payload["partitioned_node"]
+    majority_view = payload["views_during_partition"][payload["read_node"]]
+
+    assert majority_view["online"] is not None, (
+        "no majority-side reading was captured during the split window"
+    )
+    assert node_name(target) not in majority_view["online"], (
+        f"the majority still listed node {target} as online; the partition did not bite"
+    )
+    assert payload["gaps"] == {}, (
+        f"messages published to the majority side were lost under pause_minority: "
+        f"{payload['gaps']}"
     )
     assert len(payload["members_after_heal"]) == 3, (
         f"the group did not return to three members after healing: "
