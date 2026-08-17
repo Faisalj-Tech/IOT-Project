@@ -154,6 +154,44 @@ edit:
 docker compose -f compose.yml -f compose.cluster.yml up -d --force-recreate rabbitmq rabbitmq2 rabbitmq3
 ```
 
+## Fault tolerance experiments (Phase 3)
+
+The cluster fault-tolerance matrix (follower kill, leader kill, network partition)
+runs against the three-node cluster overlay above, not the single-node stack. Bring
+it up the same way, verify formation, then run the matrix under `IOT_CLUSTER=1`:
+
+```bash
+docker compose down -v
+docker compose -f compose.yml -f compose.cluster.yml up -d --wait
+docker exec iot-rabbitmq rabbitmq-queues -q --formatter json quorum_status telemetry.q
+IOT_CLUSTER=1 .venv/Scripts/python.exe -m pytest tests/ -m cluster -v -s
+```
+
+If `quorum_status` returns fewer than three rows, the definitions-import-vs-formation
+race described above has fired on this bring-up — recover with the two `grow`
+commands shown above before trusting any experiment result, or run the preflight
+suite alone first (`tests/experiments/test_cluster_preflight.py`), which asserts this
+for you and names the exact remediation in its failure message.
+
+This single `pytest -m cluster` run covers the preflight, the Telegraf-failover
+check (T), follower kill (F), leader kill (G), and the partition experiment under
+whichever mode `.env` currently has (`H` under the committed `ignore` default). The
+partition experiment under the *other* mode is skipped automatically with a
+mode-guard message rather than run — it measures the mode, so running both under one
+`.env` value would silently duplicate one of them. To measure the other mode
+(`pause_minority`), switch the arm as shown above (a `--force-recreate`, not a
+`pytest -m cluster` invocation edit) and run `pytest tests/experiments/test_partition.py -m cluster -v -s`
+again; the two partition results come from two separate stack bring-ups by design.
+
+Every run writes raw evidence to `docs/results/<experiment>-<run_id>.json`, the same
+convention Phase 2 established. `docs/reports/phase3-fault-tolerance.md` is drafted
+from those files and cites every number back to its filename. `test_partition_under_ignore`'s
+own harness-integrity-floor assertion reads a value from `GaugeRecorder.node_window()`
+that is timing-sensitive by construction (see the report's Limits section) and may fail
+on any individual run without that indicating a regression in the system under test —
+the InfluxDB sequence accounting in the same run's result JSON (`published_total`,
+`influx_total`, `gaps`) is the reliable signal for whether messages were actually lost.
+
 ## Teardown
 
 ```bash
