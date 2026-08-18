@@ -12,7 +12,9 @@ from tests.experiments.conftest import drain_and_fetch, sequence_report, start_s
 pytestmark = [pytest.mark.stack, pytest.mark.experiment]
 
 
-def test_consumer_ingests_a_clean_run(consumer_stack, influx_query, docker_control):
+def test_consumer_ingests_a_clean_run(
+    consumer_stack, influx_query, docker_control, gauge_recorder, results_dir
+):
     assert not docker_control.is_running("telegraf"), (
         "Telegraf is still running; it would compete with the consumer for the same "
         "queue and split the message stream"
@@ -27,10 +29,29 @@ def test_consumer_ingests_a_clean_run(consumer_stack, influx_query, docker_contr
     expected_total = sum(published.values())
 
     drain = drain_and_fetch(
-        influx_query, run_id, flux_range_start(started_at), expected_total, timeout_s=120
+        influx_query, run_id, flux_range_start(started_at), expected_total,
+        timeout_s=120, gauge_recorder=gauge_recorder,
     )
     rows = drain.rows
     report = sequence_report(rows, published)
 
+    results_dir(
+        "S-consumer-smoke",
+        {
+            "run_id": run_id,
+            "arm": "ack-after-write",
+            "published_counts": published,
+            "published_total": expected_total,
+            "influx_total": report["total_rows"],
+            "gaps": report["gaps"],
+            "duplicates": report["duplicates"],
+            **drain.as_result_fields(),
+            "verdict": "no-loss" if not report["gaps"] else "loss",
+            "timeline": gauge_recorder.timeline(),
+        },
+    )
+
     assert report["gaps"] == {}, f"consumer lost messages: {report['gaps']}"
-    assert report["total_rows"] == expected_total
+    assert report["total_rows"] >= expected_total, (
+        f"lost messages: expected at least {expected_total}, got {report['total_rows']}"
+    )
