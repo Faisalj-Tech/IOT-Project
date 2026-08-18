@@ -101,6 +101,10 @@ def _run_partition_experiment(
     # or three 10-second HTTP timeouts per sample starve the recorder of exactly
     # the readings this experiment exists to collect.
     gauge_recorder.expect_exec(target)
+    # The first post-partition sample can land ~20s late: the in-flight poll is
+    # still burning an HTTP timeout against a node that just lost its published
+    # ports. Reading the window without waiting for it is ADR-0018's second cause.
+    gauge_recorder.await_sample_after(gauge_recorder.mark_time("partition"), timeout_s=90.0)
     split_began = gauge_recorder.mark_time("partition")
 
     time.sleep(SPLIT_S)
@@ -110,6 +114,7 @@ def _run_partition_experiment(
 
     docker_control.heal("rabbitmq", node=target)
     gauge_recorder.expect_http(target)
+    gauge_recorder.await_sample_after(split_ended, timeout_s=90.0)
     time.sleep(HEAL_SETTLE_S)
     gauge_recorder.mark("healed")
     views_after = _views(gauge_recorder, since=split_ended)
@@ -154,7 +159,33 @@ def _run_partition_experiment(
     return payload
 
 
-@pytest.mark.xfail(reason="GaugeRecorder.node_window()'s guard logic (conftest.py:416-432) can never return a genuine False for the 'reachable' key, and a real timing race can cause any of this test's node_window-derived assertions to see None instead of a true reading. See main/docs/reports/phase3-fault-tolerance.md #6 and the session ledger's Ruling 16/18 for the full analysis. Does not affect the measured no-loss/reformation outcome, independently verified via InfluxDB sequence accounting.", strict=False)
+def _assert_harness_floor(payload: dict) -> None:
+    """The floor: did the harness actually observe the split?
+
+    Distinct from the recorded partition outcome (ADR-0015). This catches a
+    harness that silently stopped observing, which is a different failure from
+    the system misbehaving. Called last, so that an unreliable reading here can
+    never mask the loss and reformation assertions that ran before it.
+    """
+    target = payload["partitioned_node"]
+    during = payload["views_during_partition"]
+    majority_view = during[payload["read_node"]]
+
+    assert majority_view["online"] is not None, (
+        "no majority-side reading was captured during the split window"
+    )
+    assert node_name(target) not in majority_view["online"], (
+        f"the majority still listed node {target} as online throughout the split, so "
+        f"the partition never bit and this run measured a healthy cluster: "
+        f"{majority_view}"
+    )
+    assert during[target]["reachable"] is not None, (
+        f"node {target} produced no readable sample during its partition; its side "
+        f"of the split was never observed, which is the finding this experiment "
+        f"exists for"
+    )
+
+
 def test_partition_under_ignore(
     docker_control, gauge_recorder, results_dir, influx_query, rabbit_get_node
 ):
@@ -162,22 +193,8 @@ def test_partition_under_ignore(
         "H-partition-ignore", "ignore", docker_control, gauge_recorder,
         results_dir, influx_query, rabbit_get_node,
     )
-    target = payload["partitioned_node"]
-    during = payload["views_during_partition"]
-    majority_view = during[payload["read_node"]]
-
-    # Harness-integrity floor only. Everything about the split itself is recorded.
-    assert majority_view["online"] is not None, (
-        "no majority-side reading was captured during the split window"
-    )
-    assert node_name(target) not in majority_view["online"], (
-        f"the majority still listed node {target} as online throughout the split, so the "
-        f"partition never bit and this run measured a healthy cluster: {majority_view}"
-    )
-    assert during[target]["reachable"], (
-        f"node {target} produced no readable sample during its partition; its side of "
-        f"the split was never observed, which is the finding this experiment exists for"
-    )
+    # Hard assertions first, unmarked. A real loss or a failure to reform must
+    # fail this suite (audit finding C-1).
     assert payload["gaps"] == {}, (
         f"messages published to the majority side were lost: {payload['gaps']}"
     )
@@ -185,9 +202,9 @@ def test_partition_under_ignore(
         f"the group did not return to three members after healing: "
         f"{payload['members_after_heal']}"
     )
+    _assert_harness_floor(payload)
 
 
-@pytest.mark.xfail(reason="GaugeRecorder.node_window()'s guard logic (conftest.py:416-432) can never return a genuine False for the 'reachable' key, and a real timing race can cause any of this test's node_window-derived assertions to see None instead of a true reading. See main/docs/reports/phase3-fault-tolerance.md #6 and the session ledger's Ruling 16/18 for the full analysis. Does not affect the measured no-loss/reformation outcome, independently verified via InfluxDB sequence accounting.", strict=False)
 def test_partition_under_pause_minority(
     docker_control, gauge_recorder, results_dir, influx_query, rabbit_get_node
 ):
@@ -210,15 +227,6 @@ def test_partition_under_pause_minority(
         "I-partition-pause-minority", "pause_minority", docker_control, gauge_recorder,
         results_dir, influx_query, rabbit_get_node,
     )
-    target = payload["partitioned_node"]
-    majority_view = payload["views_during_partition"][payload["read_node"]]
-
-    assert majority_view["online"] is not None, (
-        "no majority-side reading was captured during the split window"
-    )
-    assert node_name(target) not in majority_view["online"], (
-        f"the majority still listed node {target} as online; the partition did not bite"
-    )
     assert payload["gaps"] == {}, (
         f"messages published to the majority side were lost under pause_minority: "
         f"{payload['gaps']}"
@@ -227,3 +235,4 @@ def test_partition_under_pause_minority(
         f"the group did not return to three members after healing: "
         f"{payload['members_after_heal']}"
     )
+    _assert_harness_floor(payload)
