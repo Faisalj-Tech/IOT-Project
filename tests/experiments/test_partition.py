@@ -179,10 +179,10 @@ def _assert_harness_floor(payload: dict) -> None:
         f"the partition never bit and this run measured a healthy cluster: "
         f"{majority_view}"
     )
-    assert during[target]["reachable"] is not None, (
-        f"node {target} produced no readable sample during its partition; its side "
-        f"of the split was never observed, which is the finding this experiment "
-        f"exists for"
+    assert during[target]["source"] == "exec", (
+        f"node {target}'s sample during its own partition was not taken via exec "
+        f"(source={during[target].get('source')!r}); the harness's own observation "
+        f"of this node's side of the split is not trustworthy"
     )
 
 

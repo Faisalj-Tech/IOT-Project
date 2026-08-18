@@ -254,6 +254,9 @@ def _exec_json(container: str, *args: str) -> object:
 # CONFIRMED against a live partition (plan Task 11 Step 2): a detached rabbit3
 # reported Raft State "unknown", outside this set, so the discrimination holds
 # on RabbitMQ 4.3.4.
+# "candidate" is deliberately left out — nothing today asserts on the exec-path
+# online field during a leader election, so this omission is unexercised. A
+# future consumer that does should treat that as a choice, not an oversight.
 LIVE_RAFT_STATES = frozenset({"leader", "follower"})
 
 
