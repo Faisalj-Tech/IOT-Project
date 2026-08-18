@@ -46,13 +46,15 @@ def test_drain_result_reports_its_exit_condition_and_elapsed_time(
 def test_as_result_fields_names_everything_a_result_json_needs():
     result = DrainResult(
         rows=[], elapsed_s=12.5, exit_condition="timeout",
-        ready_at_exit=7, unacked_at_exit=3,
+        ready_at_exit=7, unacked_at_exit=3, expected_total=10,
     )
     assert result.as_result_fields() == {
         "drain_elapsed_s": 12.5,
         "drain_exit_condition": "timeout",
         "queue_ready_at_drain_exit": 7,
         "queue_unacked_at_drain_exit": 3,
+        "drain_rows_at_exit": 0,
+        "drain_expected_total": 10,
     }
 
 
@@ -63,4 +65,4 @@ def test_drain_falls_back_to_row_stability_without_a_recorder(influx_query):
         timeout_s=60, stable_polls_limit=2,
     )
     assert result.rows == []
-    assert result.exit_condition == "row-count-stable"
+    assert result.exit_condition == "row-count-gave-up"

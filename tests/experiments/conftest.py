@@ -592,6 +592,7 @@ class DrainResult:
     exit_condition: str = "timeout"
     ready_at_exit: int | None = None
     unacked_at_exit: int | None = None
+    expected_total: int | None = None
 
     def as_result_fields(self) -> dict:
         return {
@@ -599,6 +600,8 @@ class DrainResult:
             "drain_exit_condition": self.exit_condition,
             "queue_ready_at_drain_exit": self.ready_at_exit,
             "queue_unacked_at_drain_exit": self.unacked_at_exit,
+            "drain_rows_at_exit": len(self.rows),
+            "drain_expected_total": self.expected_total,
         }
 
 
@@ -628,8 +631,10 @@ def drain_and_fetch(influx_query, run_id: str, start: str, expected_total: int,
     began = time.time()
     deadline = began + timeout_s
     result = DrainResult()
+    result.expected_total = expected_total
     last_count = -1
     stable_polls = 0
+    ready = None
 
     while time.time() < deadline:
         result.rows = fetch_seqs(influx_query, run_id, start=start)
@@ -649,10 +654,10 @@ def drain_and_fetch(influx_query, run_id: str, start: str, expected_total: int,
                 break
 
         if stable_polls >= 3 and len(result.rows) >= expected_total:
-            result.exit_condition = "row-count-stable"
+            result.exit_condition = "row-count-complete"
             break
-        if stable_polls >= stable_polls_limit:
-            result.exit_condition = "row-count-stable"
+        if (gauge_recorder is None or ready is None) and stable_polls >= stable_polls_limit:
+            result.exit_condition = "row-count-gave-up"
             break
         time.sleep(5)
 

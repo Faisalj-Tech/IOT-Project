@@ -10,7 +10,7 @@ import time
 
 import pytest
 
-from tests.experiments.conftest import GaugeRecorder, _online_from_quorum
+from tests.experiments.conftest import DrainResult, GaugeRecorder, _online_from_quorum, drain_and_fetch
 
 
 def _recorder(samples):
@@ -129,3 +129,50 @@ def test_await_sample_after_raises_when_sampling_has_stopped():
     recorder = _recorder([_sample(100.0, {1: {"reachable": True}})])
     with pytest.raises(AssertionError, match="stopped sampling"):
         recorder.await_sample_after(100.0, timeout_s=0.3)
+
+
+class _StalledRecorder:
+    """A recorder whose broker still reports work in flight."""
+
+    def node_latest(self, node, key):
+        return 5 if key == "telemetry_unacked" else 0
+
+
+def test_drain_does_not_give_up_early_while_the_recorder_reports_work_in_flight():
+    """The row-count fallback is documented as a no-recorder path but ran always.
+
+    A stalled Influx row count plus a genuinely undrained broker made it exit
+    short, and sequence_report then reported loss that had not happened — the
+    exact ADR-0012 regression. Audit finding H-1.
+    """
+    result = drain_and_fetch(
+        lambda flux: [], "no-such-run", "-5m", expected_total=10,
+        timeout_s=1.0, stable_polls_limit=1, gauge_recorder=_StalledRecorder(),
+    )
+    assert result.exit_condition == "timeout", (
+        f"gave up on the row-count heuristic despite a live recorder: "
+        f"{result.exit_condition!r}"
+    )
+
+
+def test_drain_still_falls_back_when_no_recorder_was_supplied():
+    result = drain_and_fetch(
+        lambda flux: [], "no-such-run", "-5m", expected_total=10,
+        timeout_s=60, stable_polls_limit=2,
+    )
+    assert result.exit_condition == "row-count-gave-up"
+
+
+def test_drain_result_fields_distinguish_completion_from_giving_up():
+    result = DrainResult(
+        rows=[{"_value": 1}], elapsed_s=12.5, exit_condition="row-count-gave-up",
+        ready_at_exit=7, unacked_at_exit=3, expected_total=10,
+    )
+    assert result.as_result_fields() == {
+        "drain_elapsed_s": 12.5,
+        "drain_exit_condition": "row-count-gave-up",
+        "queue_ready_at_drain_exit": 7,
+        "queue_unacked_at_drain_exit": 3,
+        "drain_rows_at_exit": 1,
+        "drain_expected_total": 10,
+    }
