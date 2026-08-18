@@ -157,20 +157,34 @@ class DockerControl:
             self._partitioned.append((service, node))
 
     def heal(self, service: str, node: int = 1) -> None:
+        """Reattach a partitioned container, and verify it actually reattached.
+
+        The connect failures below were previously swallowed and the entry
+        dropped from _partitioned regardless, which left restore() with nothing
+        to retry and the container detached for the rest of the session
+        (audit finding H-4).
+        """
         import json
         container = container_for(service, node)
-
-        # Get the original networks (recorded in partition()).
         original_networks = self._original_networks.get((service, node), set())
+        wanted = {n for n in PARTITION_NETWORKS if n in original_networks}
 
-        # Reconnect only to the networks the container was originally on.
-        for network in PARTITION_NETWORKS:
-            if network in original_networks:
-                try:
-                    _docker("network", "connect", network, container)
-                except RuntimeError:
-                    # Already connected or some other error; skip it.
-                    pass
+        failures: list[str] = []
+        for network in wanted:
+            try:
+                _docker("network", "connect", network, container)
+            except RuntimeError as exc:
+                failures.append(f"{network}: {exc}")
+
+        proc = _docker("inspect", "--format", "{{json .NetworkSettings.Networks}}", container)
+        attached = set(json.loads(proc.stdout).keys())
+        missing = wanted - attached
+        if missing:
+            raise RuntimeError(
+                f"heal() left {container} detached from {sorted(missing)}; "
+                f"connect errors: {failures or ['none reported']}. Left in "
+                f"_partitioned so restore() retries."
+            )
 
         if (service, node) in self._partitioned:
             self._partitioned.remove((service, node))
@@ -182,11 +196,13 @@ class DockerControl:
         partition that outlives a crashed test silently poisons every later run
         in the session — a worse failure than the one that caused it.
         """
+        heal_failure: Exception | None = None
         for service, node in list(self._partitioned):
             try:
                 self.heal(service, node)
-            except Exception:
-                pass
+            except Exception as exc:
+                if heal_failure is None:
+                    heal_failure = exc
         for service, node in list(self._downed):
             try:
                 self.start(service, node=node)
@@ -198,6 +214,8 @@ class DockerControl:
             except Exception:
                 pass
         self._policy_cleared.clear()
+        if heal_failure is not None:
+            raise heal_failure
 
 
 @pytest.fixture
