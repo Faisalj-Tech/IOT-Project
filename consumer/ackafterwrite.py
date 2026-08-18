@@ -21,11 +21,19 @@ from datetime import datetime, timezone
 
 from influxdb_client import Point, WritePrecision
 
+import urllib3.exceptions
+
 log = logging.getLogger(__name__)
 
 REQUIRED_FIELDS = ("ts", "region", "plant", "device", "metric", "value", "unit", "seq", "run_id")
 TAG_FIELDS = ("region", "plant", "device", "metric", "unit", "run_id")
 FATAL_STATUSES = {400, 401, 403, 404, 413, 422}
+
+# Retryable is an allow-list, not a deny-list, and deliberately so: an exception
+# nobody anticipated should dead-letter one message, not requeue it forever.
+# OSError already covers ConnectionError and (3.11+) TimeoutError. influxdb-client
+# surfaces connection failures out of the urllib3 hierarchy, not as a bare OSError.
+RETRYABLE_EXCEPTIONS = (OSError, urllib3.exceptions.HTTPError)
 
 
 def parse_message(body: bytes) -> dict:
@@ -82,11 +90,21 @@ def classify_write_error(exc: Exception) -> str:
 
     A retryable classification for a genuinely fatal error produces an infinite
     redelivery loop, which is exactly the failure mode experiment D looks for.
+
+    Statuses classify on FATAL_STATUSES membership alone. A blanket 4xx range
+    would sweep in 408 and 429, which are transient (audit H-8). Exceptions with
+    no status classify on type: transport failures come back, everything else is
+    dead-lettered, because a payload that cannot be encoded never will be (H-9).
     """
     status = getattr(exc, "status", None)
-    if status is None:
-        return "retryable"
-    return "fatal" if int(status) in FATAL_STATUSES or 400 <= int(status) < 500 else "retryable"
+    if status is not None:
+        try:
+            code = int(status)
+        except (TypeError, ValueError):
+            code = None
+        if code is not None:
+            return "fatal" if code in FATAL_STATUSES else "retryable"
+    return "retryable" if isinstance(exc, RETRYABLE_EXCEPTIONS) else "fatal"
 
 
 async def run(

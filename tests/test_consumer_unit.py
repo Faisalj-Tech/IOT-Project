@@ -56,14 +56,44 @@ def test_point_schema_matches_telegrafs_json_v2_mapping():
     assert "seq=1423i" in line, f"seq must be an integer field, got: {line}"
 
 
-def test_classify_write_error_treats_4xx_as_fatal_and_5xx_as_retryable():
-    class FakeApiException(Exception):
-        def __init__(self, status):
-            self.status = status
+class FakeApiException(Exception):
+    """Stands in for influxdb_client.rest.ApiException, which carries `.status`."""
 
+    def __init__(self, status):
+        super().__init__(f"api error {status}")
+        self.status = status
+
+
+def test_classify_write_error_dead_letters_only_the_curated_fatal_statuses():
     assert classify_write_error(FakeApiException(400)) == "fatal"
-    assert classify_write_error(FakeApiException(422)) == "fatal"
+    assert classify_write_error(FakeApiException(401)) == "fatal"
     assert classify_write_error(FakeApiException(413)) == "fatal"
+    assert classify_write_error(FakeApiException(422)) == "fatal"
+
+
+def test_classify_write_error_retries_transient_http_statuses():
+    """429 and 408 are 4xx but canonically retryable.
+
+    Dead-lettering a rate-limit response is real message loss on the arm whose
+    whole claim is that it does not lose messages (audit finding H-8).
+    """
+    assert classify_write_error(FakeApiException(408)) == "retryable"
+    assert classify_write_error(FakeApiException(429)) == "retryable"
     assert classify_write_error(FakeApiException(500)) == "retryable"
     assert classify_write_error(FakeApiException(503)) == "retryable"
+
+
+def test_classify_write_error_retries_transport_failures_without_a_status():
     assert classify_write_error(ConnectionError("influxdb unreachable")) == "retryable"
+    assert classify_write_error(TimeoutError("read timed out")) == "retryable"
+
+
+def test_classify_write_error_dead_letters_non_transport_exceptions():
+    """A message that cannot be serialized will never serialize on redelivery.
+
+    Classifying these retryable produces an infinite redelivery loop — the exact
+    failure mode this function's own docstring warns about (audit finding H-9).
+    """
+    assert classify_write_error(TypeError("not JSON serializable")) == "fatal"
+    assert classify_write_error(ValueError("bad line protocol")) == "fatal"
+    assert classify_write_error(UnicodeEncodeError("utf-8", "x", 0, 1, "bad")) == "fatal"
