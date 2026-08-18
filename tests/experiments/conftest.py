@@ -232,6 +232,28 @@ def _exec_json(container: str, *args: str) -> object:
     return json.loads(proc.stdout)
 
 
+# Raft states that mean "this peer is reachable from the node we asked".
+# ASSUMPTION, verified against a live partition rather than taken on faith — see
+# the plan's Task 11 Step 2. If these values do not discriminate on RabbitMQ
+# 4.3.4, the fallback is cluster_status's running-nodes list, which
+# _sample_node_exec already fetches.
+LIVE_RAFT_STATES = frozenset({"leader", "follower"})
+
+
+def _online_from_quorum(quorum: list[dict]) -> list[str]:
+    """Which quorum members the sampled node can actually see.
+
+    Aliasing this to the full member list made a partitioned node report every
+    peer as online, which is exactly the disagreement experiments H and I exist
+    to record (audit finding H-2).
+    """
+    return [
+        row["Node Name"]
+        for row in quorum
+        if row.get("Raft State") in LIVE_RAFT_STATES
+    ]
+
+
 class GaugeRecorder:
     """Poll every cluster node's gauges and cluster view on a background thread.
 
@@ -322,7 +344,7 @@ class GaugeRecorder:
             "telemetry_unacked": int(telemetry.get("messages_unacknowledged", 0)),
             "dlq_messages": int(dlq.get("messages_ready", 0)),
             "members": [r["Node Name"] for r in quorum],
-            "online": [r["Node Name"] for r in quorum],
+            "online": _online_from_quorum(quorum),
             "leader": leader,
             "partitions": list(status.get("partitions") or []),
             "running": True,

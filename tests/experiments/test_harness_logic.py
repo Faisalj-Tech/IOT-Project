@@ -5,7 +5,7 @@ default suite, unlike test_recorder.py and test_drain_guard.py, which are both
 marked stack+experiment and are deselected by pytest.ini's addopts.
 """
 
-from tests.experiments.conftest import GaugeRecorder
+from tests.experiments.conftest import GaugeRecorder, _online_from_quorum
 
 
 def _recorder(samples):
@@ -55,3 +55,35 @@ def test_node_latest_returns_a_genuine_false_for_reachable():
         _sample(110.0, {2: {"reachable": False, "exec_error": "timeout"}}),
     ])
     assert recorder.node_latest(2, "reachable") is False
+
+
+def test_online_excludes_peers_not_in_a_live_raft_state():
+    """online aliased members, so a partitioned node reported every peer online.
+
+    Exec is the only read path for a detached node, which made the split-brain
+    signal structurally unrepresentable. Audit finding H-2.
+    """
+    quorum = [
+        {"Node Name": "rabbit@rabbit1", "Raft State": "leader"},
+        {"Node Name": "rabbit@rabbit2", "Raft State": "follower"},
+        {"Node Name": "rabbit@rabbit3", "Raft State": "noproc"},
+    ]
+    assert _online_from_quorum(quorum) == ["rabbit@rabbit1", "rabbit@rabbit2"]
+
+
+def test_online_equals_members_on_a_healthy_group():
+    quorum = [
+        {"Node Name": "rabbit@rabbit1", "Raft State": "leader"},
+        {"Node Name": "rabbit@rabbit2", "Raft State": "follower"},
+        {"Node Name": "rabbit@rabbit3", "Raft State": "follower"},
+    ]
+    assert len(_online_from_quorum(quorum)) == 3
+
+
+def test_online_treats_a_missing_raft_state_as_not_live():
+    """A row with no Raft State is not evidence the peer is up."""
+    quorum = [
+        {"Node Name": "rabbit@rabbit1", "Raft State": "leader"},
+        {"Node Name": "rabbit@rabbit2"},
+    ]
+    assert _online_from_quorum(quorum) == ["rabbit@rabbit1"]
