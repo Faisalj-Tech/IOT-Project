@@ -402,6 +402,10 @@ class GaugeRecorder:
         """Most recent reading of `key` on a named node, regardless of read path."""
         for sample in reversed(self.samples):
             entry = sample.get("nodes", {}).get(node, {})
+            if not entry:
+                continue
+            if key == "reachable":
+                return entry.get("reachable", False)
             if entry.get("reachable") and key in entry:
                 return entry[key]
         return None
@@ -427,6 +431,10 @@ class GaugeRecorder:
             if not (since <= sample["t"] <= until):
                 continue
             entry = sample.get("nodes", {}).get(node, {})
+            if not entry:
+                continue
+            if key == "reachable":
+                return entry.get("reachable", False)
             if entry.get("reachable") and key in entry:
                 return entry[key]
         return None
