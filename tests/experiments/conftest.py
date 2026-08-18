@@ -278,6 +278,7 @@ class GaugeRecorder:
         self._get_for = rabbit_get_node
         self._nodes = nodes
         self._stop = threading.Event()
+        self._new_sample = threading.Condition()
         self._thread: threading.Thread | None = None
         self._exec_only: set[int] = set()
         self.samples: list[dict] = []
@@ -389,7 +390,10 @@ class GaugeRecorder:
 
     def _loop(self) -> None:
         while not self._stop.is_set():
-            self.samples.append(self._sample_once())
+            sample = self._sample_once()
+            with self._new_sample:
+                self.samples.append(sample)
+                self._new_sample.notify_all()
             self._stop.wait(POLL_INTERVAL_S)
 
     def start(self) -> None:
@@ -403,6 +407,32 @@ class GaugeRecorder:
 
     def mark(self, label: str) -> None:
         self.marks.append({"label": label, "t": time.time()})
+
+    def await_sample_after(self, t: float, timeout_s: float = 60.0) -> float:
+        """Block until a sample newer than `t` has landed. Returns its timestamp.
+
+        A partitioned node's first sample can land ~20 seconds late: the in-flight
+        poll is still burning an HTTP timeout against a node that just lost its
+        published ports, and only then falls back to exec. Reading a window
+        without waiting for that sample is ADR-0018's second named cause.
+
+        Raises rather than returning None on timeout: a recorder that has stopped
+        sampling is exactly the failure the harness-integrity floor exists to
+        catch, and it should be loud.
+        """
+        deadline = time.time() + timeout_s
+        with self._new_sample:
+            while True:
+                for sample in reversed(self.samples):
+                    if sample["t"] > t:
+                        return sample["t"]
+                remaining = deadline - time.time()
+                if remaining <= 0:
+                    raise AssertionError(
+                        f"no gauge sample landed within {timeout_s}s of t={t}; "
+                        f"the recorder has stopped sampling"
+                    )
+                self._new_sample.wait(remaining)
 
     def peak(self, key: str) -> float:
         values = [s[key] for s in self.samples if key in s]

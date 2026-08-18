@@ -5,6 +5,11 @@ default suite, unlike test_recorder.py and test_drain_guard.py, which are both
 marked stack+experiment and are deselected by pytest.ini's addopts.
 """
 
+import threading
+import time
+
+import pytest
+
 from tests.experiments.conftest import GaugeRecorder, _online_from_quorum
 
 
@@ -87,3 +92,40 @@ def test_online_treats_a_missing_raft_state_as_not_live():
         {"Node Name": "rabbit@rabbit2"},
     ]
     assert _online_from_quorum(quorum) == ["rabbit@rabbit1"]
+
+
+def test_await_sample_after_returns_when_a_later_sample_lands():
+    """The window _views() reads must be guaranteed to contain a fresh sample.
+
+    Without this the floor assertions can read None on a run where the partition
+    genuinely bit, which is the second of ADR-0018's two named causes.
+    """
+    recorder = _recorder([_sample(100.0, {1: {"reachable": True}})])
+    marked = 100.0
+
+    def append_later():
+        time.sleep(0.2)
+        with recorder._new_sample:
+            recorder.samples.append(_sample(101.0, {1: {"reachable": True}}))
+            recorder._new_sample.notify_all()
+
+    threading.Thread(target=append_later, daemon=True).start()
+    assert recorder.await_sample_after(marked, timeout_s=5.0) == 101.0
+
+
+def test_await_sample_after_returns_immediately_if_one_already_landed():
+    recorder = _recorder([
+        _sample(100.0, {1: {"reachable": True}}),
+        _sample(101.0, {1: {"reachable": True}}),
+    ])
+    assert recorder.await_sample_after(100.0, timeout_s=5.0) == 101.0
+
+
+def test_await_sample_after_raises_when_sampling_has_stopped():
+    """A recorder that stopped sampling is the failure the floor exists to catch.
+
+    It must fail loudly rather than degrade into an ambiguous None.
+    """
+    recorder = _recorder([_sample(100.0, {1: {"reachable": True}})])
+    with pytest.raises(AssertionError, match="stopped sampling"):
+        recorder.await_sample_after(100.0, timeout_s=0.3)
