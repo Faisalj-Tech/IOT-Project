@@ -93,7 +93,9 @@ def test_consumer_arm_survives_being_killed_mid_outage(
     time.sleep(CLEAN_S)
     docker_control.stop("influxdb", timeout=0)
     time.sleep(20)
-    unacked_at_kill = gauge_recorder.peak("telemetry_unacked")
+    # latest(), not peak(): must match Experiment B's semantics, because both arms
+    # write this into the same result key and the report compares them (audit H-5).
+    unacked_at_kill = gauge_recorder.latest("telemetry_unacked")
     gauge_recorder.mark("consumer_kill")
     docker_control.kill("consumer")
     time.sleep(20)
@@ -133,12 +135,14 @@ def test_consumer_arm_dead_letters_a_poison_message(
     consumer_stack, gauge_recorder, results_dir, influx_query, rabbit_get
 ):
     """The comparison's decisive case: the same poison message Telegraf mishandled."""
+    started_at = datetime.now(timezone.utc)
+    run_id = f"poisonE1-{int(time.time()) % 100000}"
     dlq_before = rabbit_get("/queues/%2F/dlq").json()["messages"]
     payload = json.dumps(
         {
             "ts": "2026-08-10T12:00:00.000Z", "region": "eu", "plant": "plant1",
             "device": "poison-01", "metric": "temp", "value": "not-a-number",
-            "unit": "C", "seq": 1, "run_id": "poisonE1",
+            "unit": "C", "seq": 1, "run_id": run_id,
         }
     ).encode()
 
@@ -147,12 +151,12 @@ def test_consumer_arm_dead_letters_a_poison_message(
 
     dlq_after = rabbit_get("/queues/%2F/dlq").json()["messages"]
     ready_after = rabbit_get("/queues/%2F/telemetry.q").json()["messages_ready"]
-    landed = bool(fetch_seqs(influx_query, "poisonE1", start="-10m"))
+    landed = bool(fetch_seqs(influx_query, run_id, start=flux_range_start(started_at)))
 
     results_dir(
         "E-consumer-poison",
         {
-            "run_id": "poisonE1",
+            "run_id": run_id,
             "arm": "ack-after-write",
             "messages_published": 5,
             "dlq_before": dlq_before,
