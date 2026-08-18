@@ -251,10 +251,9 @@ def _exec_json(container: str, *args: str) -> object:
 
 
 # Raft states that mean "this peer is reachable from the node we asked".
-# ASSUMPTION, verified against a live partition rather than taken on faith — see
-# the plan's Task 11 Step 2. If these values do not discriminate on RabbitMQ
-# 4.3.4, the fallback is cluster_status's running-nodes list, which
-# _sample_node_exec already fetches.
+# CONFIRMED against a live partition (plan Task 11 Step 2): a detached rabbit3
+# reported Raft State "unknown", outside this set, so the discrimination holds
+# on RabbitMQ 4.3.4.
 LIVE_RAFT_STATES = frozenset({"leader", "follower"})
 
 
