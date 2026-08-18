@@ -13,10 +13,11 @@ DLQ, and consumes broker and Telegraf capacity indefinitely.
 
 import json
 import time
+from datetime import datetime, timezone
 
 import pytest
 
-from tests.conftest import query_measurement
+from tests.conftest import flux_range_start, query_measurement
 from tests.experiments.conftest import publish_raw
 
 pytestmark = [pytest.mark.stack, pytest.mark.experiment]
@@ -60,10 +61,16 @@ def _counters(influx_query) -> dict:
     }
 
 
-def landed_in_influx(influx_query, run_id: str) -> bool:
+def landed_in_influx(influx_query, run_id: str, start: str) -> bool:
+    """Did this run's payload reach InfluxDB?
+
+    `start` is required, not defaulted: a relative window here reads the previous
+    run's points when a run id repeats, which is what made this check unreliable
+    (audit finding H-6). Callers pass flux_range_start(started_at).
+    """
     from tests.conftest import fetch_seqs
 
-    return bool(fetch_seqs(influx_query, run_id, start="-10m"))
+    return bool(fetch_seqs(influx_query, run_id, start=start))
 
 
 def _classify(dlq_delta: int, counter_deltas: dict, ready_end: int, landed: bool) -> str:
@@ -82,6 +89,7 @@ def _classify(dlq_delta: int, counter_deltas: dict, ready_end: int, landed: bool
 
 
 def _run_trigger(trigger, payload, run_id, gauge_recorder, results_dir, influx_query, rabbit_get):
+    run_start = flux_range_start(datetime.now(timezone.utc))
     dlq_before = rabbit_get("/queues/%2F/dlq").json()["messages"]
     ready_before = rabbit_get("/queues/%2F/telemetry.q").json()["messages_ready"]
     counters_before = _counters(influx_query)
@@ -95,7 +103,7 @@ def _run_trigger(trigger, payload, run_id, gauge_recorder, results_dir, influx_q
     counters_after = _counters(influx_query)
     counter_deltas = {k: counters_after[k] - counters_before[k] for k in counters_before}
 
-    landed = landed_in_influx(influx_query, run_id)
+    landed = landed_in_influx(influx_query, run_id, run_start)
     outcome = _classify(
         dlq_after - dlq_before, counter_deltas, max(ready_after - ready_before, 0), landed
     )
@@ -120,19 +128,20 @@ def _run_trigger(trigger, payload, run_id, gauge_recorder, results_dir, influx_q
             "timeline": gauge_recorder.timeline(),
         },
     )
-    return outcome
+    return outcome, run_start
 
 
 def test_d1_parse_stage_poison_message(gauge_recorder, results_dir, influx_query, rabbit_get):
+    run_id = f"poisonD1-{int(time.time()) % 100000}"
     payload = json.dumps(
         {
             "ts": "2026-08-10T12:00:00.000Z", "region": "eu", "plant": "plant1",
             "device": "poison-01", "metric": "temp", "value": "not-a-number",
-            "unit": "C", "seq": 1, "run_id": "poisonD1",
+            "unit": "C", "seq": 1, "run_id": run_id,
         }
     ).encode()
-    outcome = _run_trigger(
-        "d1-parse", payload, "poisonD1", gauge_recorder, results_dir, influx_query, rabbit_get
+    outcome, run_start = _run_trigger(
+        "d1-parse", payload, run_id, gauge_recorder, results_dir, influx_query, rabbit_get
     )
     # The test asserts only that classification succeeded. Every outcome below is a
     # legitimate experimental result, and the one this experiment hunts for
@@ -148,20 +157,21 @@ def test_d1_parse_stage_poison_message(gauge_recorder, results_dir, influx_query
 
 def test_d2_output_stage_oversized_write(gauge_recorder, results_dir, influx_query, rabbit_get):
     """An oversized tag value survives the parser and is rejected by InfluxDB."""
+    run_id = f"poisonD2-{int(time.time()) % 100000}"
     payload = json.dumps(
         {
             "ts": "2026-08-10T12:00:00.000Z", "region": "eu", "plant": "x" * 200000,
             "device": "poison-02", "metric": "temp", "value": 71.4,
-            "unit": "C", "seq": 1, "run_id": "poisonD2",
+            "unit": "C", "seq": 1, "run_id": run_id,
         }
     ).encode()
-    outcome = _run_trigger(
-        "d2-output", payload, "poisonD2", gauge_recorder, results_dir, influx_query, rabbit_get
+    outcome, run_start = _run_trigger(
+        "d2-output", payload, run_id, gauge_recorder, results_dir, influx_query, rabbit_get
     )
     # Same rule as D1: `silently-discarded-no-counter` is the report's headline
     # finding, not a test failure. The result JSON carries it into the report.
     assert outcome in KNOWN_OUTCOMES, f"unclassified outcome: {outcome}"
-    assert not landed_in_influx(influx_query, "poisonD2"), (
+    assert not landed_in_influx(influx_query, run_id, run_start), (
         "an oversized tag value reached InfluxDB, so this trigger does not exercise "
         "a rejection path and D2 needs a larger payload"
     )
