@@ -10,7 +10,7 @@ import time
 
 import pytest
 
-from tests.conftest import consumer_files
+from tests.conftest import consumer_files, detect_profile_mismatch
 from tests.experiments.conftest import DrainResult, GaugeRecorder, _online_from_quorum, drain_and_fetch
 
 
@@ -207,3 +207,46 @@ def test_docker_control_routes_the_consumer_through_the_derived_set(monkeypatch)
         "compose.consumer.yml",
     )
     assert control._files("rabbitmq") == ("compose.yml", "compose.cluster.yml")
+
+
+MISMATCHED_DRY_RUN = """\
+ Found orphan containers ([iot-rabbitmq2 iot-rabbitmq3]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.
+ Volume iot-messaging_rabbitmq-data  Creating
+ Volume iot-messaging_rabbitmq-data  Created
+ Container iot-rabbitmq  Recreate
+ Container iot-influxdb  Running
+"""
+
+MATCHING_DRY_RUN = """\
+ Container iot-rabbitmq  Running
+ Container iot-rabbitmq2  Running
+ Container iot-rabbitmq3  Running
+ Container iot-influxdb  Running
+ Container iot-telegraf  Running
+"""
+
+CLEAN_FIRST_RUN = """\
+ Network iot-messaging_core  Creating
+ Network iot-messaging_core  Created
+ Volume iot-messaging_rabbitmq-data  Creating
+ Volume iot-messaging_rabbitmq-data  Created
+ Container iot-rabbitmq  Creating
+ Container iot-rabbitmq  Created
+"""
+
+
+def test_mismatch_is_detected_from_a_recreate_and_orphans():
+    message = detect_profile_mismatch(MISMATCHED_DRY_RUN)
+    assert message is not None
+    assert "iot-rabbitmq" in message
+    assert "iot-rabbitmq2" in message
+
+
+def test_a_matching_stack_is_not_flagged():
+    assert detect_profile_mismatch(MATCHING_DRY_RUN) is None
+
+
+def test_a_clean_first_bring_up_is_not_flagged():
+    """`Creating` on a container is a first bring-up; `Recreate` is a reconcile.
+    Confusing the two would fail every clean session."""
+    assert detect_profile_mismatch(CLEAN_FIRST_RUN) is None

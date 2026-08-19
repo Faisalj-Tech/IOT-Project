@@ -1,5 +1,6 @@
 import asyncio
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -127,7 +128,8 @@ def consumer_files() -> tuple[str, ...]:
     return compose_files() + ("compose.consumer.yml",)
 
 
-def compose(*args: str, files: tuple[str, ...] = ("compose.yml",)) -> subprocess.CompletedProcess:
+def compose(*args: str, files: tuple[str, ...] = ("compose.yml",),
+            check: bool = True) -> subprocess.CompletedProcess:
     """Run `docker compose` against the project, raising with captured output on failure.
 
     subprocess.CalledProcessError's default __str__ hides stdout/stderr, which makes a
@@ -143,12 +145,68 @@ def compose(*args: str, files: tuple[str, ...] = ("compose.yml",)) -> subprocess
         capture_output=True,
         text=True,
     )
-    if proc.returncode != 0:
+    if check and proc.returncode != 0:
         raise RuntimeError(
             f"docker compose {' '.join(args)} failed with exit {proc.returncode}\n"
             f"--- stdout ---\n{proc.stdout}\n--- stderr ---\n{proc.stderr}"
         )
     return proc
+
+
+_RECREATE = re.compile(r"^\s*Container\s+(\S+)\s+Recreate\b", re.MULTILINE)
+_ORPHANS = re.compile(r"Found orphan containers \(\[(.*?)\]\)")
+_VOLUME_CREATING = re.compile(r"^\s*Volume\s+(\S+)\s+Creating\b", re.MULTILINE)
+
+
+def detect_profile_mismatch(dry_run_output: str) -> str | None:
+    """Does this `up --dry-run` describe a reconcile rather than a no-op?
+
+    Run against an already-running stack, `up --dry-run` reports what compose
+    *would* change. Against the file set the stack was brought up with, that is
+    nothing. Against a different set, compose announces exactly the damage
+    ADR-0025 diagnosed: peers of the other profile become orphans, the shared
+    service is recreated, and it is recreated onto a different, empty volume.
+
+    `Recreate` is the reconcile; `Creating` on a container is a clean first
+    bring-up and must never fire this.
+    """
+    recreated = _RECREATE.findall(dry_run_output)
+    orphans = _ORPHANS.findall(dry_run_output)
+    volumes = _VOLUME_CREATING.findall(dry_run_output) if recreated else []
+    if not recreated and not orphans:
+        return None
+    parts = []
+    if recreated:
+        parts.append(f"would recreate {', '.join(recreated)}")
+    if orphans:
+        parts.append(f"sees orphan containers [{orphans[0]}]")
+    if volumes:
+        parts.append(f"would create volume(s) {', '.join(volumes)}")
+    return "; ".join(parts)
+
+
+def _fail_on_profile_mismatch() -> None:
+    """Refuse to `up` a file set that would reconcile a running stack.
+
+    Gated on `ps -q` so a clean session pays one cheap command and no dry-run.
+    COMPOSE_PROFILES is inherited from the environment so profile-gated services
+    (the region simulators) are not mistaken for orphans.
+    """
+    files = compose_files()
+    running = compose("ps", "-q", files=files, check=False).stdout.strip()
+    if not running:
+        return
+    # check=False: a mismatched dry-run may exit non-zero, and its output is
+    # exactly what we are here to read.
+    proc = compose("up", "-d", "--wait", "--dry-run", files=files, check=False)
+    message = detect_profile_mismatch(proc.stdout + proc.stderr)
+    if message:
+        pytest.fail(
+            f"compose file set {files} would reconcile the running stack: {message}.\n"
+            "Tear the stack down with the file set it was brought up with, plus "
+            "--remove-orphans, or re-run with the matching IOT_CLUSTER / IOT_REGION "
+            "values. See ADR-0025."
+        )
 
 
 @pytest.fixture(scope="session")
@@ -161,6 +219,7 @@ def stack():
         pytest.fail("main/.env is missing. Copy .env.example to .env first.")
     acquire_stack_lock()
     try:
+        _fail_on_profile_mismatch()
         compose("up", "-d", "--wait", files=compose_files())
         yield
     finally:

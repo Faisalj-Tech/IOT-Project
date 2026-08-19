@@ -19,6 +19,17 @@ import pytest
 from tests.conftest import _pid_alive, acquire_stack_lock, release_stack_lock
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _ensure_stack_fixture_runs(stack):
+    """Ensure the stack fixture is set up so the profile-mismatch guard can run.
+
+    The guard is part of the stack fixture's setup, so we need the fixture to
+    run even though our lock tests don't directly use it. This fixture depends
+    on stack, which causes it to be set up before any test in this module runs.
+    """
+    yield
+
+
 @pytest.fixture
 def lock(tmp_path):
     return tmp_path / "stack.lock"
