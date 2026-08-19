@@ -111,8 +111,29 @@ def cluster_mode() -> bool:
     return os.environ.get("IOT_CLUSTER") == "1"
 
 
+def region_mode() -> bool:
+    """Is this session running against the multi-region overlay?
+
+    Same rationale as cluster_mode(): the stack fixture is session-scoped and must
+    choose its compose files before any test runs, so this is an environment
+    variable rather than marker inspection.
+    """
+    return os.environ.get("IOT_REGION") == "1"
+
+
 def compose_files() -> tuple[str, ...]:
-    return ("compose.yml", "compose.cluster.yml") if cluster_mode() else ("compose.yml",)
+    """The compose file set for this session, in overlay-application order.
+
+    compose.region.yml is always last: it re-mounts /etc/rabbitmq/rabbitmq.conf
+    and /etc/rabbitmq/definitions.json over whatever the cluster overlay put
+    there, and compose resolves same-target mounts by last-one-wins.
+    """
+    files = ("compose.yml",)
+    if cluster_mode():
+        files += ("compose.cluster.yml",)
+    if region_mode():
+        files += ("compose.region.yml",)
+    return files
 
 
 def consumer_files() -> tuple[str, ...]:

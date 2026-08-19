@@ -10,8 +10,8 @@ import time
 
 import pytest
 
-from tests.conftest import consumer_files, detect_profile_mismatch
-from tests.experiments.conftest import DrainResult, GaugeRecorder, _online_from_quorum, drain_and_fetch
+from tests.conftest import compose_files, consumer_files, detect_profile_mismatch, region_mode
+from tests.experiments.conftest import DrainResult, GaugeRecorder, _online_from_quorum, drain_and_fetch, partition_networks
 
 
 def _recorder(samples):
@@ -250,3 +250,49 @@ def test_a_clean_first_bring_up_is_not_flagged():
     """`Creating` on a container is a first bring-up; `Recreate` is a reconcile.
     Confusing the two would fail every clean session."""
     assert detect_profile_mismatch(CLEAN_FIRST_RUN) is None
+
+
+@pytest.mark.parametrize(
+    "cluster,region,expected",
+    [
+        (False, False, ("compose.yml",)),
+        (True, False, ("compose.yml", "compose.cluster.yml")),
+        (False, True, ("compose.yml", "compose.region.yml")),
+        (True, True, ("compose.yml", "compose.cluster.yml", "compose.region.yml")),
+    ],
+)
+def test_compose_files_covers_both_axes(monkeypatch, cluster, region, expected):
+    """Region is always last: its mounts must win over the cluster overlay's for
+    /etc/rabbitmq/rabbitmq.conf and /etc/rabbitmq/definitions.json (spec 4.3)."""
+    monkeypatch.delenv("IOT_CLUSTER", raising=False)
+    monkeypatch.delenv("IOT_REGION", raising=False)
+    if cluster:
+        monkeypatch.setenv("IOT_CLUSTER", "1")
+    if region:
+        monkeypatch.setenv("IOT_REGION", "1")
+    assert compose_files() == expected
+
+
+def test_consumer_files_appends_to_both_axes(monkeypatch):
+    monkeypatch.setenv("IOT_CLUSTER", "1")
+    monkeypatch.setenv("IOT_REGION", "1")
+    assert consumer_files() == (
+        "compose.yml",
+        "compose.cluster.yml",
+        "compose.region.yml",
+        "compose.consumer.yml",
+    )
+
+
+def test_partition_networks_include_the_region_networks(monkeypatch):
+    """A partition that leaves the region networks attached is not a partition.
+    DockerControl.partition() disconnects every network this returns."""
+    monkeypatch.delenv("IOT_REGION", raising=False)
+    assert partition_networks() == ("iot-messaging_core", "iot-messaging_edge")
+    monkeypatch.setenv("IOT_REGION", "1")
+    assert partition_networks() == (
+        "iot-messaging_core",
+        "iot-messaging_edge",
+        "iot-messaging_region-eu",
+        "iot-messaging_region-us",
+    )

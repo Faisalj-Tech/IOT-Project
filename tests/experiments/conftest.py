@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.conftest import ROOT, cluster_mode, compose, compose_files, consumer_files
+from tests.conftest import ROOT, cluster_mode, compose, compose_files, consumer_files, region_mode
 
 CONTAINER_NAMES: dict[str, str | tuple[str, ...]] = {
     "rabbitmq": ("iot-rabbitmq", "iot-rabbitmq2", "iot-rabbitmq3"),
@@ -21,7 +21,17 @@ CONTAINER_NAMES: dict[str, str | tuple[str, ...]] = {
 }
 
 # `name: iot-messaging` in compose.yml prefixes every network Compose creates.
-PARTITION_NETWORKS = ("iot-messaging_core", "iot-messaging_edge")
+def partition_networks() -> tuple[str, ...]:
+    """Every network a partitioned container must be detached from.
+
+    Under the region profile the broker also sits on the two region networks, and
+    a "partition" that left those attached would leave the node reachable from the
+    simulators — a silently weaker experiment than the one the test claims to run.
+    """
+    networks = ("iot-messaging_core", "iot-messaging_edge")
+    if region_mode():
+        networks += ("iot-messaging_region-eu", "iot-messaging_region-us")
+    return networks
 
 
 def _entry(service: str) -> tuple[str, ...]:
@@ -147,7 +157,7 @@ class DockerControl:
             self._original_networks[(service, node)] = set(json.loads(proc.stdout).keys())
 
         # Disconnect from the partition networks.
-        for network in PARTITION_NETWORKS:
+        for network in partition_networks():
             try:
                 _docker("network", "disconnect", network, container)
             except RuntimeError:
@@ -167,7 +177,7 @@ class DockerControl:
         import json
         container = container_for(service, node)
         original_networks = self._original_networks.get((service, node), set())
-        wanted = {n for n in PARTITION_NETWORKS if n in original_networks}
+        wanted = {n for n in partition_networks() if n in original_networks}
 
         failures: list[str] = []
         for network in wanted:
