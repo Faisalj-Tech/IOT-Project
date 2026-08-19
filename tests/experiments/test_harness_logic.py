@@ -10,6 +10,7 @@ import time
 
 import pytest
 
+from tests.conftest import consumer_files
 from tests.experiments.conftest import DrainResult, GaugeRecorder, _online_from_quorum, drain_and_fetch
 
 
@@ -176,3 +177,33 @@ def test_drain_result_fields_distinguish_completion_from_giving_up():
         "drain_rows_at_exit": 1,
         "drain_expected_total": 10,
     }
+
+
+def test_consumer_files_follows_the_single_node_profile(monkeypatch):
+    monkeypatch.delenv("IOT_CLUSTER", raising=False)
+    assert consumer_files() == ("compose.yml", "compose.consumer.yml")
+
+
+def test_consumer_files_follows_the_cluster_profile(monkeypatch):
+    """The bug this replaces: a hardcoded single-node set made compose evaluate
+    `consumer`'s `depends_on: rabbitmq` against compose.yml alone, which recreates
+    iot-rabbitmq onto the empty single-node volume mid-run. ADR-0026, bite #16."""
+    monkeypatch.setenv("IOT_CLUSTER", "1")
+    assert consumer_files() == (
+        "compose.yml",
+        "compose.cluster.yml",
+        "compose.consumer.yml",
+    )
+
+
+def test_docker_control_routes_the_consumer_through_the_derived_set(monkeypatch):
+    from tests.experiments.conftest import DockerControl
+
+    monkeypatch.setenv("IOT_CLUSTER", "1")
+    control = DockerControl()
+    assert control._files("consumer") == (
+        "compose.yml",
+        "compose.cluster.yml",
+        "compose.consumer.yml",
+    )
+    assert control._files("rabbitmq") == ("compose.yml", "compose.cluster.yml")

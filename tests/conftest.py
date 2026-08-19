@@ -114,6 +114,19 @@ def compose_files() -> tuple[str, ...]:
     return ("compose.yml", "compose.cluster.yml") if cluster_mode() else ("compose.yml",)
 
 
+def consumer_files() -> tuple[str, ...]:
+    """The file set for the ack-after-write consumer overlay.
+
+    Derived, never hardcoded. `compose.consumer.yml`'s `consumer` service carries
+    `depends_on: rabbitmq (condition: service_healthy)`, so compose evaluates the
+    `rabbitmq` service against whatever file set this returns. A hardcoded
+    single-node set therefore recreates iot-rabbitmq onto the empty single-node
+    volume in the middle of a cluster run — the exact reconcile ADR-0025 proved
+    and ADR-0026 filed as bite #16.
+    """
+    return compose_files() + ("compose.consumer.yml",)
+
+
 def compose(*args: str, files: tuple[str, ...] = ("compose.yml",)) -> subprocess.CompletedProcess:
     """Run `docker compose` against the project, raising with captured output on failure.
 

@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.conftest import ROOT, cluster_mode, compose, compose_files
+from tests.conftest import ROOT, cluster_mode, compose, compose_files, consumer_files
 
 CONTAINER_NAMES: dict[str, str | tuple[str, ...]] = {
     "rabbitmq": ("iot-rabbitmq", "iot-rabbitmq2", "iot-rabbitmq3"),
@@ -84,7 +84,7 @@ class DockerControl:
 
     def _files(self, service: str) -> tuple[str, ...]:
         if service == "consumer":
-            return CONSUMER_FILES
+            return consumer_files()
         return compose_files()
 
     def is_running(self, service: str, node: int = 1) -> bool:
@@ -735,9 +735,6 @@ def publish_raw(topic: str, payload: bytes, count: int = 1) -> None:
     asyncio.run(_publish())
 
 
-CONSUMER_FILES = ("compose.yml", "compose.consumer.yml")
-
-
 @pytest.fixture
 def consumer_stack(stack, docker_control):
     """Swap Telegraf out for the ack-after-write consumer, and swap back afterwards.
@@ -746,7 +743,7 @@ def consumer_stack(stack, docker_control):
     separate runs rather than side by side.
     """
     docker_control.stop("telegraf", timeout=10)
-    compose("up", "-d", "--build", "consumer", files=CONSUMER_FILES)
+    compose("up", "-d", "--build", "consumer", files=consumer_files())
     deadline = time.time() + 60
     while time.time() < deadline:
         if docker_control.is_running("consumer"):
@@ -759,7 +756,7 @@ def consumer_stack(stack, docker_control):
         yield
     finally:
         try:
-            compose("rm", "-sf", "consumer", files=CONSUMER_FILES)
+            compose("rm", "-sf", "consumer", files=consumer_files())
         except Exception:
             pass
         docker_control.start("telegraf")
