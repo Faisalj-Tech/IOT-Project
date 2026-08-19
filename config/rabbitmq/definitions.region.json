@@ -1,0 +1,289 @@
+{
+  "vhosts": [
+    { "name": "/" },
+    { "name": "eu" },
+    { "name": "us" }
+  ],
+  "users": [
+    {
+      "name": "admin",
+      "password_hash": "uq3utGL66U5CMnUqhfRu8J3xn1iqiv/AwVdXS8D+6KgmEDIf",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ["administrator"]
+    },
+    {
+      "name": "device",
+      "password_hash": "bBrFSa5mbqFRf8oo52tWkYT+tPOC+4dvfL/vqfvI5utgwKpt",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": []
+    },
+    {
+      "name": "telegraf",
+      "password_hash": "Mc9vTJ6lj8L2KSy+bahEqnDoEopntZQ7bahtBm3baCz2ozLo",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ["monitoring"]
+    },
+    {
+      "name": "device-eu",
+      "password_hash": "kzX5W4eVKY4RQXHJlWBiTS3PtdCFzsmocuqDgvO+LEgEf00O",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": []
+    },
+    {
+      "name": "device-us",
+      "password_hash": "ESXezXlBpngB/6Hwz74vxbaomNIGBRHs+OJvPYdzZVXXP79y",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": []
+    },
+    {
+      "name": "telegraf-eu",
+      "password_hash": "bR5iQnYlW17sFOmpmuq8HqnjbI2TKBxoiLYv7ZP0dtOZqJ7q",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": []
+    },
+    {
+      "name": "telegraf-us",
+      "password_hash": "7Ll5apikwQbTn/DEWYOq2xkLEJmeiu2l+/+Kup15uU0pRgyJ",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": []
+    }
+  ],
+  "permissions": [
+    {
+      "user": "admin",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "device",
+      "vhost": "/",
+      "configure": "^mqtt-subscription-.*$",
+      "write": "^amq\\.topic$",
+      "read": "^mqtt-subscription-.*$"
+    },
+    {
+      "user": "telegraf",
+      "vhost": "/",
+      "configure": "^$",
+      "write": "^telemetry\\.q$",
+      "read": "^(telemetry\\.q|amq\\.topic)$"
+    },
+    { "user": "admin", "vhost": "eu", "configure": ".*", "write": ".*", "read": ".*" },
+    {
+      "user": "device-eu",
+      "vhost": "eu",
+      "configure": "^mqtt-subscription-.*$",
+      "write": "^amq\\.topic$",
+      "read": "^mqtt-subscription-.*$"
+    },
+    {
+      "user": "telegraf-eu",
+      "vhost": "eu",
+      "configure": "^$",
+      "write": "^$",
+      "read": "^(telemetry\\.eu\\.q|amq\\.topic)$"
+    },
+    { "user": "admin", "vhost": "us", "configure": ".*", "write": ".*", "read": ".*" },
+    {
+      "user": "device-us",
+      "vhost": "us",
+      "configure": "^mqtt-subscription-.*$",
+      "write": "^amq\\.topic$",
+      "read": "^mqtt-subscription-.*$"
+    },
+    {
+      "user": "telegraf-us",
+      "vhost": "us",
+      "configure": "^$",
+      "write": "^$",
+      "read": "^(telemetry\\.us\\.q|amq\\.topic)$"
+    }
+  ],
+  "topic_permissions": [
+    {
+      "user": "device-eu",
+      "vhost": "eu",
+      "exchange": "amq.topic",
+      "write": "^region\\.eu\\..*",
+      "read": "^region\\.eu\\..*"
+    },
+    {
+      "user": "device-us",
+      "vhost": "us",
+      "exchange": "amq.topic",
+      "write": "^region\\.us\\..*",
+      "read": "^region\\.us\\..*"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "dlx",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "dlx",
+      "vhost": "eu",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "dlx",
+      "vhost": "us",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "telemetry.q",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-quorum-initial-group-size": 3,
+        "x-dead-letter-exchange": "dlx"
+      }
+    },
+    {
+      "name": "dlq",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-quorum-initial-group-size": 3
+      }
+    },
+    {
+      "name": "telemetry.eu.q",
+      "vhost": "eu",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-quorum-initial-group-size": 3,
+        "x-dead-letter-exchange": "dlx"
+      }
+    },
+    {
+      "name": "dlq",
+      "vhost": "eu",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-quorum-initial-group-size": 3
+      }
+    },
+    {
+      "name": "telemetry.us.q",
+      "vhost": "us",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-quorum-initial-group-size": 3,
+        "x-dead-letter-exchange": "dlx"
+      }
+    },
+    {
+      "name": "dlq",
+      "vhost": "us",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "quorum",
+        "x-quorum-initial-group-size": 3
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "amq.topic",
+      "vhost": "/",
+      "destination": "telemetry.q",
+      "destination_type": "queue",
+      "routing_key": "region.#",
+      "arguments": {}
+    },
+    {
+      "source": "dlx",
+      "vhost": "/",
+      "destination": "dlq",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    },
+    {
+      "source": "amq.topic",
+      "vhost": "eu",
+      "destination": "telemetry.eu.q",
+      "destination_type": "queue",
+      "routing_key": "region.eu.#",
+      "arguments": {}
+    },
+    {
+      "source": "dlx",
+      "vhost": "eu",
+      "destination": "dlq",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    },
+    {
+      "source": "amq.topic",
+      "vhost": "us",
+      "destination": "telemetry.us.q",
+      "destination_type": "queue",
+      "routing_key": "region.us.#",
+      "arguments": {}
+    },
+    {
+      "source": "dlx",
+      "vhost": "us",
+      "destination": "dlq",
+      "destination_type": "queue",
+      "routing_key": "#",
+      "arguments": {}
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "eu",
+      "name": "eu-limits",
+      "pattern": "^telemetry\\.",
+      "apply-to": "queues",
+      "priority": 0,
+      "definition": { "message-ttl": 604800000, "max-length": 100000 }
+    },
+    {
+      "vhost": "us",
+      "name": "us-limits",
+      "pattern": "^telemetry\\.",
+      "apply-to": "queues",
+      "priority": 0,
+      "definition": { "message-ttl": 86400000, "max-length": 10000 }
+    }
+  ],
+  "parameters": [],
+  "global_parameters": [
+    {
+      "name": "mqtt_port_to_vhost_mapping",
+      "value": { "1893": "eu", "1993": "us" }
+    }
+  ]
+}
