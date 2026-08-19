@@ -100,3 +100,28 @@ def test_the_port_to_vhost_mapping_matches_the_listeners():
     assert "mqtt.listeners.tcp.default = 1883" in conf, (
         "1883 must stay unmapped on vhost / so every Phase 1-3 experiment keeps working"
     )
+
+
+REGION_COMPOSE = ROOT / "compose.region.yml"
+
+EXPECTED_ADDRESSES = {"eu": "172.28.1.10", "us": "172.28.2.10"}
+
+
+def test_listener_addresses_match_the_compose_static_ips():
+    """Two files must agree or a region listener silently binds nothing.
+
+    Parsed as text rather than YAML so this test needs no new dependency and
+    fails with a readable diff.
+    """
+    compose_text = REGION_COMPOSE.read_text(encoding="utf-8")
+    conf_text = REGION_CONF.read_text(encoding="utf-8")
+    for region, address in EXPECTED_ADDRESSES.items():
+        assert f"ipv4_address: {address}" in compose_text, region
+        assert f"mqtt.listeners.tcp.{region} = {address}:" in conf_text, region
+
+
+def test_region_subnets_contain_their_broker_addresses():
+    compose_text = REGION_COMPOSE.read_text(encoding="utf-8")
+    for address in EXPECTED_ADDRESSES.values():
+        network_prefix = address.rsplit(".", 1)[0]
+        assert f"subnet: {network_prefix}.0/24" in compose_text, address

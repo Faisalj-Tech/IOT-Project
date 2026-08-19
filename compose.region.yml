@@ -1,0 +1,33 @@
+# Phase 4 overlay: per-region vhosts, listeners, and networks. Stacks on
+# compose.yml alone, or on compose.yml + compose.cluster.yml under IOT_CLUSTER=1.
+# ALWAYS LAST in the -f order: it re-mounts rabbitmq.conf and definitions.json
+# over whatever the cluster overlay put there, and compose resolves same-target
+# mounts last-one-wins.
+
+networks:
+  region-eu:
+    ipam:
+      config:
+        - subnet: 172.28.1.0/24
+  region-us:
+    ipam:
+      config:
+        - subnet: 172.28.2.0/24
+
+services:
+  rabbitmq:
+    networks:
+      core: {}
+      edge: {}
+      region-eu:
+        ipv4_address: 172.28.1.10
+      region-us:
+        ipv4_address: 172.28.2.10
+    ports:
+      - "1883:1883"
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    volumes:
+      - ./config/rabbitmq/rabbitmq.region.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./config/rabbitmq/definitions.region.json:/etc/rabbitmq/definitions.json:ro
