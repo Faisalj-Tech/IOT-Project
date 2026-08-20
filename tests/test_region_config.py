@@ -148,3 +148,23 @@ def test_region_inputs_do_not_bind_the_queue():
         assert "binding_key" not in text
         assert "queue_passive = true" in text
         assert "exchange_passive = true" in text
+
+
+def test_region_cluster_formation_is_bound_to_all_three_nodes():
+    """Under combined region+cluster profile, rabbit1 must discover rabbit2/3.
+
+    rabbitmq.region.conf carries the cluster_formation config so rabbit1 (which
+    gets the region.conf overlay on top of the cluster.conf) participates in
+    peer discovery. Without it, rabbit1 elects itself standalone and rabbit2/3
+    form their own 2-node cluster, splitting what should be a 3-node group.
+
+    Regression test for: https://github.com/rabbitmq/rabbitmq-server (4.3.4) and
+    https://github.com/ansible/ansible-runner (2.3.4 classic_config peer discovery).
+    """
+    conf_text = REGION_CONF.read_text(encoding="utf-8")
+    assert "cluster_formation.peer_discovery_backend = classic_config" in conf_text
+    assert "cluster_formation.classic_config.nodes.1 = rabbit@rabbit1" in conf_text
+    assert "cluster_formation.classic_config.nodes.2 = rabbit@rabbit2" in conf_text
+    assert "cluster_formation.classic_config.nodes.3 = rabbit@rabbit3" in conf_text
+    assert "cluster_formation.discovery_retry_limit" in conf_text
+    assert "cluster_formation.discovery_retry_interval" in conf_text
