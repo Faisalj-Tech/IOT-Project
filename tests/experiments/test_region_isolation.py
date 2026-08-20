@@ -21,7 +21,7 @@ import aiomqtt
 from aiomqtt.exceptions import MqttConnectError
 import pytest
 
-from tests.conftest import region_mode
+from tests.conftest import compose_files, region_mode, ROOT
 
 pytestmark = [pytest.mark.region, pytest.mark.stack]
 
@@ -108,3 +108,46 @@ def test_a_device_cannot_publish_into_another_regions_routing_key(stack):
     combined = logs.stdout + logs.stderr
     assert "MQTT topic access refused" in combined, combined[-2000:]
     assert "region.us.plant1.press-01.temp" in combined, combined[-2000:]
+
+
+REGION_ADDRESSES = {"eu": ("172.28.1.10", 1893), "us": ("172.28.2.10", 1993)}
+
+
+def _probe_from(region: str, address: str, port: int) -> subprocess.CompletedProcess:
+    """Try one TCP connect from inside that region's sim container.
+
+    `compose run --rm` starts a throwaway container attached to exactly the
+    networks the service declares, which is the whole point: the probe inherits
+    the simulator's network position without needing the simulator to be running.
+    Python is already in the image, so no extra package is installed.
+    """
+    files: list[str] = []
+    for name in compose_files():
+        files += ["-f", name]
+    return subprocess.run(
+        ["docker", "compose", *files, "--profile", "sim", "run", "--rm",
+         "--entrypoint", "python", f"sim-{region}", "-c",
+         f"import socket; socket.create_connection(('{address}', {port}), timeout=5)"],
+        capture_output=True, text=True, check=False, cwd=ROOT,
+    )
+
+
+def test_a_region_container_reaches_only_its_own_listener(stack):
+    """R4. The listeners bind one interface each and the networks do not route to
+    one another, so this fails twice over — which is the point of doing both."""
+    for region, (address, port) in REGION_ADDRESSES.items():
+        own = _probe_from(region, address, port)
+        assert own.returncode == 0, (
+            f"sim-{region} could not reach its own listener {address}:{port}\n"
+            f"{own.stdout}\n{own.stderr}"
+        )
+
+    other = {"eu": "us", "us": "eu"}
+    for region, foreign in other.items():
+        address, port = REGION_ADDRESSES[foreign]
+        probe = _probe_from(region, address, port)
+        assert probe.returncode != 0, (
+            f"sim-{region} reached the {foreign} listener at {address}:{port}; "
+            "the region networks are not isolated"
+        )
+        assert "Error" in probe.stderr or "error" in probe.stderr, probe.stderr
