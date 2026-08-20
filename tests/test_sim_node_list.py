@@ -63,3 +63,24 @@ def test_publisher_fails_over_to_the_next_node(stack, influx_query):
     assert len(rows) >= expected, (
         f"published {expected} but only {len(rows)} reached InfluxDB"
     )
+
+
+def test_cli_accepts_explicit_credentials():
+    """The region simulators authenticate as device-eu / device-us, not as the
+    Phase 1 `device` user, and they run inside containers where passing them on
+    the command line is how compose supplies them."""
+    from sim.devices.__main__ import parse_args
+
+    args = parse_args(["--username", "device-eu", "--password", "devicepass-eu"])
+    assert args.username == "device-eu"
+    assert args.password == "devicepass-eu"
+
+
+def test_cli_credentials_default_to_the_phase_one_device(monkeypatch):
+    from sim.devices.__main__ import parse_args
+
+    monkeypatch.delenv("RABBITMQ_DEVICE_USER", raising=False)
+    monkeypatch.delenv("RABBITMQ_DEVICE_PASSWORD", raising=False)
+    args = parse_args([])
+    assert args.username == "device"
+    assert args.password == "devicepass"

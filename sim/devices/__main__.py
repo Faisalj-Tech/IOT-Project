@@ -22,6 +22,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--host", default="localhost")
     parser.add_argument("--port", type=int, default=1883)
     parser.add_argument("--run-id", default=None, help="defaults to a random 8-char id")
+    parser.add_argument(
+        "--username",
+        default=os.environ.get("RABBITMQ_DEVICE_USER", "device"),
+        help="MQTT username; use vhost:user form to select a vhost on an unmapped port",
+    )
+    parser.add_argument(
+        "--password",
+        default=os.environ.get("RABBITMQ_DEVICE_PASSWORD", "devicepass"),
+    )
     return parser.parse_args(argv)
 
 
@@ -40,8 +49,8 @@ def main(argv: list[str] | None = None) -> int:
             run_id=run_id,
             host=args.host,
             port=args.port,
-            username=os.environ.get("RABBITMQ_DEVICE_USER", "device"),
-            password=os.environ.get("RABBITMQ_DEVICE_PASSWORD", "devicepass"),
+            username=args.username,
+            password=args.password,
         )
     )
     logging.info("published %d messages total: %s", sum(published.values()), published)

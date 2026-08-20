@@ -43,3 +43,54 @@ services:
       - /etc/telegraf/telegraf.d
       - --config-directory
       - /etc/telegraf/telegraf.region.d
+
+  # Profile-gated: `up -d --wait` must not start these, or every region test
+  # would race a live publisher. Start them explicitly with
+  #   docker compose --profile sim up -d sim-eu
+  sim-eu:
+    build:
+      context: .
+      dockerfile: Dockerfile.sim
+    image: iot-sim:phase4
+    container_name: iot-sim-eu
+    profiles: [sim]
+    env_file: .env
+    networks:
+      - region-eu
+    command:
+      - python
+      - -m
+      - sim.devices
+      - --region=eu
+      - --plant=plant1
+      - --host=172.28.1.10
+      - --port=1893
+      - --username=device-eu
+      - --password=${RABBITMQ_DEVICE_EU_PASSWORD}
+      - --devices=3
+      - --rate=2
+      - --duration=30
+
+  sim-us:
+    build:
+      context: .
+      dockerfile: Dockerfile.sim
+    image: iot-sim:phase4
+    container_name: iot-sim-us
+    profiles: [sim]
+    env_file: .env
+    networks:
+      - region-us
+    command:
+      - python
+      - -m
+      - sim.devices
+      - --region=us
+      - --plant=plant1
+      - --host=172.28.2.10
+      - --port=1993
+      - --username=device-us
+      - --password=${RABBITMQ_DEVICE_US_PASSWORD}
+      - --devices=3
+      - --rate=2
+      - --duration=30
