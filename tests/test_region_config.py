@@ -125,3 +125,26 @@ def test_region_subnets_contain_their_broker_addresses():
     for address in EXPECTED_ADDRESSES.values():
         network_prefix = address.rsplit(".", 1)[0]
         assert f"subnet: {network_prefix}.0/24" in compose_text, address
+
+
+REGION_TELEGRAF = ROOT / "config" / "telegraf" / "telegraf.region.d"
+
+
+def test_region_inputs_are_bound_to_one_vhost_each():
+    for region in REGIONS:
+        text = (REGION_TELEGRAF / f"{region}.conf").read_text(encoding="utf-8")
+        assert f'brokers = ["amqp://rabbitmq:5672/{region}"]' in text
+        assert f'queue = "telemetry.{region}.q"' in text
+        assert f'region_src = "{region}"' in text
+
+
+def test_region_inputs_do_not_bind_the_queue():
+    """Spec 2.10: binding_key forces a queue.bind, which needs write on the queue.
+    The binding is already declared in definitions.region.json, so setting the key
+    would cost the consumer its read-only identity and fail Telegraf at startup
+    with 403 ACCESS_REFUSED."""
+    for region in REGIONS:
+        text = (REGION_TELEGRAF / f"{region}.conf").read_text(encoding="utf-8")
+        assert "binding_key" not in text
+        assert "queue_passive = true" in text
+        assert "exchange_passive = true" in text

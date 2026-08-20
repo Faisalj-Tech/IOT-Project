@@ -31,3 +31,15 @@ services:
     volumes:
       - ./config/rabbitmq/rabbitmq.region.conf:/etc/rabbitmq/rabbitmq.conf:ro
       - ./config/rabbitmq/definitions.region.json:/etc/rabbitmq/definitions.json:ro
+
+  telegraf:
+    volumes:
+      - ./config/telegraf/telegraf.region.d:/etc/telegraf/telegraf.region.d:ro
+    command:
+      - telegraf
+      - --config
+      - /etc/telegraf/telegraf.conf
+      - --config-directory
+      - /etc/telegraf/telegraf.d
+      - --config-directory
+      - /etc/telegraf/telegraf.region.d
