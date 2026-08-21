@@ -46,10 +46,21 @@ def test_the_plaintext_listener_is_untouched(stack):
 
 def test_the_broker_can_fetch_the_crl(stack):
     """The CDP URI, the crl service name and its port must all agree."""
+    probe_cmd = (
+        "exec 3<>/dev/tcp/crl/8080; "
+        "printf 'GET /root.crl HTTP/1.0\\r\\nHost: crl\\r\\nConnection: close\\r\\n\\r\\n' >&3; "
+        "timeout 1 cat <&3 > /tmp/http_response 2>/dev/null; "
+        "exec 3<&-; "
+        "status_line=$(head -1 /tmp/http_response); "
+        "if echo \"$status_line\" | grep -q '200'; then "
+        "  file_size=$(wc -c < /tmp/http_response); "
+        "  if [ $file_size -gt 400 ]; then "
+        "    echo FETCHED; "
+        "  fi; "
+        "fi"
+    )
     proc = subprocess.run(
-        ["docker", "exec", "iot-rabbitmq", "bash", "-c",
-         "wget -q -O /tmp/probe.crl http://crl:8080/root.crl && "
-         "test -s /tmp/probe.crl && echo FETCHED"],
+        ["docker", "exec", "iot-rabbitmq", "bash", "-c", probe_cmd],
         capture_output=True, text=True, check=False,
     )
     assert "FETCHED" in proc.stdout, (
