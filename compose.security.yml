@@ -19,11 +19,18 @@ services:
       - "15692:15692"
     volumes:
       - ./config/rabbitmq/conf.d/10-security.conf:/etc/rabbitmq/conf.d/10-security.conf:ro
+      - ./config/rabbitmq/conf.d/20-oauth2.conf:/etc/rabbitmq/conf.d/20-oauth2.conf:ro
       - ./config/rabbitmq/advanced.config:/etc/rabbitmq/advanced.config:ro
+      - ./config/rabbitmq/enabled_plugins.security:/etc/rabbitmq/enabled_plugins:ro
       - ./certs:/certs:ro
     depends_on:
       crl:
         condition: service_healthy
+      keycloak:
+        # service_started, not service_healthy: Keycloak carries no healthcheck
+        # (see Task 10). The broker does not need the issuer reachable to boot;
+        # it fetches signing keys when it first validates a token.
+        condition: service_started
 
   crl:
     image: nginx:1.29-alpine

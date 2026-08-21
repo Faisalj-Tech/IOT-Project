@@ -82,3 +82,16 @@ def test_the_region_tls_listeners_avoid_the_all_interfaces_port():
     assert "172.28.1.10:9883" in conf
     assert "172.28.2.10:9993" in conf
     assert ":8883" not in conf
+
+
+def test_the_security_plugin_list_is_the_base_list_plus_oauth2():
+    """Two plugin files means drift. This is the ADR-0029 pattern: pay for the
+    duplication with a test rather than with a surprise."""
+    base = (ROOT / "config" / "rabbitmq" / "enabled_plugins").read_text(encoding="utf-8")
+    security = (ROOT / "config" / "rabbitmq" / "enabled_plugins.security").read_text(
+        encoding="utf-8")
+
+    def parse(text: str) -> set[str]:
+        return set(text.strip().strip("[].").split(","))
+
+    assert parse(security) == parse(base) | {"rabbitmq_auth_backend_oauth2"}

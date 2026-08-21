@@ -7,16 +7,22 @@ the mappers. If the imported realm does not issue the same claims, stop: the
 design's OAuth2 section rests on claims that are not actually being produced.
 """
 
+import asyncio
 import base64
 import json
 import os
+import sys
 import time
 
+import aio_pika
 import pytest
 import requests
 import urllib3
 
 from tests.conftest import ROOT, security_mode
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 pytestmark = [pytest.mark.security, pytest.mark.stack]
 
@@ -107,3 +113,32 @@ def test_the_short_lived_client_really_is_short_lived(stack):
         verify=False, timeout=30,
     )
     assert response.json()["expires_in"] <= 60, response.json()["expires_in"]
+
+
+def amqp_url_with_token(token: str, vhost: str = "/") -> str:
+    """The token IS the password. The username is ignored by the OAuth2 backend."""
+    path = "" if vhost == "/" else vhost
+    return f"amqp://:{token}@localhost:5672/{path}"
+
+
+def test_a_keycloak_token_authenticates_an_amqp_connection(stack):
+    """S5."""
+    token = fetch_token("telegraf-eu", os.environ["KEYCLOAK_TELEGRAF_EU_SECRET"])
+
+    async def _connect() -> None:
+        connection = await aio_pika.connect(amqp_url_with_token(token), timeout=20)
+        await connection.close()
+
+    asyncio.run(_connect())
+
+
+def test_a_garbage_token_is_refused(stack):
+    """Negative control: without it, a broker that ignored the token entirely
+    would look identical to one that validated it."""
+    async def _connect() -> None:
+        connection = await aio_pika.connect(
+            amqp_url_with_token("not.a.jwt"), timeout=20)
+        await connection.close()
+
+    with pytest.raises(Exception):  # noqa: B017 - aio_pika raises several types here
+        asyncio.run(_connect())
