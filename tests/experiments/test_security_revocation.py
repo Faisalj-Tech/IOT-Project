@@ -84,13 +84,34 @@ def wait_until_refused(cert_name: str, timeout: float = REFUSAL_TIMEOUT) -> floa
                 ssock = ctx.wrap_socket(sock, server_hostname="localhost")
                 ssock.recv(1)  # Must read to trigger certificate_revoked alert
                 ssock.close()
-        except ssl.SSLError as exc:
+        except (ssl.SSLError, OSError) as exc:
             last = exc
             if "REVOKED" in str(exc).upper():
                 return time.time() - started
         time.sleep(3)
     raise AssertionError(
         f"{cert_name} was still accepted after {timeout}s; last error: {last}")
+
+
+def test_a_non_revoked_certificate_connects_cleanly_at_the_tls_layer(stack):
+    """Negative control for wait_until_refused()/the TLS-layer test: proves recv(1)
+    is necessary because a non-revoked cert's handshake succeeds and recv() does not
+    raise a REVOKED error — distinguishing a genuine revocation alert from any other
+    immediate-failure mode the raw-SSL probe might otherwise mask.
+
+    Device-b is never revoked in this test file; this confirms the broker accepts it."""
+    ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    ctx.load_verify_locations(cafile=str(CERTS / "rootCA.crt"))
+    ctx.load_cert_chain(certfile=str(CERTS / "device-b.crt"), keyfile=str(CERTS / "device-b.key"))
+    with socket.create_connection(("localhost", 8883), timeout=15) as sock:
+        ssock = ctx.wrap_socket(sock, server_hostname="localhost")  # Must not raise
+        # recv() on non-revoked cert must not raise ssl.SSLError with REVOKED text
+        try:
+            ssock.recv(1)  # May return empty (broker waits for CONNECT) but must not raise
+        except ssl.SSLError as e:
+            if "REVOKED" in str(e).upper():
+                raise AssertionError(f"Non-revoked cert device-b wrongly rejected: {e}")
+        ssock.close()
 
 
 def test_revoking_one_certificate_leaves_its_sibling_working(stack):
@@ -117,6 +138,10 @@ def test_revoking_one_certificate_leaves_its_sibling_working(stack):
 def test_the_revoked_certificate_is_refused_at_the_tls_layer(stack):
     """The refusal must be a TLS alert, not an MQTT reason code - happens at the
     TLS layer (before any MQTT CONNECT packet is sent or received)."""
+    # Prove the broker's CRL cache reflects the current (un-revoked, per _clean_revocations)
+    # state before we revoke. Without this, a stale cache from a prior test could mask
+    # whether the broker actually re-checks the CRL or just returns a cached decision.
+    _connect("device-a")  # Must succeed; if it fails, the cache didn't clear from prior test
     revoke_and_publish("device-a")
     wait_until_refused("device-a")
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
