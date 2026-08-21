@@ -19,7 +19,7 @@ import pytest
 import requests
 import urllib3
 
-from tests.conftest import ROOT, security_mode
+from tests.conftest import ROOT, region_mode, security_mode
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -121,8 +121,11 @@ def amqp_url_with_token(token: str, vhost: str = "eu") -> str:
     return f"amqp://:{token}@localhost:5672/{path}"
 
 
+@pytest.mark.region
 def test_a_keycloak_token_authenticates_an_amqp_connection(stack):
     """S5."""
+    if not region_mode():
+        pytest.skip("needs IOT_REGION=1 as well as IOT_SECURITY=1")
     token = fetch_token("telegraf-eu", os.environ["KEYCLOAK_TELEGRAF_EU_SECRET"])
 
     async def _connect() -> None:
@@ -132,9 +135,12 @@ def test_a_keycloak_token_authenticates_an_amqp_connection(stack):
     asyncio.run(_connect())
 
 
+@pytest.mark.region
 def test_a_garbage_token_is_refused(stack):
     """Negative control: without it, a broker that ignored the token entirely
     would look identical to one that validated it."""
+    if not region_mode():
+        pytest.skip("needs IOT_REGION=1 as well as IOT_SECURITY=1")
     async def _connect() -> None:
         connection = await aio_pika.connect(
             amqp_url_with_token("not.a.jwt"), timeout=20)

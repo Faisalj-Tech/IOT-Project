@@ -1,7 +1,6 @@
 {
   "vhosts": [
-    { "name": "/" },
-    { "name": "eu" }
+    { "name": "/" }
   ],
   "users": [
     {
