@@ -2,9 +2,7 @@ name: iot-messaging
 
 services:
   rabbitmq:
-    build:
-      context: .
-      dockerfile: Dockerfile.rabbitmq
+    image: rabbitmq:4.3.4-management
     container_name: iot-rabbitmq
     hostname: rabbit1
     env_file: .env
