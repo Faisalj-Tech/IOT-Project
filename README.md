@@ -192,6 +192,58 @@ on any individual run without that indicating a regression in the system under t
 the InfluxDB sequence accounting in the same run's result JSON (`published_total`,
 `influx_total`, `gaps`) is the reliable signal for whether messages were actually lost.
 
+## Region (Phase 4)
+
+`compose.region.yml` overlays `compose.yml` (or `compose.yml` + `compose.cluster.yml`
+under `IOT_CLUSTER=1`) to add two region tenants, `eu` and `us`: their own vhosts, users,
+topic-restricted permissions, MQTT listeners bound to their own `/24` Docker network, and
+per-region policies (ADR-0027, ADR-0029, ADR-0030). It is always **last** in the `-f`
+order — it re-mounts `rabbitmq.conf` and `definitions.json` over whatever the cluster
+overlay put there, and Compose resolves same-target mounts last-one-wins.
+
+Single node:
+
+```bash
+docker compose -f compose.yml -f compose.region.yml up -d --wait
+IOT_REGION=1 KEEP_STACK=1 .venv/Scripts/python.exe -m pytest tests/ -m region -v
+docker compose -f compose.yml -f compose.region.yml down -v --remove-orphans
+```
+
+On the cluster:
+
+```bash
+docker compose -f compose.yml -f compose.cluster.yml -f compose.region.yml up -d --wait
+IOT_REGION=1 IOT_CLUSTER=1 KEEP_STACK=1 .venv/Scripts/python.exe -m pytest tests/ -m "region and cluster" -v
+docker compose -f compose.yml -f compose.cluster.yml -f compose.region.yml down -v --remove-orphans
+```
+
+Region tests are marked `region` and deselected by default, same as `cluster`. `-m` on
+the command line **replaces** `pytest.ini`'s marker expression rather than extending it,
+so the combined-profile run needs the explicit `"region and cluster"` string above — a
+bare `-m cluster` silently skips the region-and-cluster-marked tests, and a bare
+`-m region` runs them against whatever profile is actually up regardless of whether the
+cluster overlay is part of it.
+
+Three things worth knowing before touching this profile:
+
+- **The region subnets are hardcoded** as `172.28.1.0/24` (eu) and `172.28.2.0/24` (us),
+  with the broker statically addressed at `172.28.1.10` / `172.28.2.10` on each. If either
+  collides with a host or VPN network, both `compose.region.yml`'s `ipam.config` and
+  `rabbitmq.region.conf`'s `mqtt.listeners.tcp.eu`/`.us` lines need to change together — a
+  static test (`tests/test_region_config.py`) pins them to each other, so an edit to only
+  one file fails loudly rather than binding a listener to nothing.
+- **A changed region queue argument needs a volume wipe.** Definitions import never
+  modifies an existing queue, and `definitions.skip_if_unchanged = true` — so editing
+  `x-quorum-initial-group-size` or similar in `definitions.region.json` does nothing on a
+  plain restart. Policies and permissions **do** update on re-import; only queue arguments
+  need the wipe.
+- **The region MQTT ports (1893, 1993) are deliberately not published to the host.**
+  Publishing them would have Compose DNAT to one network's container address, which
+  defeats the per-interface listener binding the whole network boundary depends on
+  (ADR-0027). Host-side tooling reaches a region vhost through the existing **1883**
+  listener instead, using a colon-form username (e.g. `eu:device-eu`) — this stays open in
+  Phase 4 by design and is closed by Phase 5's mTLS/OAuth2 work, not before.
+
 ## Teardown
 
 ```bash
