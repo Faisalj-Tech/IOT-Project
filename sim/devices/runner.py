@@ -7,8 +7,10 @@ import json
 import logging
 import math
 import random
+import ssl
 import sys
 from collections.abc import Sequence
+from pathlib import Path
 
 import aiomqtt
 
@@ -37,6 +39,38 @@ def resolve_nodes(
     return resolved
 
 
+def build_tls_params(
+    cafile: str | None, certfile: str | None, keyfile: str | None
+) -> aiomqtt.TLSParameters | None:
+    """Build TLS parameters, or None when no TLS was asked for.
+
+    Phase 1-4 callers pass nothing and get None, so their behaviour is unchanged —
+    the same contract resolve_nodes() keeps for the node-list argument.
+
+    A partial set raises rather than degrading to an unauthenticated connection:
+    under mqtt.ssl_cert_login the client certificate IS the credential, so
+    silently dropping it would produce a connection with no identity at all.
+    """
+    provided = [p for p in (cafile, certfile, keyfile) if p]
+    if not provided:
+        return None
+    if len(provided) != 3:
+        raise ValueError(
+            "TLS needs all three of --cafile, --certfile and --keyfile; "
+            f"got {len(provided)}"
+        )
+    for path in (cafile, certfile, keyfile):
+        if not Path(path).exists():
+            raise FileNotFoundError(path)
+    return aiomqtt.TLSParameters(
+        ca_certs=cafile,
+        certfile=certfile,
+        keyfile=keyfile,
+        cert_reqs=ssl.CERT_REQUIRED,
+        tls_version=ssl.PROTOCOL_TLS_CLIENT,
+    )
+
+
 async def _publish_device(
     spec: DeviceSpec,
     rate_hz: float,
@@ -46,6 +80,7 @@ async def _publish_device(
     username: str,
     password: str,
     max_reconnects: int,
+    tls_params: aiomqtt.TLSParameters | None = None,
 ) -> int:
     """Publish for duration_s seconds, returning how many messages were sent.
 
@@ -72,13 +107,20 @@ async def _publish_device(
     while deadline is None or asyncio.get_running_loop().time() < deadline or seq < minimum_count:
         host, port = nodes[node_index % len(nodes)]
         try:
-            async with aiomqtt.Client(
-                hostname=host,
-                port=port,
-                username=username,
-                password=password,
-                identifier=f"{spec.device}-{run_id}",
-            ) as client:
+            # Under cert login the broker takes the identity from the certificate,
+            # so username/password are omitted entirely rather than sent empty.
+            client_kwargs: dict = {
+                "hostname": host,
+                "port": port,
+                "identifier": f"{spec.device}-{run_id}",
+            }
+            if tls_params is not None:
+                client_kwargs["tls_params"] = tls_params
+                client_kwargs["tls_insecure"] = False
+            else:
+                client_kwargs["username"] = username
+                client_kwargs["password"] = password
+            async with aiomqtt.Client(**client_kwargs) as client:
                 backoff = 0.5
                 attempt = 0
                 if deadline is None:
@@ -117,6 +159,7 @@ async def run_devices(
     password: str = "devicepass",
     max_reconnects: int = 12,
     nodes: Sequence[tuple[str, int]] | None = None,
+    tls_params: aiomqtt.TLSParameters | None = None,
 ) -> dict[str, int]:
     resolved = resolve_nodes(host, port, nodes)
     counts = await asyncio.gather(
@@ -130,6 +173,7 @@ async def run_devices(
                 username=username,
                 password=password,
                 max_reconnects=max_reconnects,
+                tls_params=tls_params,
             )
             for spec in specs
         )

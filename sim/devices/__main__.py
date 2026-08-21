@@ -9,7 +9,7 @@ import os
 import uuid
 
 from sim.devices.payload import default_specs
-from sim.devices.runner import run_devices
+from sim.devices.runner import build_tls_params, run_devices
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -31,6 +31,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--password",
         default=os.environ.get("RABBITMQ_DEVICE_PASSWORD", "devicepass"),
     )
+    parser.add_argument("--cafile", default=None, help="CA bundle for TLS")
+    parser.add_argument("--certfile", default=None, help="client certificate (PEM)")
+    parser.add_argument("--keyfile", default=None, help="client private key (PEM)")
     return parser.parse_args(argv)
 
 
@@ -40,6 +43,7 @@ def main(argv: list[str] | None = None) -> int:
     run_id = args.run_id or uuid.uuid4().hex[:8]
     specs = default_specs(args.devices, region=args.region, plant=args.plant)
 
+    tls_params = build_tls_params(args.cafile, args.certfile, args.keyfile)
     logging.info("run_id=%s devices=%d rate=%.2fHz duration=%.0fs", run_id, args.devices, args.rate, args.duration)
     published = asyncio.run(
         run_devices(
@@ -51,6 +55,7 @@ def main(argv: list[str] | None = None) -> int:
             port=args.port,
             username=args.username,
             password=args.password,
+            tls_params=tls_params,
         )
     )
     logging.info("published %d messages total: %s", sum(published.values()), published)
