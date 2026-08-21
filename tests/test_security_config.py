@@ -6,9 +6,11 @@ exist) and cannot boot under region-alone (no advanced.config, so a TLS listener
 has no ssl_options). It is valid only for the both-axes-on combination.
 """
 
+import json
 import pytest
 
 from tests import conftest as ct
+from tests.conftest import ROOT
 
 
 @pytest.fixture
@@ -58,3 +60,25 @@ def test_the_profile_guard_uses_the_derived_file_set():
     import inspect
     source = inspect.getsource(ct._fail_on_profile_mismatch)
     assert "compose_files()" in source
+
+
+def test_the_region_port_map_covers_both_plaintext_and_tls_ports():
+    """One definitions file serves region and region+security. A mapping entry
+    for a port with no live listener was verified harmless, which is what makes
+    that possible without a second file (spec 2.13)."""
+    definitions = json.loads(
+        (ROOT / "config" / "rabbitmq" / "definitions.region.json").read_text(encoding="utf-8"))
+    mapping = next(
+        p["value"] for p in definitions["global_parameters"]
+        if p["name"] == "mqtt_port_to_vhost_mapping")
+    assert mapping == {"1893": "eu", "1993": "us", "9883": "eu", "9993": "us"}
+
+
+def test_the_region_tls_listeners_avoid_the_all_interfaces_port():
+    """8883 is bound on all interfaces by 10-security.conf; a specific-address
+    bind on the same port would collide with it."""
+    conf = (ROOT / "config" / "rabbitmq" / "conf.d" / "15-region-security.conf").read_text(
+        encoding="utf-8")
+    assert "172.28.1.10:9883" in conf
+    assert "172.28.2.10:9993" in conf
+    assert ":8883" not in conf

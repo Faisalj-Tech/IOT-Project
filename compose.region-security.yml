@@ -1,0 +1,28 @@
+# Phase 5, region+security only. Appended by compose_files() when both
+# IOT_REGION=1 and IOT_SECURITY=1 are set. Never used alone.
+#
+# The region TLS ports are deliberately NOT published to the host, for the same
+# reason 1893/1993 are not: publishing would DNAT to one network's address and
+# defeat the IP-bound listener design. Tests reach them from inside the region
+# networks via `compose run --rm sim-<region>`, exactly as R4 does.
+
+services:
+  rabbitmq:
+    volumes:
+      - ./config/rabbitmq/conf.d/15-region-security.conf:/etc/rabbitmq/conf.d/15-region-security.conf:ro
+
+  # The broker fetches the CRL over HTTP. It must resolve and reach `crl` from
+  # every network it serves TLS on, or crl_check rejects EVERY certificate.
+  crl:
+    networks:
+      - core
+      - region-eu
+      - region-us
+
+  sim-eu:
+    volumes:
+      - ./certs:/certs:ro
+
+  sim-us:
+    volumes:
+      - ./certs:/certs:ro

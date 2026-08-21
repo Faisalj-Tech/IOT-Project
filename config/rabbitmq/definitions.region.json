@@ -283,7 +283,7 @@
   "global_parameters": [
     {
       "name": "mqtt_port_to_vhost_mapping",
-      "value": { "1893": "eu", "1993": "us" }
+      "value": { "1893": "eu", "1993": "us", "9883": "eu", "9993": "us" }
     }
   ]
 }
