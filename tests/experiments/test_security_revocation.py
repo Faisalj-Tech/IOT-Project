@@ -66,7 +66,11 @@ def _connect(cert_name: str, **kw) -> None:
 
 
 def wait_until_refused(cert_name: str, timeout: float = REFUSAL_TIMEOUT) -> float:
-    """Poll until the broker refuses this cert's TLS handshake. Returns seconds taken."""
+    """Poll until the broker refuses this cert's TLS handshake. Returns seconds taken.
+
+    The broker sends the certificate_revoked alert lazily (after TLS handshake
+    completes, when the client first tries to read). Calling recv(1) triggers this.
+    """
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     ctx.load_verify_locations(cafile=str(CERTS / "rootCA.crt"))
     ctx.load_cert_chain(
@@ -78,7 +82,7 @@ def wait_until_refused(cert_name: str, timeout: float = REFUSAL_TIMEOUT) -> floa
         try:
             with socket.create_connection(("localhost", 8883), timeout=15) as sock:
                 ssock = ctx.wrap_socket(sock, server_hostname="localhost")
-                ssock.recv(1)  # Trigger alert if cert is revoked
+                ssock.recv(1)  # Must read to trigger certificate_revoked alert
                 ssock.close()
         except ssl.SSLError as exc:
             last = exc
@@ -111,8 +115,8 @@ def test_revoking_one_certificate_leaves_its_sibling_working(stack):
 
 
 def test_the_revoked_certificate_is_refused_at_the_tls_layer(stack):
-    """The refusal must be a TLS alert, not an MQTT reason code - it happens
-    during the handshake, before any MQTT packet is exchanged."""
+    """The refusal must be a TLS alert, not an MQTT reason code - happens at the
+    TLS layer (before any MQTT CONNECT packet is sent or received)."""
     revoke_and_publish("device-a")
     wait_until_refused("device-a")
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
@@ -121,6 +125,6 @@ def test_the_revoked_certificate_is_refused_at_the_tls_layer(stack):
     with pytest.raises(ssl.SSLError) as excinfo:
         with socket.create_connection(("localhost", 8883), timeout=15) as sock:
             ssock = ctx.wrap_socket(sock, server_hostname="localhost")
-            ssock.recv(1)  # Trigger alert if cert is revoked
+            ssock.recv(1)  # Must read to trigger certificate_revoked alert
             ssock.close()
     assert "REVOKED" in str(excinfo.value).upper(), str(excinfo.value)
