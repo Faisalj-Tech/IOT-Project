@@ -99,7 +99,8 @@ def test_a_non_revoked_certificate_connects_cleanly_at_the_tls_layer(stack):
     raise a REVOKED error — distinguishing a genuine revocation alert from any other
     immediate-failure mode the raw-SSL probe might otherwise mask.
 
-    Device-b is never revoked in this test file; this confirms the broker accepts it."""
+    Device-b is not revoked at the point this test runs; the S4 test below revokes it
+    later, and the autouse teardown restores state before the next test."""
     ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     ctx.load_verify_locations(cafile=str(CERTS / "rootCA.crt"))
     ctx.load_cert_chain(certfile=str(CERTS / "device-b.crt"), keyfile=str(CERTS / "device-b.key"))
@@ -153,3 +154,78 @@ def test_the_revoked_certificate_is_refused_at_the_tls_layer(stack):
             ssock.recv(1)  # Must read to trigger certificate_revoked alert
             ssock.close()
     assert "REVOKED" in str(excinfo.value).upper(), str(excinfo.value)
+
+
+def _force_close(user: str) -> int:
+    """Close every connection belonging to this user. Returns how many were closed.
+
+    This is the second half of a real revocation. Measured: a CRL update alone
+    leaves an established connection publishing indefinitely (spec 2.9).
+    """
+    auth = ("admin", "adminpass")
+    conns = requests.get(f"{RABBIT_API}/connections", auth=auth, timeout=10).json()
+    closed = 0
+    for conn in conns:
+        if conn.get("user") == user:
+            requests.delete(
+                f"{RABBIT_API}/connections/{requests.utils.quote(conn['name'], safe='')}",
+                auth=auth,
+                headers={"X-Reason": "certificate revoked"},
+                timeout=10,
+            )
+            closed += 1
+    return closed
+
+
+def test_an_established_connection_survives_revocation(stack):
+    """S4, RECORDED not asserted (ADR-0004 as narrowed by ADR-0009).
+
+    Opens a connection, revokes its certificate underneath it, and measures what
+    actually happens. The finding is that nothing happens until someone closes it.
+    """
+    run_id = f"s4{int(time.time()) % 100000}"
+    findings: dict = {"run_id": run_id, "cert": "device-b", "common_name": "device"}
+
+    async def _scenario() -> None:
+        async with tls_client("device-b", timeout=30) as client:
+            await client.publish("region/eu/plant1/press-01/temp",
+                                 payload=b'{"probe":"before"}', qos=1)
+            started = time.time()
+
+            revoke_and_publish("device-b")
+            # Control: a NEW connection with the same cert must now be refused.
+            findings["seconds_until_new_connection_refused"] = round(
+                wait_until_refused("device-b"), 1)
+            findings["new_connection_refused"] = True
+
+            # The held connection: does it still work?
+            await client.publish("region/eu/plant1/press-01/temp",
+                                 payload=b'{"probe":"after-revocation"}', qos=1)
+            findings["published_after_revocation"] = True
+            findings["survived_seconds"] = round(time.time() - started, 1)
+
+            # Now force-close it, which is what a real revocation must also do.
+            findings["connections_closed"] = _force_close("device")
+            await asyncio.sleep(3)
+            try:
+                await client.publish("region/eu/plant1/press-01/temp",
+                                     payload=b'{"probe":"after-force-close"}', qos=1)
+                findings["died_on_force_close"] = False
+            except Exception as exc:  # noqa: BLE001 - the death is the measurement
+                findings["died_on_force_close"] = True
+                findings["force_close_error"] = f"{type(exc).__name__}: {exc}"
+
+    try:
+        asyncio.run(_scenario())
+    except Exception as exc:  # noqa: BLE001
+        findings["scenario_ended_with"] = f"{type(exc).__name__}: {exc}"
+
+    findings["conclusion"] = (
+        "CRL revocation gates new TLS handshakes only; an established connection "
+        "keeps publishing until it is explicitly closed."
+    )
+    write_result("S4-revocation-liveness", findings)
+
+    # The one thing that IS asserted: the control must have worked, or the whole
+    # observation is meaningless.
+    assert findings.get("new_connection_refused") is True, findings

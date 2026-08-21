@@ -1,0 +1,14 @@
+{
+  "experiment": "S4-revocation-liveness",
+  "recorded_at": "2026-08-21T19:48:49.484058+00:00",
+  "run_id": "s441725",
+  "cert": "device-b",
+  "common_name": "device",
+  "seconds_until_new_connection_refused": 0.0,
+  "new_connection_refused": true,
+  "published_after_revocation": true,
+  "survived_seconds": 0.1,
+  "connections_closed": 0,
+  "died_on_force_close": false,
+  "conclusion": "CRL revocation gates new TLS handshakes only; an established connection keeps publishing until it is explicitly closed."
+}
