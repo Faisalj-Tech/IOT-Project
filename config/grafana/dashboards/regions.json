@@ -1,0 +1,64 @@
+{
+  "uid": "iot-regions",
+  "title": "Regions and Provenance",
+  "tags": ["iot", "phase4"],
+  "timezone": "utc",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-15m", "to": "now" },
+  "description": "Per-region ingest rate, queue depth, and provenance-disagreement monitoring. The 'Provenance disagreements' table shows points where a device's claimed region tag disagrees with region_src (the vhost it was actually consumed from). An empty table indicates successful multi-region segregation.",
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Ingest rate by region",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": {} },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"seq\")\n  |> group(columns: [\"region_src\"])\n  |> aggregateWindow(every: v.windowPeriod, fn: count, createEmpty: false)"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Queue depth per region queue",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "custom": {} },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"rabbitmq_queue\")\n  |> filter(fn: (r) => r._field == \"messages_ready\")\n  |> filter(fn: (r) => r.queue == \"telemetry.eu.q\" or r.queue == \"telemetry.us.q\")\n  |> group(columns: [\"queue\"])"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "Provenance disagreements",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 9 },
+      "fieldConfig": {
+        "defaults": { "custom": {} },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"seq\")\n  |> filter(fn: (r) => r.region != r.region_src)\n  |> group(columns: [\"region\", \"region_src\"])\n  |> count()"
+        }
+      ]
+    }
+  ]
+}
