@@ -121,18 +121,39 @@ def region_mode() -> bool:
     return os.environ.get("IOT_REGION") == "1"
 
 
+def security_mode() -> bool:
+    """Is this session running against the security overlay?
+
+    Same rationale as cluster_mode() and region_mode(): the stack fixture is
+    session-scoped and must choose its compose files before any test runs.
+    """
+    return os.environ.get("IOT_SECURITY") == "1"
+
+
 def compose_files() -> tuple[str, ...]:
     """The compose file set for this session, in overlay-application order.
 
-    compose.region.yml is always last: it re-mounts /etc/rabbitmq/rabbitmq.conf
-    and /etc/rabbitmq/definitions.json over whatever the cluster overlay put
-    there, and compose resolves same-target mounts by last-one-wins.
+    compose.region.yml is always applied before the security files: it re-mounts
+    /etc/rabbitmq/rabbitmq.conf and /etc/rabbitmq/definitions.json over whatever
+    the cluster overlay put there, and compose resolves same-target mounts by
+    last-one-wins. The security files touch neither of those targets, so their
+    position is unconstrained; they go last so the -f order reads in phase order.
+
+    compose.region-security.yml exists only for the both-axes-on combination. Its
+    region TLS listeners cannot live in conf.d/10-security.conf (under
+    base+security those addresses do not exist and the listeners fail to bind)
+    nor in compose.region.yml (under region-alone there is no advanced.config, so
+    a TLS listener would have no ssl_options and the node would not boot).
     """
     files = ("compose.yml",)
     if cluster_mode():
         files += ("compose.cluster.yml",)
     if region_mode():
         files += ("compose.region.yml",)
+    if security_mode():
+        files += ("compose.security.yml",)
+        if region_mode():
+            files += ("compose.region-security.yml",)
     return files
 
 
@@ -238,6 +259,13 @@ def stack():
     """
     if not (ROOT / ".env").exists():
         pytest.fail("main/.env is missing. Copy .env.example to .env first.")
+    if security_mode():
+        # certs/ is gitignored, so a clean clone has none and the security
+        # overlay's bind mounts would resolve to an empty directory. make_certs
+        # is idempotent, so a warm run reuses what is already there and never
+        # invalidates a stack that is already running against it.
+        from scripts.make_certs import CERTS_DIR, generate_all
+        generate_all(CERTS_DIR)
     acquire_stack_lock()
     try:
         _fail_on_profile_mismatch()
