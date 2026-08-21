@@ -40,3 +40,30 @@ services:
       timeout: 3s
       retries: 12
       start_period: 5s
+
+  # HTTPS is not a choice here: RabbitMQ refuses to boot with a plaintext OIDC
+  # issuer -- "According to the JWT Specification, Key Server URL must be https"
+  # (spec 2.10). KC_HOSTNAME is pinned so the `iss` claim is stable regardless of
+  # which host called the token endpoint; without it the claim reflects the
+  # caller and will not match what the broker expects.
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4
+    container_name: iot-keycloak
+    command: ["start-dev", "--http-port=8080", "--https-port=8443", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME: "https://keycloak:8443"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "false"
+      KC_HTTPS_CERTIFICATE_FILE: /certs/keycloak.crt
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /certs/keycloak.key
+    volumes:
+      - ./certs:/certs:ro
+      - ./config/keycloak:/opt/keycloak/data/import:ro
+    ports:
+      - "18443:8443"
+    networks:
+      - core
+    restart: unless-stopped

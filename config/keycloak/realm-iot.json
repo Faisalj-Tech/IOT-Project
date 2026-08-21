@@ -1,0 +1,75 @@
+{
+  "realm": "iot",
+  "enabled": true,
+  "accessTokenLifespan": 3600,
+  "ssoSessionIdleTimeout": 7200,
+  "clients": [
+    {
+      "clientId": "telegraf-eu",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "telegraf-eu-secret",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "protocolMappers": [
+        {
+          "name": "rabbitmq-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "rabbitmq",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "name": "rmq-scopes",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "config": {
+            "claim.name": "rmq_scopes",
+            "claim.value": "rabbitmq.read:eu/telemetry.eu.q rabbitmq.read:eu/amq.topic",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "telegraf-eu-short",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "telegraf-eu-short-secret",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "attributes": {
+        "access.token.lifespan": "60"
+      },
+      "protocolMappers": [
+        {
+          "name": "rabbitmq-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "rabbitmq",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "name": "rmq-scopes",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "config": {
+            "claim.name": "rmq_scopes",
+            "claim.value": "rabbitmq.read:eu/telemetry.eu.q rabbitmq.read:eu/amq.topic",
+            "jsonType.label": "String",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ]
+}
