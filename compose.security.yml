@@ -1,10 +1,11 @@
 # Phase 5 overlay: mTLS device identity and OAuth2 service identity.
 #
 # Mounts ONLY targets no other overlay touches — /etc/rabbitmq/conf.d/*,
-# /etc/rabbitmq/advanced.config and /certs — so compose.region.yml keeps its
-# documented ALWAYS-LAST position for rabbitmq.conf and definitions.json and
-# nothing collides. Position in the -f order is therefore free; it goes last so
-# the order reads in phase order.
+# /etc/rabbitmq/advanced.config, /etc/rabbitmq/enabled_plugins and /certs —
+# so compose.region.yml keeps its documented ALWAYS-LAST position for
+# rabbitmq.conf and definitions.json and nothing collides. Adds keycloak
+# dependency (service_started, not service_healthy). Position in the -f order
+# is therefore free; it goes last so the order reads in phase order.
 #
 # Requires main/certs/ to exist. Generate it with:
 #   .venv/Scripts/python.exe -m scripts.make_certs

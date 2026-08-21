@@ -115,7 +115,7 @@ def test_the_short_lived_client_really_is_short_lived(stack):
     assert response.json()["expires_in"] <= 60, response.json()["expires_in"]
 
 
-def amqp_url_with_token(token: str, vhost: str = "/") -> str:
+def amqp_url_with_token(token: str, vhost: str = "eu") -> str:
     """The token IS the password. The username is ignored by the OAuth2 backend."""
     path = "" if vhost == "/" else vhost
     return f"amqp://:{token}@localhost:5672/{path}"
