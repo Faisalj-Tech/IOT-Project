@@ -10,6 +10,7 @@ enforced boundary produce the same red test.
 import asyncio
 import json
 import ssl
+import subprocess
 import sys
 import time
 
@@ -17,7 +18,7 @@ import aiomqtt
 import pytest
 from aiomqtt.exceptions import MqttConnectError
 
-from tests.conftest import ROOT, security_mode
+from tests.conftest import ROOT, compose_files, region_mode, security_mode
 
 pytestmark = [pytest.mark.security, pytest.mark.stack]
 
@@ -107,3 +108,67 @@ def test_a_connection_with_no_client_certificate_is_refused(stack):
 
     with pytest.raises(aiomqtt.MqttError):
         asyncio.run(_bare())
+
+
+REGION_TLS = {"eu": ("172.28.1.10", 9883), "us": ("172.28.2.10", 9993)}
+
+
+def run_tls_probe(region: str, host: str, port: int, cert: str,
+                  publish: str | None = None) -> subprocess.CompletedProcess:
+    """Run the TLS probe from inside that region's own Docker network.
+
+    `compose run --rm` starts a throwaway container attached to exactly the
+    networks the service declares, so the probe inherits the simulator's network
+    position without the simulator running. certs/ is mounted at /certs by
+    compose.region-security.yml.
+    """
+    files: list[str] = []
+    for name in compose_files():
+        files += ["-f", name]
+    argv = ["docker", "compose", *files, "--profile", "sim", "run", "--rm",
+            "--entrypoint", "python", f"sim-{region}", "-m", "sim.tlsprobe",
+            "--host", host, "--port", str(port),
+            "--cert", f"/certs/{cert}.crt", "--key", f"/certs/{cert}.key",
+            "--region", region, "--cid", f"s2-{region}-{cert}"]
+    if publish:
+        argv += ["--publish", publish]
+    return subprocess.run(argv, capture_output=True, text=True, check=False, cwd=ROOT)
+
+
+@pytest.mark.region
+def test_a_region_certificate_publishes_into_its_own_region(stack):
+    """S2 positive control, on the IP-bound TLS listener."""
+    if not region_mode():
+        pytest.skip("needs IOT_REGION=1 as well as IOT_SECURITY=1")
+    host, port = REGION_TLS["eu"]
+    proc = run_tls_probe("eu", host, port, "device-eu-a",
+                         publish="region/eu/plant1/press-01/temp")
+    assert "PUBLISH_OK" in proc.stdout, f"{proc.stdout}\n{proc.stderr}"
+
+
+@pytest.mark.region
+def test_a_region_certificate_cannot_publish_into_another_region(stack):
+    """S2. R3's topic-permission denial, reached by certificate. Reason code 128."""
+    if not region_mode():
+        pytest.skip("needs IOT_REGION=1 as well as IOT_SECURITY=1")
+    host, port = REGION_TLS["eu"]
+    proc = run_tls_probe("eu", host, port, "device-eu-a",
+                         publish="region/us/plant1/press-01/temp")
+    assert "CONNECT_OK" in proc.stdout, f"{proc.stdout}\n{proc.stderr}"
+    assert "PUBLISH_OK" not in proc.stdout, f"{proc.stdout}\n{proc.stderr}"
+    assert "code:128" in proc.stdout, f"{proc.stdout}\n{proc.stderr}"
+
+
+@pytest.mark.region
+def test_a_region_certificate_is_refused_on_the_other_regions_listener(stack):
+    """S2. R2's vhost denial, reached by certificate. Reason code 135.
+
+    device-us's cert reaching the eu listener is only possible because the probe
+    runs on region-eu; the point is that the credential layer refuses it even
+    when the network layer would have allowed it.
+    """
+    if not region_mode():
+        pytest.skip("needs IOT_REGION=1 as well as IOT_SECURITY=1")
+    host, port = REGION_TLS["eu"]
+    proc = run_tls_probe("eu", host, port, "device-us-a")
+    assert "code:135" in proc.stdout, f"{proc.stdout}\n{proc.stderr}"
