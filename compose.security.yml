@@ -1,0 +1,42 @@
+# Phase 5 overlay: mTLS device identity and OAuth2 service identity.
+#
+# Mounts ONLY targets no other overlay touches — /etc/rabbitmq/conf.d/*,
+# /etc/rabbitmq/advanced.config and /certs — so compose.region.yml keeps its
+# documented ALWAYS-LAST position for rabbitmq.conf and definitions.json and
+# nothing collides. Position in the -f order is therefore free; it goes last so
+# the order reads in phase order.
+#
+# Requires main/certs/ to exist. Generate it with:
+#   .venv/Scripts/python.exe -m scripts.make_certs
+
+services:
+  rabbitmq:
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    volumes:
+      - ./config/rabbitmq/conf.d/10-security.conf:/etc/rabbitmq/conf.d/10-security.conf:ro
+      - ./config/rabbitmq/advanced.config:/etc/rabbitmq/advanced.config:ro
+      - ./certs:/certs:ro
+    depends_on:
+      crl:
+        condition: service_healthy
+
+  crl:
+    image: nginx:1.29-alpine
+    container_name: iot-crl
+    volumes:
+      - ./certs:/usr/share/nginx/html:ro
+      - ./config/crl/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - core
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/root.crl"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
