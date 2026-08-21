@@ -108,7 +108,9 @@ def test_both_regions_flow_end_to_end_without_leaking(stack, influx_query, rabbi
     }
     dlqs = {region: rabbit_get(f"/queues/{region}/dlq").json() for region in run_ids}
 
+    run_id = f"{run_ids['eu']}-{run_ids['us']}"
     write_result("R-region-flow", {
+        "run_id": run_id,
         "expected_per_region": EXPECTED_PER_REGION,
         "counts_by_provenance": counts,
         "run_ids": run_ids,
