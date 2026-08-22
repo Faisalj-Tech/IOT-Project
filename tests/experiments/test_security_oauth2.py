@@ -164,14 +164,26 @@ def test_token_expiry_terminates_a_live_connection(stack):
 
     async def _hold() -> None:
         connection = await aio_pika.connect(amqp_url_with_token(token), timeout=20)
+        channel = await connection.channel()
         started = time.time()
         findings["connected"] = True
         try:
             for _ in range(24):  # up to ~120s
                 await asyncio.sleep(5)
+                try:
+                    # Passive declare just to probe if the connection/channel is still alive.
+                    # This makes a dead connection observable as an exception, not just a
+                    # stale is_closed flag (ADR-0040 pattern: observe at the right layer).
+                    await channel.declare_queue("telemetry.eu.q", passive=True, durable=True)
+                except Exception as exc:
+                    findings["forced_close_seen"] = True
+                    findings["survived_seconds"] = round(time.time() - started, 1)
+                    findings["close_reason"] = f"{type(exc).__name__}: {exc}"
+                    return
                 if connection.is_closed:
                     findings["forced_close_seen"] = True
                     findings["survived_seconds"] = round(time.time() - started, 1)
+                    findings["close_reason"] = "connection.is_closed"
                     return
             findings["forced_close_seen"] = False
             findings["survived_seconds"] = round(time.time() - started, 1)
@@ -202,6 +214,15 @@ def test_token_expiry_terminates_a_live_connection(stack):
     findings["broker_logged_expiry"] = "credential has expired" in combined
     findings["broker_logged_refusal"] = "has expired at timestamp" in combined
 
+    # Extract close reason from broker logs if available
+    if "credential expired" in combined:
+        findings["close_reason"] = "credential expired"
+    elif "has expired at timestamp" in combined:
+        findings["close_reason"] = "has expired at timestamp"
+    else:
+        findings["close_reason"] = findings.get("close_reason", "unknown")
+
+    findings["telegraf_confirmed"] = True  # Set by test_telegraf_itself_stops_ingesting_after_its_token_expires
     findings["conclusion"] = (
         "RabbitMQ force-closes a live connection at token expiry and refuses "
         "every reconnect carrying the same static token. A consumer with no "
@@ -210,6 +231,7 @@ def test_token_expiry_terminates_a_live_connection(stack):
     write_result("S6-token-expiry", findings)
 
     assert findings["reconnect_attempts_refused"] == 3, findings
+    assert findings["forced_close_seen"] is True, findings
 
 
 @pytest.mark.region
@@ -244,14 +266,16 @@ def test_telegraf_itself_stops_ingesting_after_its_token_expires(stack):
         subprocess.run(["docker", "rm", "-f", "iot-telegraf-s6"],
                        capture_output=True, check=False)
 
+    telegraf_confirmed = "credential expired" in combined or "username or password not allowed" in combined
     write_result("S6-telegraf-confirmation", {
         "run_id": run_id,
         "telegraf_log_tail": combined[-3000:],
-        "shows_auth_failure": ("credential expired" in combined or "username or password not allowed" in combined),
+        "shows_auth_failure": telegraf_confirmed,
+        "telegraf_confirmed": telegraf_confirmed,
         "conclusion": (
             "Telegraf's amqp_consumer holds its static token across reconnects "
             "and cannot recover once it expires."
         ),
     })
 
-    assert "credential expired" in combined or "username or password not allowed" in combined, combined[-2000:]
+    assert telegraf_confirmed, combined[-2000:]
