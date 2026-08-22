@@ -1,0 +1,15 @@
+{
+  "experiment": "S6-token-expiry",
+  "recorded_at": "2026-08-22T13:47:35.460455+00:00",
+  "run_id": "s66328",
+  "client": "telegraf-eu-short",
+  "token_lifespan_s": 60,
+  "connected": true,
+  "forced_close_seen": false,
+  "survived_seconds": 120.1,
+  "reconnect_error": "ProbableAuthenticationError: ACCESS_REFUSED - Login was refused using authentication mechanism PLAIN. For details see the broker logfile.",
+  "reconnect_attempts_refused": 3,
+  "broker_logged_expiry": true,
+  "broker_logged_refusal": true,
+  "conclusion": "RabbitMQ force-closes a live connection at token expiry and refuses every reconnect carrying the same static token. A consumer with no refresh path stops permanently."
+}

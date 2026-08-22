@@ -11,6 +11,7 @@ import asyncio
 import base64
 import json
 import os
+import subprocess
 import sys
 import time
 
@@ -20,6 +21,7 @@ import requests
 import urllib3
 
 from tests.conftest import ROOT, region_mode, security_mode
+from tests.experiments.conftest import write_result
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -148,3 +150,108 @@ def test_a_garbage_token_is_refused(stack):
 
     with pytest.raises(Exception):  # noqa: B017 - aio_pika raises several types here
         asyncio.run(_connect())
+
+
+@pytest.mark.region
+def test_token_expiry_terminates_a_live_connection(stack):
+    """S6, RECORDED. The exact mirror of S4: revocation spares established
+    connections, expiry destroys them."""
+    run_id = f"s6{int(time.time()) % 100000}"
+    token = fetch_token("telegraf-eu-short",
+                        os.environ["KEYCLOAK_TELEGRAF_EU_SHORT_SECRET"])
+    findings: dict = {"run_id": run_id, "client": "telegraf-eu-short",
+                      "token_lifespan_s": 60}
+
+    async def _hold() -> None:
+        connection = await aio_pika.connect(amqp_url_with_token(token), timeout=20)
+        started = time.time()
+        findings["connected"] = True
+        try:
+            for _ in range(24):  # up to ~120s
+                await asyncio.sleep(5)
+                if connection.is_closed:
+                    findings["forced_close_seen"] = True
+                    findings["survived_seconds"] = round(time.time() - started, 1)
+                    return
+            findings["forced_close_seen"] = False
+            findings["survived_seconds"] = round(time.time() - started, 1)
+        finally:
+            if not connection.is_closed:
+                await connection.close()
+
+    asyncio.run(_hold())
+
+    # After expiry, the same static token must never work again.
+    refused = 0
+    for _ in range(3):
+        async def _retry() -> None:
+            connection = await aio_pika.connect(amqp_url_with_token(token), timeout=15)
+            await connection.close()
+        try:
+            asyncio.run(_retry())
+        except Exception as exc:  # noqa: BLE001 - the refusal is the measurement
+            refused += 1
+            findings["reconnect_error"] = f"{type(exc).__name__}: {exc}"
+        time.sleep(2)
+    findings["reconnect_attempts_refused"] = refused
+
+    logs = subprocess.run(
+        ["docker", "logs", "iot-rabbitmq", "--since", "300s"],
+        capture_output=True, text=True, check=False)
+    combined = logs.stdout + logs.stderr
+    findings["broker_logged_expiry"] = "credential has expired" in combined
+    findings["broker_logged_refusal"] = "has expired at timestamp" in combined
+
+    findings["conclusion"] = (
+        "RabbitMQ force-closes a live connection at token expiry and refuses "
+        "every reconnect carrying the same static token. A consumer with no "
+        "refresh path stops permanently."
+    )
+    write_result("S6-token-expiry", findings)
+
+    assert findings["reconnect_attempts_refused"] == 3, findings
+
+
+@pytest.mark.region
+def test_telegraf_itself_stops_ingesting_after_its_token_expires(stack):
+    """S6, the confirmation spec 2.12 explicitly did NOT establish.
+
+    The design measured the mechanism with aio-pika's connect_robust standing in
+    for Telegraf. This runs Telegraf.
+    """
+    run_id = f"s6t{int(time.time()) % 100000}"
+    token = fetch_token("telegraf-eu-short",
+                        os.environ["KEYCLOAK_TELEGRAF_EU_SHORT_SECRET"])
+
+    proc = subprocess.run(
+        ["docker", "run", "--rm", "-d",
+         "--name", "iot-telegraf-s6",
+         "--network", "iot-messaging_core",
+         "-e", f"IOT_OAUTH_TOKEN={token}",
+         "-v", f"{ROOT / 'config' / 'telegraf' / 'telegraf.security.d'}:/etc/telegraf/telegraf.d:ro",
+         "telegraf:1.39.2",
+         "telegraf", "--config-directory", "/etc/telegraf/telegraf.d"],
+        capture_output=True, text=True, check=False)
+    assert proc.returncode == 0, f"{proc.stdout}\n{proc.stderr}"
+
+    try:
+        time.sleep(150)  # outlive the 60s token by a comfortable margin
+        logs = subprocess.run(
+            ["docker", "logs", "iot-telegraf-s6"],
+            capture_output=True, text=True, check=False)
+        combined = logs.stdout + logs.stderr
+    finally:
+        subprocess.run(["docker", "rm", "-f", "iot-telegraf-s6"],
+                       capture_output=True, check=False)
+
+    write_result("S6-telegraf-confirmation", {
+        "run_id": run_id,
+        "telegraf_log_tail": combined[-3000:],
+        "shows_auth_failure": ("credential expired" in combined or "username or password not allowed" in combined),
+        "conclusion": (
+            "Telegraf's amqp_consumer holds its static token across reconnects "
+            "and cannot recover once it expires."
+        ),
+    })
+
+    assert "credential expired" in combined or "username or password not allowed" in combined, combined[-2000:]
