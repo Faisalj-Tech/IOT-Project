@@ -156,6 +156,8 @@ def test_a_garbage_token_is_refused(stack):
 def test_token_expiry_terminates_a_live_connection(stack):
     """S6, RECORDED. The exact mirror of S4: revocation spares established
     connections, expiry destroys them."""
+    if not region_mode():
+        pytest.skip("needs IOT_REGION=1 as well as IOT_SECURITY=1")
     run_id = f"s6{int(time.time()) % 100000}"
     token = fetch_token("telegraf-eu-short",
                         os.environ["KEYCLOAK_TELEGRAF_EU_SHORT_SECRET"])
@@ -241,6 +243,8 @@ def test_telegraf_itself_stops_ingesting_after_its_token_expires(stack):
     The design measured the mechanism with aio-pika's connect_robust standing in
     for Telegraf. This runs Telegraf.
     """
+    if not region_mode():
+        pytest.skip("needs IOT_REGION=1 as well as IOT_SECURITY=1")
     run_id = f"s6t{int(time.time()) % 100000}"
     token = fetch_token("telegraf-eu-short",
                         os.environ["KEYCLOAK_TELEGRAF_EU_SHORT_SECRET"])
