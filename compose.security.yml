@@ -13,11 +13,7 @@
 services:
   rabbitmq:
     ports:
-      - "1883:1883"
       - "8883:8883"
-      - "5672:5672"
-      - "15672:15672"
-      - "15692:15692"
     volumes:
       - ./config/rabbitmq/conf.d/10-security.conf:/etc/rabbitmq/conf.d/10-security.conf:ro
       - ./config/rabbitmq/conf.d/20-oauth2.conf:/etc/rabbitmq/conf.d/20-oauth2.conf:ro

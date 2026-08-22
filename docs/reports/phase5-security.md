@@ -150,6 +150,10 @@ without that step, revocation would be incomplete (ADR-0035). The force-close
 implementation itself needed a poll/retry loop: RabbitMQ management's `/api/connections`
 is backed by a ~5-second stats-collection interval, not a live query, so querying it
 immediately after a near-instant revocation finds nothing to close (ADR-0041).
+The `connections_closed: 1` / `died_on_force_close: true` here reflects `device-b`'s own
+connection dying in this test's isolated stack; combined with S3's proof that a same-CN sibling can be
+live simultaneously, the same `_force_close` call would have closed that sibling too, since the filter
+is by CN not by certificate.
 
 ### S5 — OAuth2 service identity authenticates and is legible
 
@@ -243,6 +247,10 @@ Task 8 change itself, which the plan's Global Constraints explicitly sanctioned.
 - **Revocation requires the force-close step; a CRL alone is not a revocation.** An
   established connection survives a CRL update indefinitely (S4) — the demonstrated
   procedure is always CRL-republish-then-force-close, never CRL-republish alone.
+  The force-close step itself filters by RabbitMQ username, which is the certificate's CN — so it
+  terminates every live connection sharing that CN, not only the connection whose specific
+  certificate was revoked. A production deployment where multiple devices legitimately share one
+  CN would see all of them disconnected by a single device's revocation force-close.
 - **A static-token consumer cannot survive expiry.** The committed realm gives
   `telegraf-eu` a long (3600s) lifespan to keep normal operation stable; a leaked service
   token is therefore valid for up to an hour. The short-lived client (`telegraf-eu-short`,
@@ -253,6 +261,10 @@ Task 8 change itself, which the plan's Global Constraints explicitly sanctioned.
 - **The CRL cache TTL is uncharacterised** — only that propagation was measured within
   seconds in this environment. Tests poll until refused rather than assuming a fixed
   interval.
+- **Keycloak client secrets in the imported realm are committed in plaintext**, consistent with this
+  project's existing convention of dev-only plaintext credentials (RabbitMQ admin credentials are
+  the same way throughout). Not a new class of issue, just naming it explicitly like the other
+  Known Limits bullets do.
 
 ## 6. Recommendation
 
