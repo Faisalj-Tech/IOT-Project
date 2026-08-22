@@ -130,6 +130,16 @@ def security_mode() -> bool:
     return os.environ.get("IOT_SECURITY") == "1"
 
 
+def load_mode() -> bool:
+    """Is this session running against the Phase 6 load overlay?
+
+    Same rationale as cluster_mode(), region_mode() and security_mode(): the stack
+    fixture is session-scoped and must choose its compose files before any test
+    runs, so this is an environment variable rather than marker inspection.
+    """
+    return os.environ.get("IOT_LOAD") == "1"
+
+
 def compose_files() -> tuple[str, ...]:
     """The compose file set for this session, in overlay-application order.
 
@@ -144,6 +154,11 @@ def compose_files() -> tuple[str, ...]:
     base+security those addresses do not exist and the listeners fail to bind)
     nor in compose.region.yml (under region-alone there is no advanced.config, so
     a TLS listener would have no ssl_options and the node would not boot).
+
+    compose.load.yml goes last of all. It re-declares the rabbitmq service purely
+    to pin mem_limit/cpus and an absolute memory watermark, so it must win over
+    anything an earlier overlay set; compose resolves competing scalar keys by
+    last-one-wins. Phase 6 combines it only with the base and cluster profiles.
     """
     files = ("compose.yml",)
     if cluster_mode():
@@ -154,6 +169,8 @@ def compose_files() -> tuple[str, ...]:
         files += ("compose.security.yml",)
         if region_mode():
             files += ("compose.region-security.yml",)
+    if load_mode():
+        files += ("compose.load.yml",)
     return files
 
 
