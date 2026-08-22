@@ -244,6 +244,69 @@ Three things worth knowing before touching this profile:
   listener instead, using a colon-form username (e.g. `eu:device-eu`) — this stays open in
   Phase 4 by design and is closed by Phase 5's mTLS/OAuth2 work, not before.
 
+## Security (Phase 5)
+
+`compose.security.yml` overlays `compose.yml` to add mTLS device identity and OAuth2
+service identity: a TLS listener on `8883`, a CRL nginx sidecar, and RabbitMQ's OAuth2
+auth backend wired to a Keycloak realm (ADR-0033–0037). `compose.region-security.yml`
+adds the region-bound TLS listeners (`9883`/`9993`) and is valid only in combination with
+both `compose.region.yml` and `compose.security.yml` — never alone.
+
+**Certificates first.** `main/certs/` is gitignored and required before any
+security-profile bring-up:
+
+```bash
+.venv/Scripts/python.exe -m scripts.make_certs
+```
+
+The test harness's `stack` fixture also generates it automatically on a clean clone, so a
+plain `pytest -m security` run doesn't need this run manually first — but a manual
+`docker compose up` does.
+
+Base + security:
+
+```bash
+docker compose -f compose.yml -f compose.security.yml up -d --wait
+IOT_SECURITY=1 KEEP_STACK=1 .venv/Scripts/python.exe -m pytest tests/ -m security -v -s
+docker compose -f compose.yml -f compose.security.yml down -v --remove-orphans
+```
+
+Region + security (all four overlay files, `-f` order matters — `compose.region.yml`
+stays ALWAYS LAST relative to `compose.yml`/`compose.cluster.yml`, the two security files
+go after it):
+
+```bash
+docker compose -f compose.yml -f compose.region.yml -f compose.security.yml -f compose.region-security.yml up -d --wait
+IOT_REGION=1 IOT_SECURITY=1 KEEP_STACK=1 .venv/Scripts/python.exe -m pytest tests/ -m security -v -s
+docker compose -f compose.yml -f compose.region.yml -f compose.security.yml -f compose.region-security.yml down -v --remove-orphans
+```
+
+Security tests are marked `security` and deselected by default, same as `cluster` and
+`region`. Tests scoped to OAuth2's service identity (`telegraf-eu`/`telegraf-eu-short`,
+both scoped to vhost `eu` only) additionally carry `region` and skip themselves under
+`IOT_REGION` unset — the OAuth2 realm's identity only means anything inside the region
+model, so those tests need both env vars set, not `IOT_SECURITY=1` alone.
+
+Four things worth knowing before touching this profile:
+
+- **Certificate CN is the identity; no password is exchanged.** A device certificate's
+  Common Name resolves directly to a RabbitMQ user via `ssl_cert_login_from =
+  common_name`. Every device certificate must carry a `crlDistributionPoints` extension —
+  without one, `crl_check = peer` rejects it outright with `{bad_crls,no_relevant_crls}`,
+  which reads like a broken TLS setup rather than a missing extension.
+- **Revoking a certificate is two steps, not one.** `scripts/make_certs.py`'s `revoke()` +
+  `write_crl()` republishes the CRL, which gates *new* TLS handshakes within seconds — but
+  an already-established connection is completely unaffected until it is also
+  force-closed via the management API (`DELETE /api/connections/:name`). Skipping the
+  second step is not revocation.
+- **OAuth2's token is the AMQP password; the username is ignored.** `auth_backends.1 =
+  internal` is checked first, so every Phase 1-4 plain-credential and every mTLS
+  certificate-CN login is unaffected by the OAuth2 backend's presence.
+- **An expired OAuth2 token behaves the opposite of a revoked certificate**: it forcibly
+  terminates the live connection carrying it, and a static-token consumer (Telegraf's
+  `amqp_consumer` has no refresh path) can never reconnect afterward. See
+  `main/docs/reports/phase5-security.md` §1 for the full contrast.
+
 ## Teardown
 
 ```bash
