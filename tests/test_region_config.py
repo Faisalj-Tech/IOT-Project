@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CLUSTER_DEFS = ROOT / "config" / "rabbitmq" / "definitions.cluster.json"
 REGION_DEFS = ROOT / "config" / "rabbitmq" / "definitions.region.json"
 REGION_CONF = ROOT / "config" / "rabbitmq" / "rabbitmq.region.conf"
+REGION_SECURITY_CONF = ROOT / "config" / "rabbitmq" / "conf.d" / "15-region-security.conf"
 
 REGIONS = ("eu", "us")
 
@@ -92,11 +93,21 @@ def test_the_port_to_vhost_mapping_matches_the_listeners():
     mapping = {
         p["name"]: p["value"] for p in _defs(REGION_DEFS)["global_parameters"]
     }["mqtt_port_to_vhost_mapping"]
-    assert mapping == {"1893": "eu", "1993": "us"}
+    assert mapping == {"1893": "eu", "1993": "us", "9883": "eu", "9993": "us"}
+    # TLS ports live in 15-region-security.conf, not rabbitmq.region.conf, because they're
+    # mounted only under region+security — see that file's own header comment for why.
     conf = REGION_CONF.read_text(encoding="utf-8")
+    plaintext_ports = {"1893", "1993"}
     for port, region in mapping.items():
-        assert f"mqtt.listeners.tcp.{region} = " in conf
-        assert f":{port}" in conf
+        if port in plaintext_ports:
+            assert f"mqtt.listeners.tcp.{region} = " in conf
+            assert f":{port}" in conf
+    security_conf = REGION_SECURITY_CONF.read_text(encoding="utf-8")
+    tls_ports = {"9883", "9993"}
+    for port, region in mapping.items():
+        if port in tls_ports:
+            assert f"mqtt.listeners.ssl.{region} = " in security_conf
+            assert f":{port}" in security_conf
     assert "mqtt.listeners.tcp.default = 1883" in conf, (
         "1883 must stay unmapped on vhost / so every Phase 1-3 experiment keeps working"
     )
