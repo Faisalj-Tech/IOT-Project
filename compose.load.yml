@@ -1,0 +1,108 @@
+# Phase 6 overlay: the load-generation instrument.
+#
+# Three jobs, in order of how much they matter:
+#
+# 1. PIN THE BROKER. Without this the memory watermark is 0.6 x whatever RAM the
+#    host has (9.76 GB on the design machine), so "the broker breaks at N
+#    messages" is a fact about the tester's laptop. The values below are derived
+#    from spec 2.7's measured model, memory ~= N * (0.85 KB + payload): a 256 MiB
+#    watermark over a ~75 MB idle baseline predicts the alarm near 184k 200-byte
+#    messages, INSIDE the 100k-200k range the model was fitted over. mem_limit is
+#    ~4x the watermark so the alarm fires as a RabbitMQ alarm rather than as an
+#    OOM kill by the kernel.
+#
+# 2. The scalable device swarm. NOTE the absence of container_name: that key is
+#    what makes a service unscalable, and every prior phase's sim services set it.
+#    Scale with `docker compose --scale sim-load=N`. Every replica therefore runs
+#    an IDENTICAL command line, which is why device identity is self-assigned from
+#    the container hostname rather than passed as an argument (spec 2.13).
+#
+# 3. Locust, for structured ramp profiles. It owns ramps and its own HTML report,
+#    never the report's headline numbers - those come from the swarm (spec
+#    decision 5).
+
+services:
+  rabbitmq:
+    mem_limit: 1g
+    cpus: "2.0"
+    volumes:
+      - ./config/rabbitmq/rabbitmq.load.conf:/etc/rabbitmq/conf.d/50-load.conf:ro
+
+  telegraf:
+    volumes:
+      - ./config/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./config/telegraf/telegraf.d:/etc/telegraf/telegraf.d:ro
+      - ./config/telegraf/telegraf.load.d:/etc/telegraf/telegraf.load.d:ro
+    command:
+      - telegraf
+      - --config
+      - /etc/telegraf/telegraf.conf
+      - --config-directory
+      - /etc/telegraf/telegraf.d
+      - --config-directory
+      - /etc/telegraf/telegraf.load.d
+
+  sim-load:
+    build:
+      context: .
+      dockerfile: Dockerfile.sim
+    image: iot-sim:phase6
+    profiles: [load]
+    env_file: .env
+    networks:
+      - edge
+    volumes:
+      - ./docs/results/_swarm:/reports
+    command:
+      - python
+      - -m
+      - sim.devices
+      - --host=rabbitmq
+      - --port=1883
+      - --devices=${LOAD_DEVICES:-50}
+      - --rate=${LOAD_RATE:-1}
+      - --duration=${LOAD_DURATION:-60}
+      - --mqtt-version=5
+      - --report=/reports/
+
+  locust-master:
+    build:
+      context: .
+      dockerfile: Dockerfile.locust
+    image: iot-locust:phase6
+    container_name: iot-locust-master
+    profiles: [locust]
+    env_file: .env
+    ports:
+      - "8089:8089"
+    networks:
+      - edge
+    volumes:
+      - ./loadtest:/loadtest:ro
+      - ./docs/results/_locust:/reports
+    command:
+      - locust
+      - -f
+      - /loadtest/locustfile.py
+      - --master
+      - --host=rabbitmq
+
+  locust-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.locust
+    image: iot-locust:phase6
+    profiles: [locust]
+    env_file: .env
+    networks:
+      - edge
+    volumes:
+      - ./loadtest:/loadtest:ro
+    depends_on:
+      - locust-master
+    command:
+      - locust
+      - -f
+      - /loadtest/locustfile.py
+      - --worker
+      - --master-host=locust-master

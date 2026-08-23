@@ -88,6 +88,9 @@ def main(argv: list[str] | None = None) -> int:
     logging.info("published %d messages total: %s", sum(published.values()), published)
     if args.report:
         report_path = Path(args.report)
+        # If the path ends in a separator, it's a directory; append the device prefix filename
+        if args.report.endswith(("/", "\\")):
+            report_path = report_path / f"{args.device_prefix}.json"
         report_path.parent.mkdir(parents=True, exist_ok=True)
         report = {
             "run_id": run_id,
