@@ -1,0 +1,11 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements-locust.txt ./
+RUN pip install --no-cache-dir -r requirements-locust.txt
+
+# loadtest/ is bind-mounted by compose.load.yml so a ramp can be edited without
+# rebuilding the image.
+ENV PYTHONPATH=/:$PYTHONPATH
+EXPOSE 8089
