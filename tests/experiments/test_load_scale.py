@@ -7,6 +7,8 @@ HOST process dies at (spec 2.1, `ValueError: too many file descriptors in
 select()`), which is why the swarm runs in Linux containers at all.
 """
 
+import time
+
 import pytest
 
 from tests.conftest import load_mode
@@ -27,6 +29,7 @@ def test_swarm_connection_ceiling(stack):
     try:
         for replicas, devices in STEPS:
             swarm.scale(replicas, devices=devices, duration_s=600)
+            time.sleep(15)  # Allow connections to establish and API to settle (~5s lag under churn)
             observed = swarm.connection_count()
             steps.append({
                 "replicas": replicas,
