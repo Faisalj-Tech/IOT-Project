@@ -9,7 +9,7 @@ echoed back in the queue's arguments, and IGNORED by the broker.
 import pytest
 
 from tests.conftest import load_mode
-from tests.experiments.conftest import write_result, DockerControl
+from tests.experiments.conftest import write_result
 from tests.experiments.load import (
     amqp_publish_burst, host_envelope, load_policy, mqtt_publish_burst,
     purge_queue, stable_depth,
@@ -27,14 +27,17 @@ def _requires_load_profile():
 
 
 @pytest.fixture(autouse=True)
-def no_telegraf(stack):
-    """Stop Telegraf to prevent it from consuming test messages."""
-    control = DockerControl()
-    control.stop("telegraf", timeout=10)
+def no_telegraf(stack, docker_control):
+    """Stop Telegraf to prevent it from consuming test messages.
+
+    Uses the shared docker_control fixture so that if the restart fails,
+    the fixture's restore() method will handle recovery for subsequent tests.
+    """
+    docker_control.stop("telegraf", timeout=10)
     try:
         yield
     finally:
-        control.start("telegraf")
+        docker_control.start("telegraf")
 
 
 @pytest.fixture
