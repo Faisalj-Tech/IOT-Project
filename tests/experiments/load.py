@@ -14,16 +14,20 @@ Three of these exist because the design probes proved the obvious approach wrong
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import platform
 import subprocess
 import time
+import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import aio_pika
 import requests
+from aio_pika import DeliveryMode, Message
 
 from tests.conftest import ROOT, compose, compose_files, rabbit_api
 from tests.experiments.conftest import container_for
@@ -215,7 +219,7 @@ def mnesia_megabytes(node: int = 1) -> int:
 def purge_queue(queue: str, vhost: str = "/") -> None:
     vhost_enc = requests.utils.quote(vhost, safe="")
     response = requests.delete(
-        f"{rabbit_api()}/api/queues/{vhost_enc}/{queue}/contents",
+        f"{rabbit_api()}/queues/{vhost_enc}/{queue}/contents",
         auth=_admin_auth(), timeout=15,
     )
     if response.status_code not in (204, 404):
@@ -309,7 +313,7 @@ class Swarm:
         Backed by a ~5s stats interval (carried-forward bite #20), so callers
         under churn should sample this repeatedly rather than trusting one read.
         """
-        response = requests.get(f"{rabbit_api()}/api/connections",
+        response = requests.get(f"{rabbit_api()}/connections",
                                 auth=_admin_auth(), timeout=15)
         response.raise_for_status()
         return len(response.json())
@@ -332,3 +336,85 @@ class Swarm:
         if self._report_dir.exists():
             for path in self._report_dir.glob("*.json"):
                 path.unlink()
+
+
+def amqp_publish_burst(queue: str, count: int, body: bytes,
+                       vhost: str = "/") -> tuple[int, int]:
+    """Publish `count` messages with confirms. Returns (acked, nacked).
+
+    AMQP carries the mechanism assertions because a rejected publish produces an
+    explicit Basic.Nack, which makes the overflow boundary exactly measurable.
+    The MQTT side of the same behaviour is a separate test, because - as spec 2.6
+    measured - it is a completely different observation.
+    """
+    user, password = _admin_auth()
+
+    async def _run() -> tuple[int, int]:
+        connection = await aio_pika.connect_robust(
+            f"amqp://{user}:{password}@localhost:5672/{'' if vhost == '/' else vhost}"
+        )
+        channel = await connection.channel(publisher_confirms=True)
+        acked = nacked = 0
+        for _ in range(count):
+            try:
+                await channel.default_exchange.publish(
+                    Message(body=body, delivery_mode=DeliveryMode.PERSISTENT),
+                    routing_key=queue, timeout=10,
+                )
+                acked += 1
+            except Exception:
+                # aio_pika raises DeliveryError on a Basic.Nack
+                nacked += 1
+        await connection.close()
+        return acked, nacked
+
+    return asyncio.run(_run())
+
+
+def mqtt_publish_burst(version: int, count: int, topic: str = "region.probe.l3.dev.temp",
+                       timeout_s: float = 10.0) -> dict:
+    """Publish over MQTT at a chosen protocol version; return the accounting dict.
+
+    Reads PUBACK reason codes through sim.devices.reasoncodes, so this observes
+    exactly what the swarm observes - including the case that matters most: over
+    3.1.1 a rejected publish produces NO PUBACK at all, so `puback` stays 0 and
+    `timed_out` rises, while over MQTT 5 the same publish yields 0x97 and
+    `rejected` rises (spec 2.6).
+
+    The topic uses dots because it is published to amq.topic via MQTT, whose
+    slashes the plugin translates to dots for routing.
+    """
+    import aiomqtt
+    from paho.mqtt.client import MQTTv5, MQTTv311
+
+    from sim.devices.reasoncodes import PublishAccounting, attach_reason_code_observer
+    # Ensure Windows event-loop policy is set (sim.devices.runner sets it at import time)
+    import sim.devices.runner  # noqa: F401
+
+    protocol = {3: MQTTv311, 5: MQTTv5}[version]
+    accounting = PublishAccounting()
+    run_id = uuid.uuid4().hex[:8]
+    mqtt_topic = topic.replace(".", "/")
+
+    async def _run() -> None:
+        async with aiomqtt.Client(
+            hostname="localhost", port=1883,
+            username=os.environ.get("RABBITMQ_DEVICE_USER", "device"),
+            password=os.environ.get("RABBITMQ_DEVICE_PASSWORD", "devicepass"),
+            identifier=f"l3-{version}-{run_id}",
+            protocol=protocol, timeout=timeout_s,
+        ) as client:
+            attach_reason_code_observer(client, accounting)
+            for index in range(count):
+                accounting.record_attempt()
+                try:
+                    await client.publish(mqtt_topic, payload=f"m{index}".encode(),
+                                         qos=1, timeout=timeout_s)
+                except aiomqtt.MqttError:
+                    # Under 3.1.1 an overflow rejection arrives as silence, which
+                    # surfaces here as a timeout. It is NOT a disconnect, and
+                    # counting it as one would hide the finding.
+                    accounting.record_timeout()
+
+    asyncio.run(_run())
+    return {"run_id": run_id, **accounting.as_dict()}
