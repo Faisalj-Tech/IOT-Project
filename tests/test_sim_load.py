@@ -88,12 +88,11 @@ def test_aiomqtt_still_exposes_the_paho_client():
     this attribute the swarm would silently stop counting rejections - so the
     assumption fails loudly here instead.
     """
-    # Check that aiomqtt.Client class has _client attribute in its __init__.
-    import inspect
-    init_source = inspect.getsource(aiomqtt.Client.__init__)
-    assert "_client" in init_source, "aiomqtt no longer initializes ._client"
+    async def check_paho_client():
+        # Construct a live aiomqtt.Client instance (requires event loop).
+        client = aiomqtt.Client(hostname="localhost", port=1883)
+        assert hasattr(client, "_client"), "aiomqtt.Client no longer exposes ._client"
+        assert hasattr(client._client, "on_publish"), "paho mqtt.Client no longer has on_publish"
 
-    # Check that paho mqtt.Client has on_publish callback
-    from paho.mqtt import client as mqtt
-    paho_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="test")
-    assert hasattr(paho_client, "on_publish"), "paho mqtt.Client no longer has on_publish"
+    import asyncio
+    asyncio.run(check_paho_client())

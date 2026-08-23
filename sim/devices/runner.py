@@ -147,6 +147,10 @@ async def _publish_device(
             if attempt >= max_reconnects:
                 raise
             if accounting is not None:
+                # timed_out is not populated here: aiomqtt raises MqttError uniformly for both
+                # a timed-out publish and a genuine disconnect, and this handler cannot cheaply
+                # distinguish them. The L3 overflow experiment's mqtt_publish_burst() helper
+                # distinguishes timeout from rejection where it matters.
                 accounting.record_reconnect()
             attempt += 1
             node_index += 1  # a dead node stays dead; try the next one
