@@ -130,6 +130,7 @@ def test_mqtt5_publisher_sees_quota_exceeded_and_311_sees_silence(stack, clean_q
     write_result("L3-overflow", {
         "run_id": v5["run_id"],
         "host_envelope": host_envelope(),
+        "telegraf_stopped": True,
         "mqtt5": v5,
         "mqtt311": v311,
         "finding": (
