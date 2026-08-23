@@ -1,0 +1,169 @@
+{
+  "experiment": "L4-memory-a",
+  "recorded_at": "2026-08-23T17:44:31.600790+00:00",
+  "run_id": "L4a",
+  "host_envelope": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10",
+    "cpu_count": 24,
+    "docker_version": "29.6.1",
+    "broker_mem_limit_bytes": 1073741824,
+    "broker_nano_cpus": 2000000000,
+    "broker_memory_watermark_bytes": 268435456,
+    "compose_files": [
+      "compose.yml",
+      "compose.load.yml"
+    ]
+  },
+  "baseline_memory_bytes": 76199304,
+  "model_predicted_messages": 183082,
+  "model_reference_prediction": 184000,
+  "measured_alarm_at_messages": null,
+  "alarmed": false,
+  "samples": [
+    {
+      "sent": 25000,
+      "nacked": 0,
+      "memory_bytes": 101133600,
+      "mnesia_mb": 13,
+      "alarms": []
+    },
+    {
+      "sent": 50000,
+      "nacked": 0,
+      "memory_bytes": 124854128,
+      "mnesia_mb": 24,
+      "alarms": []
+    },
+    {
+      "sent": 75000,
+      "nacked": 0,
+      "memory_bytes": 152323544,
+      "mnesia_mb": 36,
+      "alarms": []
+    },
+    {
+      "sent": 100000,
+      "nacked": 0,
+      "memory_bytes": 176050096,
+      "mnesia_mb": 48,
+      "alarms": []
+    },
+    {
+      "sent": 124998,
+      "nacked": 2,
+      "memory_bytes": 89607376,
+      "mnesia_mb": 60,
+      "alarms": []
+    },
+    {
+      "sent": 149998,
+      "nacked": 0,
+      "memory_bytes": 113120704,
+      "mnesia_mb": 72,
+      "alarms": []
+    },
+    {
+      "sent": 174998,
+      "nacked": 0,
+      "memory_bytes": 136736648,
+      "mnesia_mb": 83,
+      "alarms": []
+    },
+    {
+      "sent": 199998,
+      "nacked": 0,
+      "memory_bytes": 160385344,
+      "mnesia_mb": 95,
+      "alarms": []
+    },
+    {
+      "sent": 224996,
+      "nacked": 2,
+      "memory_bytes": 89012688,
+      "mnesia_mb": 107,
+      "alarms": []
+    },
+    {
+      "sent": 249996,
+      "nacked": 0,
+      "memory_bytes": 112612288,
+      "mnesia_mb": 119,
+      "alarms": []
+    },
+    {
+      "sent": 274996,
+      "nacked": 0,
+      "memory_bytes": 142717864,
+      "mnesia_mb": 131,
+      "alarms": []
+    },
+    {
+      "sent": 299996,
+      "nacked": 0,
+      "memory_bytes": 166085200,
+      "mnesia_mb": 142,
+      "alarms": []
+    },
+    {
+      "sent": 324994,
+      "nacked": 2,
+      "memory_bytes": 101759528,
+      "mnesia_mb": 155,
+      "alarms": []
+    },
+    {
+      "sent": 349994,
+      "nacked": 0,
+      "memory_bytes": 125073200,
+      "mnesia_mb": 166,
+      "alarms": []
+    },
+    {
+      "sent": 374994,
+      "nacked": 0,
+      "memory_bytes": 148625392,
+      "mnesia_mb": 178,
+      "alarms": []
+    },
+    {
+      "sent": 399992,
+      "nacked": 2,
+      "memory_bytes": 90995552,
+      "mnesia_mb": 190,
+      "alarms": []
+    },
+    {
+      "sent": 424992,
+      "nacked": 0,
+      "memory_bytes": 114580112,
+      "mnesia_mb": 202,
+      "alarms": []
+    },
+    {
+      "sent": 449992,
+      "nacked": 0,
+      "memory_bytes": 138227392,
+      "mnesia_mb": 214,
+      "alarms": []
+    },
+    {
+      "sent": 474992,
+      "nacked": 0,
+      "memory_bytes": 161515512,
+      "mnesia_mb": 225,
+      "alarms": []
+    },
+    {
+      "sent": 499990,
+      "nacked": 2,
+      "memory_bytes": 108620440,
+      "mnesia_mb": 238,
+      "alarms": []
+    }
+  ],
+  "queue_depth_at_alarm": 500000,
+  "memory_after_purge_bytes": 77996240,
+  "disk_before_purge_mb": 238,
+  "disk_after_purge_mb": 11
+}
