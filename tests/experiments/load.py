@@ -62,7 +62,7 @@ def apply_policy(name: str, pattern: str, definition: dict, vhost: str = "/",
     """
     vhost_enc = requests.utils.quote(vhost, safe="")
     response = requests.put(
-        f"{rabbit_api()}/api/policies/{vhost_enc}/{name}",
+        f"{rabbit_api()}/policies/{vhost_enc}/{name}",
         json=_policy_body(pattern, definition, priority, apply_to),
         auth=_admin_auth(), timeout=10,
     )
@@ -73,7 +73,7 @@ def remove_policy(name: str, vhost: str = "/") -> None:
     """Remove a policy. 404 is success: the policy is already gone."""
     vhost_enc = requests.utils.quote(vhost, safe="")
     response = requests.delete(
-        f"{rabbit_api()}/api/policies/{vhost_enc}/{name}",
+        f"{rabbit_api()}/policies/{vhost_enc}/{name}",
         auth=_admin_auth(), timeout=10,
     )
     if response.status_code not in (204, 404):

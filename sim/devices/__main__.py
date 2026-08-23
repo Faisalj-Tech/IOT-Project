@@ -12,6 +12,7 @@ import uuid
 from pathlib import Path
 
 from sim.devices.payload import default_specs
+from sim.devices.reasoncodes import PublishAccounting
 from sim.devices.runner import build_tls_params, run_devices
 
 
@@ -51,6 +52,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--report", default=None,
         help="path to write this replica's JSON report to; the swarm driver aggregates these",
     )
+    parser.add_argument(
+        "--mqtt-version", type=int, choices=(3, 5), default=5,
+        help="MQTT protocol version; 5 is required to observe overflow rejections "
+             "(under 3.1.1 a rejected publish is silent - spec 2.6)",
+    )
     return parser.parse_args(argv)
 
 
@@ -62,6 +68,7 @@ def main(argv: list[str] | None = None) -> int:
                           prefix=args.device_prefix, width=args.device_width)
 
     tls_params = build_tls_params(args.cafile, args.certfile, args.keyfile)
+    accounting = PublishAccounting()
     logging.info("run_id=%s devices=%d rate=%.2fHz duration=%.0fs", run_id, args.devices, args.rate, args.duration)
     published = asyncio.run(
         run_devices(
@@ -74,13 +81,15 @@ def main(argv: list[str] | None = None) -> int:
             username=args.username,
             password=args.password,
             tls_params=tls_params,
+            mqtt_version=args.mqtt_version,
+            accounting=accounting,
         )
     )
     logging.info("published %d messages total: %s", sum(published.values()), published)
     if args.report:
         report_path = Path(args.report)
         report_path.parent.mkdir(parents=True, exist_ok=True)
-        report_path.write_text(json.dumps({
+        report = {
             "run_id": run_id,
             "device_prefix": args.device_prefix,
             "devices": args.devices,
@@ -88,7 +97,9 @@ def main(argv: list[str] | None = None) -> int:
             "duration_s": args.duration,
             "attempted": sum(published.values()),
             "per_device": published,
-        }, indent=2), encoding="utf-8")
+        }
+        report.update(accounting.as_dict())
+        report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
         logging.info("wrote report to %s", report_path)
     return 0
 

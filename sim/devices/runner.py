@@ -13,8 +13,12 @@ from collections.abc import Sequence
 from pathlib import Path
 
 import aiomqtt
+from paho.mqtt.client import MQTTv5, MQTTv311
 
 from sim.devices.payload import DeviceSpec, build_payload, topic_for
+from sim.devices.reasoncodes import PublishAccounting, attach_reason_code_observer
+
+PROTOCOL_BY_VERSION = {3: MQTTv311, 5: MQTTv5}
 
 log = logging.getLogger(__name__)
 
@@ -81,6 +85,8 @@ async def _publish_device(
     password: str,
     max_reconnects: int,
     tls_params: aiomqtt.TLSParameters | None = None,
+    mqtt_version: int = 5,
+    accounting: PublishAccounting | None = None,
 ) -> int:
     """Publish for duration_s seconds, returning how many messages were sent.
 
@@ -113,6 +119,7 @@ async def _publish_device(
                 "hostname": host,
                 "port": port,
                 "identifier": f"{spec.device}-{run_id}",
+                "protocol": PROTOCOL_BY_VERSION[mqtt_version],
             }
             if tls_params is not None:
                 client_kwargs["tls_params"] = tls_params
@@ -121,6 +128,8 @@ async def _publish_device(
                 client_kwargs["username"] = username
                 client_kwargs["password"] = password
             async with aiomqtt.Client(**client_kwargs) as client:
+                if accounting is not None:
+                    attach_reason_code_observer(client, accounting)
                 backoff = 0.5
                 attempt = 0
                 if deadline is None:
@@ -129,12 +138,16 @@ async def _publish_device(
                     candidate = seq + 1
                     value = round(spec.baseline + random.uniform(-spec.jitter, spec.jitter), 3)
                     payload = build_payload(spec, seq=candidate, run_id=run_id, value=value)
+                    if accounting is not None:
+                        accounting.record_attempt()
                     await client.publish(topic, payload=json.dumps(payload).encode(), qos=1)
                     seq = candidate
                     await asyncio.sleep(interval)
         except aiomqtt.MqttError as exc:
             if attempt >= max_reconnects:
                 raise
+            if accounting is not None:
+                accounting.record_reconnect()
             attempt += 1
             node_index += 1  # a dead node stays dead; try the next one
             log.warning(
@@ -160,6 +173,8 @@ async def run_devices(
     max_reconnects: int = 12,
     nodes: Sequence[tuple[str, int]] | None = None,
     tls_params: aiomqtt.TLSParameters | None = None,
+    mqtt_version: int = 5,
+    accounting: PublishAccounting | None = None,
 ) -> dict[str, int]:
     resolved = resolve_nodes(host, port, nodes)
     counts = await asyncio.gather(
@@ -174,6 +189,8 @@ async def run_devices(
                 password=password,
                 max_reconnects=max_reconnects,
                 tls_params=tls_params,
+                mqtt_version=mqtt_version,
+                accounting=accounting,
             )
             for spec in specs
         )

@@ -45,3 +45,55 @@ def test_device_prefix_can_be_overridden():
 
 def test_report_flag_defaults_to_none():
     assert parse_args([]).report is None
+
+
+import aiomqtt
+import pytest
+
+from sim.devices.reasoncodes import PublishAccounting, attach_reason_code_observer
+
+
+def test_accounting_starts_empty():
+    acc = PublishAccounting()
+    assert acc.attempted == 0 and acc.rejected == 0 and acc.reason_codes == {}
+
+
+def test_accounting_separates_rejections_from_disconnects():
+    """Spec 2.6: aiomqtt raises MqttError for BOTH a timed-out publish and a real
+    disconnect, and runner.py's reconnect loop treats them identically. Counting
+    them together would report an overflow rejection as connection churn.
+    """
+    acc = PublishAccounting()
+    acc.record_reason_code("Quota exceeded", is_failure=True)
+    acc.record_timeout()
+    acc.record_reconnect()
+    assert acc.rejected == 1
+    assert acc.timed_out == 1
+    assert acc.reconnects == 1
+    assert acc.reason_codes == {"Quota exceeded": 1}
+
+
+def test_accounting_does_not_count_success_as_rejection():
+    acc = PublishAccounting()
+    acc.record_reason_code("Success", is_failure=False)
+    assert acc.rejected == 0
+    assert acc.puback == 1
+
+
+def test_aiomqtt_still_exposes_the_paho_client():
+    """Pins the one private-API assumption this module makes.
+
+    attach_reason_code_observer() reaches into aiomqtt's underlying paho client,
+    because aiomqtt itself surfaces no reason code. If a future aiomqtt renames
+    this attribute the swarm would silently stop counting rejections - so the
+    assumption fails loudly here instead.
+    """
+    # Check that aiomqtt.Client class has _client attribute in its __init__.
+    import inspect
+    init_source = inspect.getsource(aiomqtt.Client.__init__)
+    assert "_client" in init_source, "aiomqtt no longer initializes ._client"
+
+    # Check that paho mqtt.Client has on_publish callback
+    from paho.mqtt import client as mqtt
+    paho_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="test")
+    assert hasattr(paho_client, "on_publish"), "paho mqtt.Client no longer has on_publish"
