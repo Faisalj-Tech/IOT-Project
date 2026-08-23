@@ -1,0 +1,41 @@
+{
+  "experiment": "L4-memory-c",
+  "recorded_at": "2026-08-23T19:39:20.520363+00:00",
+  "run_id": "L4c",
+  "host_envelope": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10",
+    "cpu_count": 24,
+    "docker_version": "29.6.1",
+    "broker_mem_limit_bytes": 1073741824,
+    "broker_nano_cpus": 2000000000,
+    "broker_memory_watermark_bytes": 268435456,
+    "compose_files": [
+      "compose.yml",
+      "compose.load.yml"
+    ]
+  },
+  "published": 20000,
+  "depth_during_outage": {
+    "telemetry.q_messages": 20000,
+    "telemetry.q_ready": 19950,
+    "telemetry.q_unacked": 50,
+    "telemetry.q_depth_polls": 5,
+    "telemetry.q_depth_exit": "stable"
+  },
+  "depth_after_recovery": {
+    "telemetry.q_messages": 0,
+    "telemetry.q_ready": 0,
+    "telemetry.q_unacked": 0,
+    "telemetry.q_depth_polls": 27,
+    "telemetry.q_depth_exit": "stable"
+  },
+  "dlq_after_recovery": {
+    "dlq_messages": 0,
+    "dlq_ready": 0,
+    "dlq_unacked": 0,
+    "dlq_depth_polls": 4,
+    "dlq_depth_exit": "stable"
+  },
+  "memory_during_outage_bytes": 98189120
+}

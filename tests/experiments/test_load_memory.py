@@ -15,6 +15,7 @@ returns" claim is about the system rather than about a dead-letter path.
 
 import json
 import time
+from datetime import datetime, timezone
 
 import pytest
 import requests
@@ -32,6 +33,18 @@ pytestmark = [pytest.mark.load, pytest.mark.stack]
 
 PAYLOAD = b"x" * 200
 BATCH = 25_000
+# Arm (c)'s consumer (consumer/ackafterwrite.py) parses each message as JSON with
+# 9 required fields and dead-letters anything else immediately (parse_message()),
+# before it ever attempts an InfluxDB write. PAYLOAD (raw filler bytes) is fine for
+# arms (a)/(b), which never parse the body - but it defeats arm (c)'s entire premise:
+# every message was found dead-lettering with "payload is not JSON" instantly, so
+# telemetry.q never buffered anything. Live-diagnosed via `docker logs iot-consumer`
+# during a direct re-run. Arm (c) needs its own valid, parseable payload.
+CONSUMER_PAYLOAD = json.dumps({
+    "ts": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+    "region": "eu", "plant": "plant1", "device": "l4c-probe", "metric": "temp",
+    "value": 70.0, "unit": "C", "seq": 1, "run_id": "L4c",
+}).encode()
 MAX_BATCHES = 20  # 500k messages is well past the predicted alarm; a guard, not a target
 MODEL_FIXED_BYTES = 850          # spec 2.7: N * (0.85 KB + payload)
 MODEL_PREDICTED_MESSAGES = 184_000
@@ -130,7 +143,7 @@ def test_arm_a_no_consumer_the_clean_model(stack, docker_control):
 def _one_dlq_message() -> dict:
     """Pop one DLQ message (requeueing it) to read its x-death header."""
     response = requests.post(
-        f"{rabbit_api()}/api/queues/%2F/dlq/get",
+        f"{rabbit_api()}/queues/%2F/dlq/get",
         json={"count": 1, "ackmode": "ack_requeue_true", "encoding": "auto"},
         auth=_admin_auth(), timeout=15,
     )
@@ -207,7 +220,7 @@ def test_arm_c_ack_after_write_consumer_buffers_and_loses_nothing(stack, docker_
     compose("up", "-d", "consumer", files=consumer_files())
     try:
         docker_control.stop("influxdb")
-        acked, _ = amqp_publish_burst("telemetry.q", count=20_000, body=PAYLOAD)
+        acked, _ = amqp_publish_burst("telemetry.q", count=20_000, body=CONSUMER_PAYLOAD)
         during = stable_depth("telemetry.q", timeout_s=180)
         memory_during = broker_memory_bytes()
 

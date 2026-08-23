@@ -1,6 +1,6 @@
 {
   "experiment": "L4-memory-a",
-  "recorded_at": "2026-08-23T17:44:31.600790+00:00",
+  "recorded_at": "2026-08-23T19:23:16.057064+00:00",
   "run_id": "L4a",
   "host_envelope": {
     "platform": "Windows-11-10.0.26200-SP0",
@@ -15,8 +15,8 @@
       "compose.load.yml"
     ]
   },
-  "baseline_memory_bytes": 76199304,
-  "model_predicted_messages": 183082,
+  "baseline_memory_bytes": 75979792,
+  "model_predicted_messages": 183291,
   "model_reference_prediction": 184000,
   "measured_alarm_at_messages": null,
   "alarmed": false,
@@ -24,146 +24,147 @@
     {
       "sent": 25000,
       "nacked": 0,
-      "memory_bytes": 101133600,
-      "mnesia_mb": 13,
+      "memory_bytes": 101114872,
+      "mnesia_mb": 12,
       "alarms": []
     },
     {
       "sent": 50000,
       "nacked": 0,
-      "memory_bytes": 124854128,
+      "memory_bytes": 124833248,
       "mnesia_mb": 24,
       "alarms": []
     },
     {
       "sent": 75000,
       "nacked": 0,
-      "memory_bytes": 152323544,
+      "memory_bytes": 152260464,
       "mnesia_mb": 36,
       "alarms": []
     },
     {
       "sent": 100000,
       "nacked": 0,
-      "memory_bytes": 176050096,
+      "memory_bytes": 176105448,
       "mnesia_mb": 48,
       "alarms": []
     },
     {
       "sent": 124998,
       "nacked": 2,
-      "memory_bytes": 89607376,
+      "memory_bytes": 89254984,
       "mnesia_mb": 60,
       "alarms": []
     },
     {
       "sent": 149998,
       "nacked": 0,
-      "memory_bytes": 113120704,
+      "memory_bytes": 112789872,
       "mnesia_mb": 72,
       "alarms": []
     },
     {
       "sent": 174998,
       "nacked": 0,
-      "memory_bytes": 136736648,
+      "memory_bytes": 136219720,
       "mnesia_mb": 83,
       "alarms": []
     },
     {
       "sent": 199998,
       "nacked": 0,
-      "memory_bytes": 160385344,
+      "memory_bytes": 159908776,
       "mnesia_mb": 95,
       "alarms": []
     },
     {
       "sent": 224996,
       "nacked": 2,
-      "memory_bytes": 89012688,
+      "memory_bytes": 86535200,
       "mnesia_mb": 107,
       "alarms": []
     },
     {
       "sent": 249996,
       "nacked": 0,
-      "memory_bytes": 112612288,
+      "memory_bytes": 110047320,
       "mnesia_mb": 119,
       "alarms": []
     },
     {
       "sent": 274996,
       "nacked": 0,
-      "memory_bytes": 142717864,
+      "memory_bytes": 140032912,
       "mnesia_mb": 131,
       "alarms": []
     },
     {
       "sent": 299996,
       "nacked": 0,
-      "memory_bytes": 166085200,
-      "mnesia_mb": 142,
+      "memory_bytes": 163528960,
+      "mnesia_mb": 143,
       "alarms": []
     },
     {
       "sent": 324994,
       "nacked": 2,
-      "memory_bytes": 101759528,
+      "memory_bytes": 102529240,
       "mnesia_mb": 155,
       "alarms": []
     },
     {
       "sent": 349994,
       "nacked": 0,
-      "memory_bytes": 125073200,
+      "memory_bytes": 125812312,
       "mnesia_mb": 166,
       "alarms": []
     },
     {
       "sent": 374994,
       "nacked": 0,
-      "memory_bytes": 148625392,
+      "memory_bytes": 149624048,
       "mnesia_mb": 178,
       "alarms": []
     },
     {
-      "sent": 399992,
-      "nacked": 2,
-      "memory_bytes": 90995552,
+      "sent": 399994,
+      "nacked": 0,
+      "memory_bytes": 173034776,
       "mnesia_mb": 190,
       "alarms": []
     },
     {
       "sent": 424992,
-      "nacked": 0,
-      "memory_bytes": 114580112,
+      "nacked": 2,
+      "memory_bytes": 111291976,
       "mnesia_mb": 202,
       "alarms": []
     },
     {
       "sent": 449992,
       "nacked": 0,
-      "memory_bytes": 138227392,
+      "memory_bytes": 134746640,
       "mnesia_mb": 214,
       "alarms": []
     },
     {
       "sent": 474992,
       "nacked": 0,
-      "memory_bytes": 161515512,
+      "memory_bytes": 158479512,
       "mnesia_mb": 225,
       "alarms": []
     },
     {
       "sent": 499990,
       "nacked": 2,
-      "memory_bytes": 108620440,
+      "memory_bytes": 100626576,
       "mnesia_mb": 238,
       "alarms": []
     }
   ],
-  "queue_depth_at_alarm": 500000,
-  "memory_after_purge_bytes": 77996240,
+  "queue_depth_at_run_end": 500000,
+  "memory_after_purge_bytes": 78223416,
   "disk_before_purge_mb": 238,
-  "disk_after_purge_mb": 11
+  "disk_after_purge_mb": 7,
+  "model_divergence_note": "measured memory never reached the pinned 256MiB watermark even at 500000 messages (2.7x the model's predicted alarm point of ~184000); memory shows a repeating rise-then-drop pattern approximately every 100000 messages while mnesia disk usage grows monotonically the whole time - consistent with periodic Raft checkpoint/segment-rollover reclaiming the quorum_ets index between measurement pauses, which the model (fitted on a single uninterrupted burst) never observed. Recorded as a finding per spec 2.7's own instruction not to tune the model to fit a divergent run."
 }
