@@ -1,0 +1,6079 @@
+{
+  "experiment": "F-follower-kill",
+  "recorded_at": "2026-08-17T22:05:40.850007+00:00",
+  "run_id": "expF4157",
+  "arm": "telegraf",
+  "config": {
+    "devices": 5,
+    "rate_hz": 2.0,
+    "clean_s": 20.0,
+    "down_s": 45.0,
+    "tail_s": 20.0,
+    "max_reconnects": 12,
+    "partition_handling": "ignore"
+  },
+  "killed_node": 2,
+  "killed_at": 1787004177.3227835,
+  "read_node": 1,
+  "leader_before": "rabbit@rabbit1",
+  "leader_after": "rabbit@rabbit1",
+  "leader_held": true,
+  "telegraf_connected_node": 3,
+  "members_after_rejoin": [
+    "rabbit@rabbit1",
+    "rabbit@rabbit2",
+    "rabbit@rabbit3"
+  ],
+  "rejoin_elapsed_s": 0.0,
+  "published_counts": {
+    "press-01": 170,
+    "press-02": 170,
+    "press-03": 170,
+    "press-04": 170,
+    "press-05": 170
+  },
+  "published_total": 850,
+  "influx_total": 850,
+  "gaps": {},
+  "duplicates": {},
+  "duplicate_total": 0,
+  "duplicate_rate": 0.0,
+  "drain_elapsed_s": 96.09,
+  "drain_exit_condition": "broker-drained",
+  "queue_ready_at_drain_exit": 0,
+  "queue_unacked_at_drain_exit": 0,
+  "verdict": "no-loss",
+  "timeline": {
+    "samples": [
+      {
+        "t": 1787004157.2933447,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004159.3615525,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004161.39973,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004163.4404554,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 15,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 15,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 15,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 15,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004165.4917312,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 15,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 15,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 15,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 15,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004167.5441806,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 15,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 15,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 15,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 15,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004169.5993612,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 15,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 15,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 15,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 15,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004171.6687453,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 15,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 15,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 15,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 15,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004173.7074738,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 10,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 10,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 10,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 10,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004175.7489312,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 10,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 10,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 10,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 10,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004177.7900393,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 10,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": false,
+            "source": null,
+            "http_error": "ConnectionError: ('Connection aborted.', ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None))",
+            "exec_error": "CalledProcessError: Command '['docker', 'exec', 'iot-rabbitmq2', 'rabbitmq-diagnostics', '-q', '--formatter', 'json', 'cluster_status']' returned non-zero exit status 1."
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 10,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 10,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004180.093412,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 60,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": false,
+            "source": null,
+            "http_error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15673): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15673): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))",
+            "exec_error": "CalledProcessError: Command '['docker', 'exec', 'iot-rabbitmq2', 'rabbitmq-diagnostics', '-q', '--formatter', 'json', 'cluster_status']' returned non-zero exit status 1."
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 60,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 60,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004186.2699175,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 60,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": false,
+            "source": null,
+            "http_error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15673): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15673): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))",
+            "exec_error": "CalledProcessError: Command '['docker', 'exec', 'iot-rabbitmq2', 'rabbitmq-diagnostics', '-q', '--formatter', 'json', 'cluster_status']' returned non-zero exit status 1."
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 110,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 60,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004192.466954,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 110,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": false,
+            "source": null,
+            "http_error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15673): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15673): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))",
+            "exec_error": "CalledProcessError: Command '['docker', 'exec', 'iot-rabbitmq2', 'rabbitmq-diagnostics', '-q', '--formatter', 'json', 'cluster_status']' returned non-zero exit status 1."
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 105,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 110,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004198.6751544,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 155,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": false,
+            "source": null,
+            "http_error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15673): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15673): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))",
+            "exec_error": "CalledProcessError: Command '['docker', 'exec', 'iot-rabbitmq2', 'rabbitmq-diagnostics', '-q', '--formatter', 'json', 'cluster_status']' returned non-zero exit status 1."
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 155,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 155,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004204.8750918,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 155,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": false,
+            "source": null,
+            "http_error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15673): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15673): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))",
+            "exec_error": "CalledProcessError: Command '['docker', 'exec', 'iot-rabbitmq2', 'rabbitmq-diagnostics', '-q', '--formatter', 'json', 'cluster_status']' returned non-zero exit status 1."
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 205,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 155,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004211.0864165,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 205,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": false,
+            "source": null,
+            "http_error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15673): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15673): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))",
+            "exec_error": "CalledProcessError: Command '['docker', 'exec', 'iot-rabbitmq2', 'rabbitmq-diagnostics', '-q', '--formatter', 'json', 'cluster_status']' returned non-zero exit status 1."
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 205,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004217.3433535,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": false,
+            "source": null,
+            "http_error": "ConnectionError: HTTPConnectionPool(host='localhost', port=15673): Max retries exceeded with url: /api/queues/%2F/telemetry.q (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=15673): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))",
+            "exec_error": "CalledProcessError: Command '['docker', 'exec', 'iot-rabbitmq2', 'rabbitmq-diagnostics', '-q', '--formatter', 'json', 'cluster_status']' returned non-zero exit status 1."
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004223.559401,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": false,
+            "source": null,
+            "http_error": "ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+            "exec_error": "CalledProcessError: Command '['docker', 'exec', 'iot-rabbitmq2', 'rabbitmq-diagnostics', '-q', '--formatter', 'json', 'cluster_status']' returned non-zero exit status 69."
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004227.2976398,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": false,
+            "source": null,
+            "http_error": "ConnectionError: ('Connection aborted.', ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None))",
+            "exec_error": "CalledProcessError: Command '['docker', 'exec', 'iot-rabbitmq2', 'rabbitmq-diagnostics', '-q', '--formatter', 'json', 'cluster_status']' returned non-zero exit status 64."
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004230.2074034,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 295,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004232.2792714,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 295,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004234.3338516,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 295,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004236.3769245,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 295,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 295,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004238.4169936,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 345,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004240.4770474,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 345,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004242.5352943,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 345,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004244.5883896,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 345,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004246.6422722,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 345,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 345,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004248.694475,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 390,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 390,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 390,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 390,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004250.7380097,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 390,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 390,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 390,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 390,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004252.779128,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 390,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 390,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 390,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 390,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004254.836336,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 350,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004256.877016,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 350,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004258.9150121,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 350,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004260.9541116,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 350,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004263.0220084,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 350,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 350,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004265.066726,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 300,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004267.1064804,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 300,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004269.1584022,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 300,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004271.2138028,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 300,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 300,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004273.2574592,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004275.3326604,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004277.3941207,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004279.4491725,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004281.50442,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 250,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 250,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004283.5451646,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004285.6101253,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004287.6692138,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004289.7257662,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004291.7811604,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 200,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 200,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004293.838371,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004295.8790786,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004297.9358432,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004299.9830275,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004302.040905,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 150,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 150,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004304.0974083,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 100,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004306.1546812,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 100,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004308.1964085,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 100,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004310.2390058,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 100,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004312.2979765,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 100,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 100,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004314.3499062,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004316.3909981,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004318.431319,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004320.500798,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004322.5460014,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 50,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 50,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004324.60001,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004326.6532574,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004328.7089844,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004330.76714,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004332.8047845,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 50,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 50,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004334.8519561,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004336.9071777,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      },
+      {
+        "t": 1787004338.9610047,
+        "nodes": {
+          "1": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "2": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          },
+          "3": {
+            "reachable": true,
+            "source": "http",
+            "telemetry_ready": 0,
+            "telemetry_unacked": 0,
+            "dlq_messages": 0,
+            "members": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "online": [
+              "rabbit@rabbit1",
+              "rabbit@rabbit2",
+              "rabbit@rabbit3"
+            ],
+            "leader": "rabbit@rabbit1",
+            "partitions": [],
+            "running": true,
+            "alarms": {
+              "mem": false,
+              "disk": false
+            }
+          }
+        },
+        "telemetry_ready": 0,
+        "telemetry_unacked": 0,
+        "dlq_messages": 0,
+        "alarms": {
+          "mem": false,
+          "disk": false
+        }
+      }
+    ],
+    "marks": [
+      {
+        "label": "sim_start",
+        "t": 1787004157.321768
+      },
+      {
+        "label": "kill_follower_node2",
+        "t": 1787004177.3227835
+      },
+      {
+        "label": "restart_node",
+        "t": 1787004223.1272929
+      },
+      {
+        "label": "rejoined",
+        "t": 1787004230.275456
+      },
+      {
+        "label": "sim_done",
+        "t": 1787004244.7451973
+      }
+    ]
+  }
+}

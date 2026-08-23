@@ -1,0 +1,11 @@
+{
+  "experiment": "T-telegraf-failover",
+  "recorded_at": "2026-08-17T22:12:27.089286+00:00",
+  "run_id": "tfo4738",
+  "arm": "telegraf",
+  "connected_node_before": 1,
+  "connected_node_after": 3,
+  "failover_elapsed_s": 1.05,
+  "failover_timeout_s": 90.0,
+  "verdict": "failed-over"
+}

@@ -1,0 +1,41 @@
+{
+  "experiment": "L3-overflow",
+  "recorded_at": "2026-08-23T14:22:13.044810+00:00",
+  "run_id": "b1e46ee0",
+  "host_envelope": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10",
+    "cpu_count": 24,
+    "docker_version": "29.6.1",
+    "broker_mem_limit_bytes": 1073741824,
+    "broker_nano_cpus": 2000000000,
+    "broker_memory_watermark_bytes": 268435456,
+    "compose_files": [
+      "compose.yml",
+      "compose.load.yml"
+    ]
+  },
+  "telegraf_stopped": true,
+  "mqtt5": {
+    "run_id": "b1e46ee0",
+    "attempted": 10,
+    "puback": 6,
+    "rejected": 4,
+    "timed_out": 0,
+    "reconnects": 0,
+    "reason_codes": {
+      "Success": 6,
+      "Quota exceeded": 4
+    }
+  },
+  "mqtt311": {
+    "run_id": "941fe689",
+    "attempted": 3,
+    "puback": 0,
+    "rejected": 0,
+    "timed_out": 3,
+    "reconnects": 0,
+    "reason_codes": {}
+  },
+  "finding": "reject-publish is observable only over MQTT 5 (0x97 Quota exceeded); over 3.1.1 it is silent message loss"
+}

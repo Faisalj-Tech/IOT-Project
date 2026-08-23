@@ -1,0 +1,10 @@
+{
+  "experiment": "S3-cert-scoped-revocation",
+  "recorded_at": "2026-08-21T17:39:47.328314+00:00",
+  "run_id": "s333987",
+  "revoked_cert": "device-a",
+  "sibling_cert": "device-b",
+  "shared_common_name": "device",
+  "seconds_until_refused": 0.0,
+  "sibling_still_connects": true
+}

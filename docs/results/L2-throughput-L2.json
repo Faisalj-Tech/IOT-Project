@@ -1,0 +1,93 @@
+{
+  "experiment": "L2-throughput",
+  "recorded_at": "2026-08-23T16:54:52.384491+00:00",
+  "run_id": "L2",
+  "host_envelope": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10",
+    "cpu_count": 24,
+    "docker_version": "29.6.1",
+    "broker_mem_limit_bytes": 1073741824,
+    "broker_nano_cpus": 2000000000,
+    "broker_memory_watermark_bytes": 268435456,
+    "compose_files": [
+      "compose.yml",
+      "compose.load.yml"
+    ]
+  },
+  "steps": [
+    {
+      "replicas": 2,
+      "devices_each": 25,
+      "rate_hz_each": 1.0,
+      "offered_rate_hz": 50.0,
+      "published_attempted": 0,
+      "published_acked": 0,
+      "published_rejected": 0,
+      "publish_timeouts": 0,
+      "reconnects": 0,
+      "ingested_rows": 500,
+      "queue_after_drain": 2150,
+      "queue_depth_exit": "stable",
+      "broker_memory_bytes": 86882088,
+      "latency": {
+        "samples": 0
+      }
+    },
+    {
+      "replicas": 2,
+      "devices_each": 50,
+      "rate_hz_each": 2.0,
+      "offered_rate_hz": 200.0,
+      "published_attempted": 0,
+      "published_acked": 0,
+      "published_rejected": 0,
+      "publish_timeouts": 0,
+      "reconnects": 0,
+      "ingested_rows": 400,
+      "queue_after_drain": 11200,
+      "queue_depth_exit": "stable",
+      "broker_memory_bytes": 96708408,
+      "latency": {
+        "samples": 0
+      }
+    },
+    {
+      "replicas": 4,
+      "devices_each": 50,
+      "rate_hz_each": 4.0,
+      "offered_rate_hz": 800.0,
+      "published_attempted": 0,
+      "published_acked": 0,
+      "published_rejected": 0,
+      "publish_timeouts": 0,
+      "reconnects": 0,
+      "ingested_rows": 400,
+      "queue_after_drain": 47100,
+      "queue_depth_exit": "stable",
+      "broker_memory_bytes": 151202752,
+      "latency": {
+        "samples": 0
+      }
+    },
+    {
+      "replicas": 4,
+      "devices_each": 100,
+      "rate_hz_each": 8.0,
+      "offered_rate_hz": 3200.0,
+      "published_attempted": 0,
+      "published_acked": 0,
+      "published_rejected": 0,
+      "publish_timeouts": 0,
+      "reconnects": 0,
+      "ingested_rows": 800,
+      "queue_after_drain": 87002,
+      "queue_depth_exit": "stable",
+      "broker_memory_bytes": 115186800,
+      "latency": {
+        "samples": 0
+      }
+    }
+  ],
+  "accounting_note": "ingested_rows counts the base `telemetry` measurement only; telegraf.load.d runs a second consumer on the same queue, so the latency sample is a subset of the stream"
+}

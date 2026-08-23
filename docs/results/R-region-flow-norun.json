@@ -1,0 +1,26 @@
+{
+  "experiment": "R-region-flow",
+  "recorded_at": "2026-08-21T00:36:52.605787+00:00",
+  "expected_per_region": 180,
+  "counts_by_provenance": {
+    "eu": {
+      "eu": 180
+    },
+    "us": {
+      "us": 180
+    }
+  },
+  "run_ids": {
+    "eu": "Reub7790b",
+    "us": "Rusf5e7bf"
+  },
+  "queue_ready": {
+    "eu": 0,
+    "us": 0
+  },
+  "dlq_ready": {
+    "eu": 0,
+    "us": 0
+  },
+  "started_at": "2026-08-21T00:35:34.438364+00:00"
+}
