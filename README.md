@@ -307,6 +307,51 @@ Four things worth knowing before touching this profile:
   `amqp_consumer` has no refresh path) can never reconnect afterward. See
   `main/docs/reports/phase5-security.md` §1 for the full contrast.
 
+## Load testing (Phase 6)
+
+`compose.load.yml` overlays `compose.yml` to add a scaled asyncio device simulator
+(`sim-load` service, no `container_name`, scaled with `--scale sim-load=N`) that publishes
+MQTT 5 at a target rate, Telegraf running under the load overlay, and InfluxDB configured
+to capture two-clock latency (publish-time and ingest-time). Four load experiments measure
+throughput (L2), latency (L5), memory pressure under three distinct outage scenarios (L4),
+and cluster replication cost (L6). A fifth experiment (L11) uses Locust for structured
+ramp profiles. Full details are in `main/docs/reports/phase6-load.md`.
+
+Throughput and latency (L2/L5):
+
+```bash
+docker compose -f compose.yml -f compose.load.yml up -d --wait
+IOT_LOAD=1 KEEP_STACK=1 .venv/Scripts/python.exe -m pytest tests/experiments/test_load_boot.py tests/experiments/test_load_overflow.py tests/experiments/test_load_scale.py tests/experiments/test_load_throughput.py tests/experiments/test_load_memory.py -m load -v -s
+docker compose -f compose.yml -f compose.load.yml down -v --remove-orphans
+.venv/Scripts/python.exe -m pytest tests/ -q     # full default-profile suite, L7 — ONLY after teardown
+```
+
+Cluster replication cost (L6, requires `compose.cluster.yml`):
+
+```bash
+docker compose -f compose.yml -f compose.cluster.yml -f compose.load.yml up -d --wait
+IOT_LOAD=1 IOT_CLUSTER=1 KEEP_STACK=1 .venv/Scripts/python.exe -m pytest tests/experiments/test_load_cluster.py -m load -v -s
+docker compose -f compose.yml -f compose.cluster.yml -f compose.load.yml down -v --remove-orphans
+```
+
+Locust ramp profiles (L11, requires Locust docker profile):
+
+```bash
+docker compose -f compose.yml -f compose.load.yml --profile locust up -d --wait
+curl -s -X POST http://localhost:8089/swarm -d "user_count=50&spawn_rate=10"
+# wait ~260s for the StepRamp shape's 240s duration
+curl -s http://localhost:8089/stats/report -o docs/results/_locust/report.html
+curl -s http://localhost:8089/stop
+docker compose -f compose.yml -f compose.load.yml --profile locust down --remove-orphans
+```
+
+The swarm scales with `--scale sim-load=N` — each replica self-assigns its device identity
+from its container hostname, eliminating the collision problem that would occur with a fixed
+device prefix across all replicas. The pinned broker memory and CPU limits in `compose.load.yml`
+keep the experiments inside measurable bounds (1 GiB memory, 256 MiB alarm threshold) rather
+than running until the host saturates. Results are written to `main/docs/results/` and
+summarized in the phase report.
+
 ## Teardown
 
 ```bash
