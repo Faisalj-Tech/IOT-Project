@@ -1,0 +1,127 @@
+{
+  "experiment": "L6-cluster",
+  "recorded_at": "2026-08-23T19:58:45.772045+00:00",
+  "run_id": "L6",
+  "host_envelope": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10",
+    "cpu_count": 24,
+    "docker_version": "29.6.1",
+    "broker_mem_limit_bytes": 1073741824,
+    "broker_nano_cpus": 2000000000,
+    "broker_memory_watermark_bytes": 268435456,
+    "compose_files": [
+      "compose.yml",
+      "compose.cluster.yml",
+      "compose.load.yml"
+    ]
+  },
+  "messages": 99995,
+  "nacked": 5,
+  "publish_seconds": 539.0,
+  "publish_rate_hz": 185.5,
+  "queue_depth": {
+    "telemetry.q_messages": 0,
+    "telemetry.q_ready": 0,
+    "telemetry.q_unacked": 0,
+    "telemetry.q_depth_polls": 4,
+    "telemetry.q_depth_exit": "stable"
+  },
+  "memory_before_bytes": 77200336,
+  "memory_after_bytes": 113845000,
+  "per_message_memory_bytes": 366.5,
+  "single_node_reference": {
+    "note": "compare against L2-throughput-L2.json's steps",
+    "steps": [
+      {
+        "replicas": 2,
+        "devices_each": 25,
+        "rate_hz_each": 1.0,
+        "offered_rate_hz": 50.0,
+        "published_attempted": 0,
+        "published_acked": 0,
+        "published_rejected": 0,
+        "publish_timeouts": 0,
+        "reconnects": 0,
+        "ingested_rows": 800,
+        "queue_after_drain": 2350,
+        "queue_depth_exit": "stable",
+        "broker_memory_bytes": 84409840,
+        "latency": {
+          "samples": 400,
+          "p50_s": 23.458,
+          "p95_s": 51.894,
+          "p99_s": 51.897,
+          "max_s": 51.898
+        }
+      },
+      {
+        "replicas": 2,
+        "devices_each": 50,
+        "rate_hz_each": 2.0,
+        "offered_rate_hz": 200.0,
+        "published_attempted": 0,
+        "published_acked": 0,
+        "published_rejected": 0,
+        "publish_timeouts": 0,
+        "reconnects": 0,
+        "ingested_rows": 750,
+        "queue_after_drain": 11500,
+        "queue_depth_exit": "stable",
+        "broker_memory_bytes": 98213328,
+        "latency": {
+          "samples": 400,
+          "p50_s": 38.82,
+          "p95_s": 62.578,
+          "p99_s": 62.58,
+          "max_s": 62.58
+        }
+      },
+      {
+        "replicas": 4,
+        "devices_each": 50,
+        "rate_hz_each": 4.0,
+        "offered_rate_hz": 800.0,
+        "published_attempted": 0,
+        "published_acked": 0,
+        "published_rejected": 0,
+        "publish_timeouts": 0,
+        "reconnects": 0,
+        "ingested_rows": 750,
+        "queue_after_drain": 47411,
+        "queue_depth_exit": "stable",
+        "broker_memory_bytes": 151887432,
+        "latency": {
+          "samples": 400,
+          "p50_s": 40.646,
+          "p95_s": 72.071,
+          "p99_s": 72.072,
+          "max_s": 72.073
+        }
+      },
+      {
+        "replicas": 4,
+        "devices_each": 100,
+        "rate_hz_each": 8.0,
+        "offered_rate_hz": 3200.0,
+        "published_attempted": 0,
+        "published_acked": 0,
+        "published_rejected": 0,
+        "publish_timeouts": 0,
+        "reconnects": 0,
+        "ingested_rows": 750,
+        "queue_after_drain": 80393,
+        "queue_depth_exit": "stable",
+        "broker_memory_bytes": 116077184,
+        "latency": {
+          "samples": 400,
+          "p50_s": 40.866,
+          "p95_s": 75.249,
+          "p99_s": 75.25,
+          "max_s": 75.251
+        }
+      }
+    ]
+  },
+  "model_single_node_per_message_bytes": 1050
+}
