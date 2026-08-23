@@ -1,6 +1,6 @@
 {
   "experiment": "L2-throughput",
-  "recorded_at": "2026-08-23T16:54:52.384491+00:00",
+  "recorded_at": "2026-08-23T17:15:08.703452+00:00",
   "run_id": "L2",
   "host_envelope": {
     "platform": "Windows-11-10.0.26200-SP0",
@@ -26,12 +26,16 @@
       "published_rejected": 0,
       "publish_timeouts": 0,
       "reconnects": 0,
-      "ingested_rows": 500,
-      "queue_after_drain": 2150,
+      "ingested_rows": 800,
+      "queue_after_drain": 2350,
       "queue_depth_exit": "stable",
-      "broker_memory_bytes": 86882088,
+      "broker_memory_bytes": 84409840,
       "latency": {
-        "samples": 0
+        "samples": 400,
+        "p50_s": 23.458,
+        "p95_s": 51.894,
+        "p99_s": 51.897,
+        "max_s": 51.898
       }
     },
     {
@@ -44,12 +48,16 @@
       "published_rejected": 0,
       "publish_timeouts": 0,
       "reconnects": 0,
-      "ingested_rows": 400,
-      "queue_after_drain": 11200,
+      "ingested_rows": 750,
+      "queue_after_drain": 11500,
       "queue_depth_exit": "stable",
-      "broker_memory_bytes": 96708408,
+      "broker_memory_bytes": 98213328,
       "latency": {
-        "samples": 0
+        "samples": 400,
+        "p50_s": 38.82,
+        "p95_s": 62.578,
+        "p99_s": 62.58,
+        "max_s": 62.58
       }
     },
     {
@@ -62,12 +70,16 @@
       "published_rejected": 0,
       "publish_timeouts": 0,
       "reconnects": 0,
-      "ingested_rows": 400,
-      "queue_after_drain": 47100,
+      "ingested_rows": 750,
+      "queue_after_drain": 47411,
       "queue_depth_exit": "stable",
-      "broker_memory_bytes": 151202752,
+      "broker_memory_bytes": 151887432,
       "latency": {
-        "samples": 0
+        "samples": 400,
+        "p50_s": 40.646,
+        "p95_s": 72.071,
+        "p99_s": 72.072,
+        "max_s": 72.073
       }
     },
     {
@@ -80,14 +92,19 @@
       "published_rejected": 0,
       "publish_timeouts": 0,
       "reconnects": 0,
-      "ingested_rows": 800,
-      "queue_after_drain": 87002,
+      "ingested_rows": 750,
+      "queue_after_drain": 80393,
       "queue_depth_exit": "stable",
-      "broker_memory_bytes": 115186800,
+      "broker_memory_bytes": 116077184,
       "latency": {
-        "samples": 0
+        "samples": 400,
+        "p50_s": 40.866,
+        "p95_s": 75.249,
+        "p99_s": 75.25,
+        "max_s": 75.251
       }
     }
   ],
-  "accounting_note": "ingested_rows counts the base `telemetry` measurement only; telegraf.load.d runs a second consumer on the same queue, so the latency sample is a subset of the stream"
+  "accounting_note": "ingested_rows counts rows with a `seq` field in the `telemetry` measurement from BOTH consumers combined (the base Telegraf input and telegraf.load.d's second consumer both write measurement=telemetry, field=seq) - it is an upper bound on base-pipeline throughput, not an isolated base-only count. The two consumers cannot be distinguished with the current config.",
+  "measurement_note": "The swarm's own publish-accounting fields (published_attempted, published_acked, published_rejected, publish_timeouts, reconnects) read zero in every step because swarm.stop() force-removes each replica before its duration_s (90s) elapses and its report is written \u2014 the test only waits STEP_SECONDS (60s). These five fields are not meaningful in this result and should not be read as 'zero rejections/zero timeouts' findings."
 }

@@ -56,7 +56,7 @@ def _latency_percentiles(influx_query, start_iso: str) -> dict:
     """
     rows = influx_query(
         f'from(bucket:"telemetry") |> range(start:{start_iso}) '
-        f'|> filter(fn:(r) => r._measurement == "telemetry_latency" and r._field == "ts")'
+        f'|> filter(fn:(r) => r._measurement == "telemetry" and r._field == "ts")'
     )
     deltas = []
     for row in rows:
@@ -121,9 +121,20 @@ def test_throughput_ceiling_and_latency_under_load(stack, influx_query):
         "host_envelope": host_envelope(),
         "steps": steps,
         "accounting_note": (
-            "ingested_rows counts the base `telemetry` measurement only; "
-            "telegraf.load.d runs a second consumer on the same queue, so the "
-            "latency sample is a subset of the stream"
+            "ingested_rows counts rows with a `seq` field in the `telemetry` "
+            "measurement from BOTH consumers combined (the base Telegraf input and "
+            "telegraf.load.d's second consumer both write measurement=telemetry, "
+            "field=seq) - it is an upper bound on base-pipeline throughput, not an "
+            "isolated base-only count. The two consumers cannot be distinguished "
+            "with the current config."
+        ),
+        "measurement_note": (
+            "The swarm's own publish-accounting fields (published_attempted, "
+            "published_acked, published_rejected, publish_timeouts, reconnects) "
+            "read zero in every step because swarm.stop() force-removes each replica "
+            "before its duration_s (90s) elapses and its report is written — the test "
+            "only waits STEP_SECONDS (60s). These five fields are not meaningful in "
+            "this result and should not be read as 'zero rejections/zero timeouts' findings."
         ),
     })
     write_result("L5-latency", {
