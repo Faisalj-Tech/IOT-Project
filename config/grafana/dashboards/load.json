@@ -1,0 +1,113 @@
+{
+  "uid": "iot-load",
+  "title": "IoT Load Testing Metrics",
+  "tags": ["iot", "phase6", "load"],
+  "timezone": "utc",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Throughput (rows/s)",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "custom": {} },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"seq\")\n  |> aggregateWindow(every: 10s, fn: count, createEmpty: true)\n  |> map(fn: (r) => ({r with _value: float(v: r._value) / 10.0}))"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Queue Depth (ready vs unacked)",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "custom": {} },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"rabbitmq_queue\")\n  |> filter(fn: (r) => r._field == \"messages_ready\" or r._field == \"messages_unack\")\n  |> filter(fn: (r) => r.queue == \"telemetry.q\" or r.queue == \"dlq\")\n  |> aggregateWindow(every: 10s, fn: last, createEmpty: false)"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Latency (p50/p95/p99)",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 9 },
+      "fieldConfig": {
+        "defaults": { "unit": "ms", "custom": {} },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"ts\")\n  |> map(fn: (r) => ({\n       _time: r._time,\n       _value: float(v: int(v: r._time) - int(v: time(v: r._value))) / 1000000000.0,\n     }))\n  |> aggregateWindow(every: 30s, fn: mean, createEmpty: false)"
+        },
+        {
+          "refId": "B",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"ts\")\n  |> map(fn: (r) => ({\n       _time: r._time,\n       _value: float(v: int(v: r._time) - int(v: time(v: r._value))) / 1000000000.0,\n     }))\n  |> aggregateWindow(every: 30s, fn: quantile(q: 0.95), createEmpty: false)"
+        },
+        {
+          "refId": "C",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"telemetry\" and r._field == \"ts\")\n  |> map(fn: (r) => ({\n       _time: r._time,\n       _value: float(v: int(v: r._time) - int(v: time(v: r._value))) / 1000000000.0,\n     }))\n  |> aggregateWindow(every: 30s, fn: quantile(q: 0.99), createEmpty: false)"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Broker Memory (256 MiB watermark)",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 18 },
+      "fieldConfig": {
+        "defaults": { "unit": "bytes", "custom": {} },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"rabbitmq_node\" and r._field == \"mem_used\")\n  |> aggregateWindow(every: 10s, fn: last, createEmpty: false)"
+        }
+      ],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          { "color": "green", "value": null },
+          { "color": "yellow", "value": 268435456 }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Connection Count (stats-interval lag ~5s)",
+      "datasource": { "type": "influxdb", "uid": "influxdb-telemetry" },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 18 },
+      "description": "Backed by RabbitMQ stats interval (~5s), scraped every 10s. Under heavy churn, count may lag true value.",
+      "fieldConfig": {
+        "defaults": { "unit": "short", "custom": {} },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "from(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"rabbitmq_overview\" and r._field == \"connections\")\n  |> aggregateWindow(every: 10s, fn: last, createEmpty: false)"
+        }
+      ]
+    }
+  ]
+}
