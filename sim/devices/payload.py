@@ -54,13 +54,24 @@ def build_payload(
     }
 
 
-def default_specs(count: int, region: str, plant: str) -> list[DeviceSpec]:
-    """A small SCADA-flavoured fleet: temperature sensors on numbered presses."""
+def default_specs(count: int, region: str, plant: str,
+                  prefix: str = "press", width: int = 2) -> list[DeviceSpec]:
+    """A small SCADA-flavoured fleet: temperature sensors on numbered presses.
+
+    `prefix` and `width` exist for the Phase 6 swarm, whose replicas must not share
+    device names: `docker compose --scale` gives every replica an identical command
+    line, so each one self-assigns from its container hostname instead (spec 4.2).
+    The defaults reproduce the Phase 1-5 names exactly - press-01, press-02, ... -
+    because four phases of tests assert on them.
+
+    width=3 is what the swarm passes; width=2 would collide past 99 devices per
+    replica.
+    """
     return [
         DeviceSpec(
             region=region,
             plant=plant,
-            device=f"press-{index:02d}",
+            device=f"{prefix}-{index:0{width}d}",
             metric="temp",
             unit="C",
             baseline=70.0,
