@@ -1,6 +1,6 @@
 {
   "experiment": "L2-throughput",
-  "recorded_at": "2026-08-23T17:15:08.703452+00:00",
+  "recorded_at": "2026-08-23T21:50:59.123238+00:00",
   "run_id": "L2",
   "host_envelope": {
     "platform": "Windows-11-10.0.26200-SP0",
@@ -26,16 +26,16 @@
       "published_rejected": 0,
       "publish_timeouts": 0,
       "reconnects": 0,
-      "ingested_rows": 800,
-      "queue_after_drain": 2350,
+      "ingested_rows": 467,
+      "queue_after_drain": 2050,
       "queue_depth_exit": "stable",
-      "broker_memory_bytes": 84409840,
+      "broker_memory_bytes": 83286864,
       "latency": {
         "samples": 400,
-        "p50_s": 23.458,
-        "p95_s": 51.894,
-        "p99_s": 51.897,
-        "max_s": 51.898
+        "p50_s": 47.599,
+        "p95_s": 76.034,
+        "p99_s": 76.086,
+        "max_s": 76.087
       }
     },
     {
@@ -51,13 +51,13 @@
       "ingested_rows": 750,
       "queue_after_drain": 11500,
       "queue_depth_exit": "stable",
-      "broker_memory_bytes": 98213328,
+      "broker_memory_bytes": 97235048,
       "latency": {
         "samples": 400,
-        "p50_s": 38.82,
-        "p95_s": 62.578,
-        "p99_s": 62.58,
-        "max_s": 62.58
+        "p50_s": 39.142,
+        "p95_s": 84.029,
+        "p99_s": 84.078,
+        "max_s": 84.08
       }
     },
     {
@@ -70,16 +70,16 @@
       "published_rejected": 0,
       "publish_timeouts": 0,
       "reconnects": 0,
-      "ingested_rows": 750,
-      "queue_after_drain": 47411,
+      "ingested_rows": 800,
+      "queue_after_drain": 47450,
       "queue_depth_exit": "stable",
-      "broker_memory_bytes": 151887432,
+      "broker_memory_bytes": 151820400,
       "latency": {
         "samples": 400,
-        "p50_s": 40.646,
-        "p95_s": 72.071,
-        "p99_s": 72.072,
-        "max_s": 72.073
+        "p50_s": 40.777,
+        "p95_s": 75.372,
+        "p99_s": 75.374,
+        "max_s": 75.379
       }
     },
     {
@@ -93,15 +93,15 @@
       "publish_timeouts": 0,
       "reconnects": 0,
       "ingested_rows": 750,
-      "queue_after_drain": 80393,
+      "queue_after_drain": 54127,
       "queue_depth_exit": "stable",
-      "broker_memory_bytes": 116077184,
+      "broker_memory_bytes": 93406240,
       "latency": {
         "samples": 400,
-        "p50_s": 40.866,
-        "p95_s": 75.249,
-        "p99_s": 75.25,
-        "max_s": 75.251
+        "p50_s": 41.114,
+        "p95_s": 85.194,
+        "p99_s": 85.2,
+        "max_s": 85.201
       }
     }
   ],
