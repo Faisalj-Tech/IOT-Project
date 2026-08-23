@@ -6,9 +6,13 @@ the offered rate at which broker ingress, Telegraf ingest and InfluxDB writes st
 tracking one another. Divergence locates the bottleneck; no single number does.
 
 ACCOUNTING WARNING. telegraf.load.d adds a SECOND consumer on telemetry.q - that is
-how L5 gets an ingest-time clock at all. Two consumers split the stream between them,
-exactly as compose.consumer.yml's header warns. Therefore:
-  - the ingest figure below counts the base `telemetry` measurement only
+how L5 gets an ingest-time clock at all. Two consumers write to the same measurement.
+Therefore:
+  - `ingested_rows` counts rows with a `seq` field in the `telemetry` measurement from
+    BOTH consumers combined (the base Telegraf input and telegraf.load.d's second consumer
+    both write measurement=telemetry, field=seq) - it is an upper bound on base-pipeline
+    throughput, not an isolated base-only count. The two consumers cannot be distinguished
+    with the current config.
   - the latency sample is a SUBSET of the stream, not all of it
 Both facts belong in the report. Conflating them would overstate throughput.
 """
@@ -39,7 +43,10 @@ def _requires_load_profile():
 
 
 def _ingested_since(influx_query, start_iso: str) -> int:
-    """Rows the BASE telegraf input wrote. Excludes telemetry_latency on purpose."""
+    """Rows with a `seq` field in the `telemetry` measurement from BOTH consumers combined
+    (the base Telegraf input and telegraf.load.d's second consumer both write measurement=telemetry,
+    field=seq) - it is an upper bound on base-pipeline throughput, not an isolated base-only count.
+    The two consumers cannot be distinguished with the current config."""
     rows = influx_query(
         f'from(bucket:"telemetry") |> range(start:{start_iso}) '
         f'|> filter(fn:(r) => r._measurement == "telemetry" and r._field == "seq")'
