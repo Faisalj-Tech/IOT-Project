@@ -5,8 +5,8 @@ pipeline with a Python device simulator and an integration test suite.
 
 ## Reports
 
-**Start here: [`docs/reports/Resilient-IoT-Messaging-Infrastructure-Technical-Report.docx`](docs/reports/Resilient-IoT-Messaging-Infrastructure-Technical-Report.docx)**
-— the consolidated technical report across all six phases, including the reference
+**Start here: [`docs/reports/Resilient-IoT-Messaging-Infrastructure-Technical-Report.docx`](docs/reports/Resilient-IoT-Messaging-Infrastructure-Technical-Report.docx).**
+It is the consolidated technical report across all six phases, including the reference
 architecture diagram, the cross-phase findings, and the infrastructure requirements derived
 from measurement. The five per-phase reports below are its detailed inputs and remain the
 authoritative record for their own experiments.
@@ -19,8 +19,8 @@ authoritative record for their own experiments.
 | [`phase5-security.md`](docs/reports/phase5-security.md) | mTLS/OAuth2 evidence S1–S7 |
 | [`phase6-load.md`](docs/reports/phase6-load.md) | Load gates L1–L11 + raw probe appendix |
 
-Design decisions — all 48, with the context that forced each, the alternatives rejected, and what
-happened when each met reality — live in
+Design decisions (all 48, with the context that forced each, the alternatives rejected, and what
+happened when each met reality) live in
 [`design-decisions.md`](docs/design-decisions.md). Raw measurement artifacts are in
 [`docs/results/`](docs/results/).
 
@@ -108,11 +108,11 @@ three-member quorum groups (`x-quorum-initial-group-size: 3`, ADR-0013).
 Node 1 keeps the service name `rabbitmq`, the Phase 1 ports, and the Phase 1
 DNS name (`rabbit1`), so `telegraf.d`, the simulator's default endpoint, and
 every Phase 1/2 test resolve unchanged. Nodes 2 and 3 boot from fresh,
-cluster-only volumes and import no definitions of their own — only node 1
+cluster-only volumes and import no definitions of their own; only node 1
 imports, so formation is not a three-way race.
 
 A pre-existing Phase 1/2 `.env` lacks `RABBITMQ_ERLANG_COOKIE` and
-`RABBITMQ_PARTITION_HANDLING` — copy them from `.env.example` before
+`RABBITMQ_PARTITION_HANDLING`; copy them from `.env.example` before
 bringing the cluster up, or formation fails with a peer-discovery-looking
 error instead of the config gap it actually is.
 
@@ -133,7 +133,7 @@ docker exec iot-rabbitmq rabbitmq-queues -q --formatter json quorum_status telem
 `cluster_status` should list all three nodes under `running_nodes`, and
 `quorum_status` should return three rows (one `leader`, two `follower`, all
 `voter`). The definitions-import-vs-formation race described in ADR-0013 is
-**non-deterministic per bring-up, not per machine** — on this implementation
+**non-deterministic per bring-up, not per machine**: on this implementation
 it did not fire on one `down -v` / `up -d --wait` cycle and did fire on a
 later one, on the same machine. Treat `quorum_status` returning a single row
 as a routine possibility to check after every fresh bring-up, not a rare
@@ -189,7 +189,7 @@ IOT_CLUSTER=1 .venv/Scripts/python.exe -m pytest tests/ -m cluster -v -s
 ```
 
 If `quorum_status` returns fewer than three rows, the definitions-import-vs-formation
-race described above has fired on this bring-up — recover with the two `grow`
+race described above has fired on this bring-up. Recover with the two `grow`
 commands shown above before trusting any experiment result, or run the preflight
 suite alone first (`tests/experiments/test_cluster_preflight.py`), which asserts this
 for you and names the exact remediation in its failure message.
@@ -198,7 +198,7 @@ This single `pytest -m cluster` run covers the preflight, the Telegraf-failover
 check (T), follower kill (F), leader kill (G), and the partition experiment under
 whichever mode `.env` currently has (`H` under the committed `ignore` default). The
 partition experiment under the *other* mode is skipped automatically with a
-mode-guard message rather than run — it measures the mode, so running both under one
+mode-guard message rather than run, because it measures the mode, so running both under one
 `.env` value would silently duplicate one of them. To measure the other mode
 (`pause_minority`), switch the arm as shown above (a `--force-recreate`, not a
 `pytest -m cluster` invocation edit) and run `pytest tests/experiments/test_partition.py -m cluster -v -s`
@@ -209,8 +209,8 @@ convention Phase 2 established. `docs/reports/phase3-fault-tolerance.md` is draf
 from those files and cites every number back to its filename. `test_partition_under_ignore`'s
 own harness-integrity-floor assertion reads a value from `GaugeRecorder.node_window()`
 that is timing-sensitive by construction (see the report's Limits section) and may fail
-on any individual run without that indicating a regression in the system under test —
-the InfluxDB sequence accounting in the same run's result JSON (`published_total`,
+on any individual run without that indicating a regression in the system under test.
+The InfluxDB sequence accounting in the same run's result JSON (`published_total`,
 `influx_total`, `gaps`) is the reliable signal for whether messages were actually lost.
 
 ## Region (Phase 4)
@@ -219,7 +219,7 @@ the InfluxDB sequence accounting in the same run's result JSON (`published_total
 under `IOT_CLUSTER=1`) to add two region tenants, `eu` and `us`: their own vhosts, users,
 topic-restricted permissions, MQTT listeners bound to their own `/24` Docker network, and
 per-region policies (ADR-0027, ADR-0029, ADR-0030). It is always **last** in the `-f`
-order — it re-mounts `rabbitmq.conf` and `definitions.json` over whatever the cluster
+order, because it re-mounts `rabbitmq.conf` and `definitions.json` over whatever the cluster
 overlay put there, and Compose resolves same-target mounts last-one-wins.
 
 Single node:
@@ -240,7 +240,7 @@ docker compose -f compose.yml -f compose.cluster.yml -f compose.region.yml down 
 
 Region tests are marked `region` and deselected by default, same as `cluster`. `-m` on
 the command line **replaces** `pytest.ini`'s marker expression rather than extending it,
-so the combined-profile run needs the explicit `"region and cluster"` string above — a
+so the combined-profile run needs the explicit `"region and cluster"` string above. A
 bare `-m cluster` silently skips the region-and-cluster-marked tests, and a bare
 `-m region` runs them against whatever profile is actually up regardless of whether the
 cluster overlay is part of it.
@@ -250,11 +250,11 @@ Three things worth knowing before touching this profile:
 - **The region subnets are hardcoded** as `172.28.1.0/24` (eu) and `172.28.2.0/24` (us),
   with the broker statically addressed at `172.28.1.10` / `172.28.2.10` on each. If either
   collides with a host or VPN network, both `compose.region.yml`'s `ipam.config` and
-  `rabbitmq.region.conf`'s `mqtt.listeners.tcp.eu`/`.us` lines need to change together — a
+  `rabbitmq.region.conf`'s `mqtt.listeners.tcp.eu`/`.us` lines need to change together. A
   static test (`tests/test_region_config.py`) pins them to each other, so an edit to only
   one file fails loudly rather than binding a listener to nothing.
 - **A changed region queue argument needs a volume wipe.** Definitions import never
-  modifies an existing queue, and `definitions.skip_if_unchanged = true` — so editing
+  modifies an existing queue, and `definitions.skip_if_unchanged = true`, so editing
   `x-quorum-initial-group-size` or similar in `definitions.region.json` does nothing on a
   plain restart. Policies and permissions **do** update on re-import; only queue arguments
   need the wipe.
@@ -262,7 +262,7 @@ Three things worth knowing before touching this profile:
   Publishing them would have Compose DNAT to one network's container address, which
   defeats the per-interface listener binding the whole network boundary depends on
   (ADR-0027). Host-side tooling reaches a region vhost through the existing **1883**
-  listener instead, using a colon-form username (e.g. `eu:device-eu`) — this stays open in
+  listener instead, using a colon-form username (e.g. `eu:device-eu`). This stays open in
   Phase 4 by design and is closed by Phase 5's mTLS/OAuth2 work, not before.
 
 ## Security (Phase 5)
@@ -271,7 +271,7 @@ Three things worth knowing before touching this profile:
 service identity: a TLS listener on `8883`, a CRL nginx sidecar, and RabbitMQ's OAuth2
 auth backend wired to a Keycloak realm (ADR-0033–0037). `compose.region-security.yml`
 adds the region-bound TLS listeners (`9883`/`9993`) and is valid only in combination with
-both `compose.region.yml` and `compose.security.yml` — never alone.
+both `compose.region.yml` and `compose.security.yml`, never alone.
 
 **Certificates first.** `main/certs/` is gitignored and required before any
 security-profile bring-up:
@@ -281,7 +281,7 @@ security-profile bring-up:
 ```
 
 The test harness's `stack` fixture also generates it automatically on a clean clone, so a
-plain `pytest -m security` run doesn't need this run manually first — but a manual
+plain `pytest -m security` run doesn't need this run manually first, but a manual
 `docker compose up` does.
 
 Base + security:
@@ -292,7 +292,7 @@ IOT_SECURITY=1 KEEP_STACK=1 .venv/Scripts/python.exe -m pytest tests/ -m securit
 docker compose -f compose.yml -f compose.security.yml down -v --remove-orphans
 ```
 
-Region + security (all four overlay files, `-f` order matters — `compose.region.yml`
+Region + security (all four overlay files; `-f` order matters: `compose.region.yml`
 stays ALWAYS LAST relative to `compose.yml`/`compose.cluster.yml`, the two security files
 go after it):
 
@@ -305,19 +305,19 @@ docker compose -f compose.yml -f compose.region.yml -f compose.security.yml -f c
 Security tests are marked `security` and deselected by default, same as `cluster` and
 `region`. Tests scoped to OAuth2's service identity (`telegraf-eu`/`telegraf-eu-short`,
 both scoped to vhost `eu` only) additionally carry `region` and skip themselves under
-`IOT_REGION` unset — the OAuth2 realm's identity only means anything inside the region
+`IOT_REGION` unset, because the OAuth2 realm's identity only means anything inside the region
 model, so those tests need both env vars set, not `IOT_SECURITY=1` alone.
 
 Four things worth knowing before touching this profile:
 
 - **Certificate CN is the identity; no password is exchanged.** A device certificate's
   Common Name resolves directly to a RabbitMQ user via `ssl_cert_login_from =
-  common_name`. Every device certificate must carry a `crlDistributionPoints` extension —
-  without one, `crl_check = peer` rejects it outright with `{bad_crls,no_relevant_crls}`,
+  common_name`. Every device certificate must carry a `crlDistributionPoints` extension.
+  Without one, `crl_check = peer` rejects it outright with `{bad_crls,no_relevant_crls}`,
   which reads like a broken TLS setup rather than a missing extension.
 - **Revoking a certificate is two steps, not one.** `scripts/make_certs.py`'s `revoke()` +
-  `write_crl()` republishes the CRL, which gates *new* TLS handshakes within seconds — but
-  an already-established connection is completely unaffected until it is also
+  `write_crl()` republishes the CRL, which gates *new* TLS handshakes within seconds.
+  An already-established connection is completely unaffected, though, until it is also
   force-closed via the management API (`DELETE /api/connections/:name`). Skipping the
   second step is not revocation.
 - **OAuth2's token is the AMQP password; the username is ignored.** `auth_backends.1 =
@@ -344,7 +344,7 @@ Throughput and latency (L2/L5):
 docker compose -f compose.yml -f compose.load.yml up -d --wait
 IOT_LOAD=1 KEEP_STACK=1 .venv/Scripts/python.exe -m pytest tests/experiments/test_load_boot.py tests/experiments/test_load_overflow.py tests/experiments/test_load_scale.py tests/experiments/test_load_throughput.py tests/experiments/test_load_memory.py -m load -v -s
 docker compose -f compose.yml -f compose.load.yml down -v --remove-orphans
-.venv/Scripts/python.exe -m pytest tests/ -q     # full default-profile suite, L7 — ONLY after teardown
+.venv/Scripts/python.exe -m pytest tests/ -q     # full default-profile suite, L7; run only after teardown
 ```
 
 Cluster replication cost (L6, requires `compose.cluster.yml`):
@@ -366,7 +366,7 @@ curl -s http://localhost:8089/stop
 docker compose -f compose.yml -f compose.load.yml --profile locust down --remove-orphans
 ```
 
-The swarm scales with `--scale sim-load=N` — each replica self-assigns its device identity
+The swarm scales with `--scale sim-load=N`; each replica self-assigns its device identity
 from its container hostname, eliminating the collision problem that would occur with a fixed
 device prefix across all replicas. The pinned broker memory and CPU limits in `compose.load.yml`
 keep the experiments inside measurable bounds (1 GiB memory, 256 MiB alarm threshold) rather
@@ -396,7 +396,7 @@ docker compose down -v
   with one, `dlq` depth is a measurable quantity.
 - **`seq` and `run_id`.** Every message carries a per-device monotonic counter
   and a per-run id. Zero-loss claims are proven by checking the sequence set has
-  no gaps, not by looking at a graph. `run_id` is a high-cardinality tag —
+  no gaps, not by looking at a graph. `run_id` is a high-cardinality tag:
   correct for experiments, wrong for production.
 - **Untuned Telegraf.** `metric_buffer_limit` and `flush_interval` are left at
   their plan values on purpose; Phase 2 measures what the defaults do during an
