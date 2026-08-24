@@ -3,6 +3,27 @@
 Phase 1: a single-node MQTT → RabbitMQ → Telegraf → InfluxDB → Grafana telemetry
 pipeline with a Python device simulator and an integration test suite.
 
+## Reports
+
+**Start here: [`docs/reports/Resilient-IoT-Messaging-Infrastructure-Technical-Report.docx`](docs/reports/Resilient-IoT-Messaging-Infrastructure-Technical-Report.docx)**
+— the consolidated technical report across all six phases, including the reference
+architecture diagram, the cross-phase findings, and the infrastructure requirements derived
+from measurement. The five per-phase reports below are its detailed inputs and remain the
+authoritative record for their own experiments.
+
+| Report | Covers |
+|---|---|
+| [`phase2-reliability.md`](docs/reports/phase2-reliability.md) | Durability experiments A–E |
+| [`phase3-fault-tolerance.md`](docs/reports/phase3-fault-tolerance.md) | Cluster experiments F, G, H, I, T |
+| [`phase4-segregation.md`](docs/reports/phase4-segregation.md) | Region isolation R2–R7 |
+| [`phase5-security.md`](docs/reports/phase5-security.md) | mTLS/OAuth2 evidence S1–S7 |
+| [`phase6-load.md`](docs/reports/phase6-load.md) | Load gates L1–L11 + raw probe appendix |
+
+Design decisions — all 48, with the context that forced each, the alternatives rejected, and what
+happened when each met reality — live in
+[`design-decisions.md`](docs/design-decisions.md). Raw measurement artifacts are in
+[`docs/results/`](docs/results/).
+
 ## Architecture
 
 ```
