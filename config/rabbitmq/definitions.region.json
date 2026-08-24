@@ -70,6 +70,13 @@
       "write": "^telemetry\\.q$",
       "read": "^(telemetry\\.q|amq\\.topic)$"
     },
+    {
+      "user": "telegraf",
+      "vhost": "eu",
+      "configure": "^$",
+      "write": "^$",
+      "read": "^(telemetry\\.eu\\.q|dlq)$"
+    },
     { "user": "admin", "vhost": "eu", "configure": ".*", "write": ".*", "read": ".*" },
     {
       "user": "device-eu",
@@ -84,6 +91,13 @@
       "configure": "^$",
       "write": "^$",
       "read": "^(telemetry\\.eu\\.q|amq\\.topic)$"
+    },
+    {
+      "user": "telegraf",
+      "vhost": "us",
+      "configure": "^$",
+      "write": "^$",
+      "read": "^(telemetry\\.us\\.q|dlq)$"
     },
     { "user": "admin", "vhost": "us", "configure": ".*", "write": ".*", "read": ".*" },
     {
